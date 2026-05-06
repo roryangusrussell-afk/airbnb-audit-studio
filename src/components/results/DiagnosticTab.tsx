@@ -1,7 +1,8 @@
 import { useMemo } from "react";
+import { TrendingUp, ArrowUpRight, Minus } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CopyButton } from "@/components/CopyButton";
-import { categoryRatingBand, bandTextClass } from "@/lib/scoring";
+import { categoryRatingBand, bandTextClass, scoreBand, type Band } from "@/lib/scoring";
 import type { AuditResponse, Fix } from "@/lib/types";
 
 const CARDS: { id: string; label: string; area: string }[] = [
@@ -13,6 +14,68 @@ const CARDS: { id: string; label: string; area: string }[] = [
   { id: "reviews", label: "Reviews and rating", area: "Reviews & rating" },
 ];
 
+type Lift = "high" | "medium" | "low";
+
+function potentialLift(fixes: Fix[], score: number): Lift {
+  const hasQuickWin = fixes.some((f) => f.tier === "quick_win");
+  if (hasQuickWin && score < 75) return "high";
+  if (hasQuickWin) return "medium";
+  if (fixes.length > 0 && score < 70) return "high";
+  if (fixes.length > 0) return "medium";
+  return "low";
+}
+
+function bandStroke(band: Band): string {
+  if (band === "strong") return "hsl(var(--success))";
+  if (band === "average") return "hsl(var(--warning))";
+  return "hsl(var(--danger))";
+}
+
+function ScoreBar({ score }: { score: number }) {
+  const band = scoreBand(score);
+  return (
+    <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted sm:w-20">
+      <div
+        className="h-full rounded-full transition-all"
+        style={{ width: `${Math.max(4, Math.min(100, score))}%`, background: bandStroke(band) }}
+      />
+    </div>
+  );
+}
+
+function LiftBadge({ lift }: { lift: Lift }) {
+  const cfg = {
+    high: {
+      label: "High potential lift",
+      cls: "border-brand-border bg-brand-soft text-brand",
+      Icon: TrendingUp,
+    },
+    medium: {
+      label: "Medium potential lift",
+      cls: "border-warning-border bg-warning-soft text-warning",
+      Icon: ArrowUpRight,
+    },
+    low: {
+      label: "Low potential lift",
+      cls: "border-success-border bg-success-soft text-success",
+      Icon: Minus,
+    },
+  }[lift];
+  const { Icon } = cfg;
+  return (
+    <span
+      className={
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold " +
+        cfg.cls
+      }
+    >
+      <Icon className="h-3 w-3" />
+      <span className="hidden sm:inline">{cfg.label}</span>
+      <span className="sm:hidden">{lift === "high" ? "High lift" : lift === "medium" ? "Med lift" : "Low lift"}</span>
+    </span>
+  );
+}
+
 export function DiagnosticTab({ data }: { data: AuditResponse }) {
   const fixesByArea = useMemo(() => {
     const map: Record<string, Fix[]> = {};
@@ -23,24 +86,33 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
   }, [data.fixes]);
 
   const catByName = useMemo(() => {
-    const m: Record<string, string> = {};
-    for (const c of data.cats) m[c.name] = c.fb;
+    const m: Record<string, { score: number; fb: string }> = {};
+    for (const c of data.cats) m[c.name] = { score: c.score, fb: c.fb };
     return m;
   }, [data.cats]);
 
   const defaultOpen = useMemo(() => {
+    let best: { id: string; score: number } | null = null;
     for (const c of CARDS) {
       const fixes = fixesByArea[c.area] ?? [];
-      if (fixes.some((f) => f.tier === "quick_win")) return c.id;
+      const lift = potentialLift(fixes, catByName[c.area]?.score ?? 100);
+      if (lift === "high") {
+        const s = catByName[c.area]?.score ?? 100;
+        if (!best || s < best.score) best = { id: c.id, score: s };
+      }
     }
-    return CARDS[0].id;
-  }, [fixesByArea]);
+    return best?.id ?? CARDS[0].id;
+  }, [fixesByArea, catByName]);
 
   return (
     <Accordion type="single" collapsible defaultValue={defaultOpen} className="space-y-3">
       {CARDS.map((card) => {
         const fixes = fixesByArea[card.area] ?? [];
-        const severity = fixes.some((f) => f.tier === "quick_win") ? "HIGH" : "MEDIUM";
+        const cat = catByName[card.area];
+        const score = cat?.score ?? 0;
+        const preview = cat?.fb ?? "";
+        const lift = potentialLift(fixes, score);
+        const band = scoreBand(score);
         return (
           <AccordionItem
             key={card.id}
@@ -48,18 +120,27 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
             className="overflow-hidden rounded-2xl border bg-card !border-b shadow-card"
           >
             <AccordionTrigger className="px-5 py-4 hover:no-underline">
-              <div className="flex w-full items-center justify-between gap-3 pr-2">
-                <span className="text-base font-semibold tracking-tight">{card.label}</span>
-                <span
-                  className={
-                    "rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-wider " +
-                    (severity === "HIGH"
-                      ? "border-danger-border bg-danger-soft text-danger"
-                      : "border-warning-border bg-warning-soft text-warning")
-                  }
-                >
-                  {severity}
-                </span>
+              <div className="flex w-full items-start justify-between gap-4 pr-2">
+                <div className="min-w-0 flex-1 text-left">
+                  <div className="text-base font-semibold tracking-tight text-foreground">
+                    {card.label}
+                  </div>
+                  {preview && (
+                    <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                      {preview}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-none items-center gap-3">
+                  <div className="hidden items-center gap-2 sm:flex">
+                    <ScoreBar score={score} />
+                    <span className={`text-sm font-bold tabular-nums ${bandTextClass(band)}`}>
+                      {score}
+                      <span className="text-muted-foreground font-normal">/100</span>
+                    </span>
+                  </div>
+                  <LiftBadge lift={lift} />
+                </div>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-5">
@@ -67,7 +148,7 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
 
               {fixes.length === 0 ? (
                 <div className="mt-4 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
-                  {catByName[card.area] ?? "No issues found in this category."}
+                  {preview || "No issues found in this category."}
                 </div>
               ) : (
                 <div className="mt-4 space-y-5">
@@ -218,8 +299,8 @@ function FixBlock({ fix }: { fix: Fix }) {
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-bold text-brand">{fix.rank}</span>
         <h4 className="text-sm font-semibold tracking-tight text-foreground">{fix.title}</h4>
-        <span className="ml-auto rounded-full border bg-muted/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          {fix.difficulty}
+        <span className="ml-auto inline-flex items-center gap-1 rounded-full border bg-muted/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Effort: {fix.difficulty}
         </span>
       </div>
       <p className="mt-2 text-xs uppercase tracking-wider text-muted-foreground">What's weak</p>
