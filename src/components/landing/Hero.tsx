@@ -59,15 +59,22 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
                 fix first.
                 <svg
                   aria-hidden="true"
-                  viewBox="0 0 220 12"
+                  viewBox="0 0 160 12"
                   preserveAspectRatio="none"
-                  className="pointer-events-none absolute left-0 right-0 -bottom-2 h-[0.22em] w-full text-brand sm:-bottom-2.5"
+                  className="pointer-events-none absolute left-0 -bottom-1 h-2 w-[88%] text-brand"
                 >
                   <path
-                    d="M3 7 C 55 2, 110 10, 165 4 S 210 8, 217 6"
+                    d="M4 5 C 42 2, 88 6, 150 3"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="3"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M14 10 C 55 8, 100 9, 140 7"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                   />
                 </svg>
