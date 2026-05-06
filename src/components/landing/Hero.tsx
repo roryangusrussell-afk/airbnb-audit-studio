@@ -50,10 +50,7 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
       <section className="container py-10 md:py-16 lg:py-20">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
-            <div className="inline-flex rounded-full border border-brand-border bg-brand-soft px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand">
-              Operator-built. Impact-first.
-            </div>
-            <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
+            <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
               See exactly what your Airbnb listing should{" "}
               <span className="relative inline-block whitespace-nowrap">
                 fix first
