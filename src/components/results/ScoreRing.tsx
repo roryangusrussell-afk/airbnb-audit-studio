@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { verdictLabel } from "@/lib/scoring";
+import { verdictLabel, scoreBand, bandSoftClasses, bandTextClass } from "@/lib/scoring";
+
+function bandStrokeVar(score: number): string {
+  const b = scoreBand(score);
+  if (b === "strong") return "hsl(var(--success))";
+  if (b === "average") return "hsl(var(--warning))";
+  return "hsl(var(--danger))";
+}
 
 export function ScoreRing({ score }: { score: number }) {
   const [displayed, setDisplayed] = useState(0);
@@ -22,6 +29,8 @@ export function ScoreRing({ score }: { score: number }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c - (displayed / 100) * c;
+  const arcColor = bandStrokeVar(score);
+  const numberColor = bandTextClass(scoreBand(score));
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -38,7 +47,7 @@ export function ScoreRing({ score }: { score: number }) {
           cx={size / 2}
           cy={size / 2}
           r={r}
-          stroke="hsl(var(--brand))"
+          stroke={arcColor}
           strokeWidth={stroke}
           fill="none"
           strokeLinecap="round"
@@ -48,7 +57,7 @@ export function ScoreRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="text-5xl font-extrabold tracking-tight tabular-nums">
+        <div className={`text-5xl font-extrabold tracking-tight tabular-nums ${numberColor}`}>
           {displayed}
         </div>
         <div className="mt-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -60,9 +69,12 @@ export function ScoreRing({ score }: { score: number }) {
 }
 
 export function VerdictLabel({ score }: { score: number }) {
+  const band = scoreBand(score);
   return (
-    <div className="text-base font-semibold text-foreground">
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] ${bandSoftClasses(band)}`}
+    >
       {verdictLabel(score)}
-    </div>
+    </span>
   );
 }

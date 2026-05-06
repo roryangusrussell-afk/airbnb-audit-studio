@@ -169,13 +169,47 @@ function CurrentBlock({ area, data }: { area: string; data: AuditResponse }) {
             );
           })}
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          Host replied to {Math.round((data.hostResponseRatio ?? 0) * 100)}% of recent reviews.
-        </p>
+        <ReviewResponseRatio ratio={data.hostResponseRatio} />
       </div>
     );
   }
   return null;
+}
+
+function ReviewResponseRatio({ ratio }: { ratio: number | null | undefined }) {
+  if (ratio == null) return null;
+  const pct = Math.round(ratio * 100);
+
+  if (ratio < 0.3) {
+    return (
+      <div className="mt-4 rounded-xl border border-danger-border bg-danger-soft p-4">
+        <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-danger">
+          Review response ratio
+        </div>
+        <h5 className="mt-1.5 text-sm font-semibold text-foreground">Low review response ratio</h5>
+        <p className="mt-1.5 text-sm text-foreground">
+          Only {pct}% of recent reviews have host replies.
+        </p>
+        <p className="mt-2 text-xs uppercase tracking-wider text-muted-foreground">Why it matters</p>
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          Replying to guest reviews shows attentiveness and helps future guests see that the host is engaged.
+        </p>
+        <p className="mt-2 text-xs uppercase tracking-wider text-muted-foreground">Recommended action</p>
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          Reply to every substantive guest review within 48 hours, especially reviews mentioning problems, praise, location, parking, cleanliness, or check-in.
+        </p>
+      </div>
+    );
+  }
+
+  const positive = ratio >= 0.7;
+  return (
+    <p
+      className={`mt-3 text-xs ${positive ? "text-success" : "text-muted-foreground"}`}
+    >
+      Review response ratio: {pct}% of recent reviews have host replies.
+    </p>
+  );
 }
 
 function FixBlock({ fix }: { fix: Fix }) {

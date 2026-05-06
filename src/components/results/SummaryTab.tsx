@@ -3,7 +3,6 @@ import type { AuditResponse, Fix } from "@/lib/types";
 import { Eyebrow } from "@/components/Eyebrow";
 import { ScoreRing, VerdictLabel } from "./ScoreRing";
 import { CategoryRow } from "./CategoryRow";
-import { AdvisoryCard } from "./AdvisoryCard";
 
 function buildOpening(data: AuditResponse): string {
   const top = data.issues[0];
@@ -21,6 +20,7 @@ export function SummaryTab({ data }: { data: AuditResponse }) {
     ...data.checks.filter((c) => c.ok === false).map((c) => c.label),
   ];
   const missed: Fix[] = data.fixes.filter((f) => f.tier === "quick_win");
+  const mainOpportunity = data.issues[0]?.action;
 
   return (
     <div className="space-y-10">
@@ -29,10 +29,18 @@ export function SummaryTab({ data }: { data: AuditResponse }) {
         <div className="grid items-center gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             <ScoreRing score={data.score} />
-            <div className="mt-5">
+            <div className="mt-5 space-y-2">
               <VerdictLabel score={data.score} />
-              <p className="mt-1 max-w-xs text-sm text-muted-foreground">{data.verdict}</p>
+              <p className="max-w-xs text-sm text-muted-foreground">{data.verdict}</p>
             </div>
+            {mainOpportunity && (
+              <div className="mt-4 w-full max-w-sm rounded-lg border-l-2 border-brand bg-brand-soft/60 px-3 py-2 text-left">
+                <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">
+                  Main opportunity
+                </div>
+                <p className="mt-1 text-sm leading-snug text-foreground">{mainOpportunity}</p>
+              </div>
+            )}
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {data.cats.map((c) => (
@@ -56,39 +64,21 @@ export function SummaryTab({ data }: { data: AuditResponse }) {
             title="Strengths"
             items={strengths}
             icon={<Check className="h-3.5 w-3.5" />}
-            order="md:order-2"
-            mobileOrder="order-2"
           />
           <SignalColumn
-            tone="neutral"
+            tone="rose"
             title="Gaps"
             items={gaps}
             icon={<Minus className="h-3.5 w-3.5" />}
-            order="md:order-1"
-            mobileOrder="order-1"
           />
           <SignalColumn
             tone="warning"
             title="Missed opportunities"
             items={missed.map((f) => `${f.title}: ${f.fix}`)}
             icon={<span className="block h-1.5 w-1.5 rounded-full bg-current" />}
-            order="md:order-3"
-            mobileOrder="order-3"
           />
         </div>
       </section>
-
-      {/* Advisory */}
-      {data.advisoryNotes.length > 0 && (
-        <section>
-          <Eyebrow>Host performance signals</Eyebrow>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {data.advisoryNotes.map((n) => (
-              <AdvisoryCard key={n.area} note={n} />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
@@ -98,33 +88,25 @@ function SignalColumn({
   items,
   icon,
   tone,
-  order,
-  mobileOrder,
 }: {
   title: string;
   items: string[];
   icon: React.ReactNode;
-  tone: "strong" | "warning" | "neutral";
-  order?: string;
-  mobileOrder?: string;
+  tone: "strong" | "warning" | "rose";
 }) {
   const toneClasses =
     tone === "strong"
       ? "border-success-border bg-success-soft"
       : tone === "warning"
         ? "border-warning-border bg-warning-soft"
-        : "border-border bg-card";
+        : "border-brand-border bg-brand-soft/60";
   const headerColor =
-    tone === "strong" ? "text-success" : tone === "warning" ? "text-warning" : "text-foreground";
+    tone === "strong" ? "text-success" : tone === "warning" ? "text-warning" : "text-brand";
   const bulletColor =
-    tone === "strong"
-      ? "text-success"
-      : tone === "warning"
-        ? "text-warning"
-        : "text-muted-foreground";
+    tone === "strong" ? "text-success" : tone === "warning" ? "text-warning" : "text-brand";
 
   return (
-    <div className={`rounded-2xl border p-5 ${toneClasses} ${order ?? ""} ${mobileOrder ?? ""}`}>
+    <div className={`rounded-2xl border p-5 ${toneClasses}`}>
       <h4 className={`text-xs font-bold uppercase tracking-[0.14em] ${headerColor}`}>{title}</h4>
       <ul className="mt-3 space-y-2.5">
         {items.length === 0 && (
