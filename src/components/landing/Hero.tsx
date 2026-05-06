@@ -54,7 +54,31 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
               Operator-built. Impact-first.
             </div>
             <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
-              See exactly what your Airbnb listing should fix first.
+              See exactly what your Airbnb listing should{" "}
+              <span className="relative inline-block whitespace-nowrap">
+                fix first.
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 220 24"
+                  preserveAspectRatio="none"
+                  className="pointer-events-none absolute left-0 right-0 -bottom-2 h-[0.35em] w-full text-brand sm:-bottom-2.5"
+                >
+                  <path
+                    d="M4 14 C 40 6, 95 6, 132 12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M138 16 C 165 11, 195 10, 214 14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
               Paste your listing URL. We score 6 categories, flag the highest-impact gaps,
