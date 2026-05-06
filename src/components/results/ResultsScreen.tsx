@@ -56,7 +56,7 @@ export function ResultsScreen({
           <DiagnosticTab data={data} />
         </TabsContent>
         <TabsContent value="next" className="mt-6">
-          <NextStepTab email={email} />
+          <NextStepTab email={email} data={data} />
         </TabsContent>
       </Tabs>
     </div>

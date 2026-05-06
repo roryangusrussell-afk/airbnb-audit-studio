@@ -3,11 +3,12 @@ import { Link2, Mail, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/Eyebrow";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import type { AuditResponse } from "@/lib/types";
 
-export function NextStepTab({ email }: { email: string }) {
+export function NextStepTab({ email, data }: { email: string; data: AuditResponse }) {
   return (
     <div className="grid gap-5 lg:grid-cols-3">
-      <StrategyCallCard />
+      <StrategyCallCard data={data} />
       <div className="grid gap-5 lg:col-span-1">
         <ReferralCard email={email} />
         <NewsletterCard />
@@ -16,7 +17,20 @@ export function NextStepTab({ email }: { email: string }) {
   );
 }
 
-function StrategyCallCard() {
+function buildBridge(data: AuditResponse): string {
+  const score = data.score;
+  const weakest = [...data.cats]
+    .sort((a, b) => a.score - b.score)
+    .slice(0, 2)
+    .map((c) => c.name.toLowerCase());
+  const opportunity = data.issues?.[0]?.title?.toLowerCase();
+  const focus = opportunity
+    ? `${weakest.join(" and ")}${opportunity ? `, especially ${opportunity}` : ""}`
+    : weakest.join(" and ");
+  return `Your listing scored ${score}/100, with the biggest upside in ${focus}. A strategy call is the fastest way to find the highest-leverage fixes across your portfolio.`;
+}
+
+function StrategyCallCard({ data }: { data: AuditResponse }) {
   const bullets = [
     "Audit your whole portfolio in one call",
     "Find which listing has the biggest upside",
@@ -34,20 +48,25 @@ function StrategyCallCard() {
         out whether self-managing, automating, or handing over entirely makes the most
         sense.
       </p>
+
+      <div className="mt-4 rounded-xl border border-border bg-card/70 px-4 py-3">
+        <p className="text-sm leading-relaxed text-foreground">{buildBridge(data)}</p>
+      </div>
+
       <ul className="mt-5 grid gap-2 sm:grid-cols-2">
         {bullets.map((b) => (
           <li key={b} className="flex items-start gap-2 text-sm">
-            <Check className="mt-0.5 h-4 w-4 flex-none text-brand" />
+            <Check className="mt-0.5 h-4 w-4 flex-none text-success" />
             <span>{b}</span>
           </li>
         ))}
       </ul>
-      <p className="mt-5 text-xs text-muted-foreground">
+      <p className="mt-6 text-xs font-medium text-foreground/70">
         30 minutes · Best for hosts thinking about scaling
       </p>
       <Button
         asChild
-        className="mt-5 h-12 w-full bg-brand text-brand-foreground hover:bg-brand/90 text-sm font-semibold"
+        className="mt-4 h-12 w-full bg-brand text-brand-foreground hover:bg-brand/90 text-sm font-semibold"
       >
         <a href="#">Book a call</a>
       </Button>
@@ -62,13 +81,13 @@ function ReferralCard({ email }: { email: string }) {
 
   return (
     <div className="rounded-2xl border bg-card p-5 shadow-card">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-soft">
-        <Link2 className="h-4 w-4 text-brand" />
+      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft">
+        <Link2 className="h-3.5 w-3.5 text-brand" />
       </div>
-      <Eyebrow className="mt-4">Get more audits</Eyebrow>
+      <Eyebrow className="mt-3">Get more audits</Eyebrow>
       <h4 className="mt-1 text-base font-bold tracking-tight">Unlock more free audits</h4>
       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-        Share your link with another host. Each referral unlocks one more free audit.
+        Share your link with another host. When they complete an audit, you unlock one extra free audit.
       </p>
       <Button
         variant="outline"
@@ -86,10 +105,10 @@ function NewsletterCard() {
   const [joined, setJoined] = useState(false);
   return (
     <div className="rounded-2xl border bg-card p-5 shadow-card">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-soft">
-        <Mail className="h-4 w-4 text-brand" />
+      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft">
+        <Mail className="h-3.5 w-3.5 text-brand" />
       </div>
-      <Eyebrow className="mt-4">Stay informed</Eyebrow>
+      <Eyebrow className="mt-3">Stay informed</Eyebrow>
       <h4 className="mt-1 text-base font-bold tracking-tight">Get the operator newsletter</h4>
       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
         Practical listing teardowns, positioning ideas, and STR systems from the field.
