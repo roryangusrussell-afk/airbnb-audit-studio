@@ -61,26 +61,18 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
                   aria-hidden="true"
                   viewBox="0 0 100 10"
                   preserveAspectRatio="none"
-                  className="pointer-events-none absolute left-[14%] -bottom-[0.08em] h-[0.18em] w-[70%] overflow-visible text-brand"
+                  className="pointer-events-none absolute left-[14%] -bottom-[0.08em] h-[0.22em] w-[70%] overflow-visible text-brand"
                 >
                   <path
-                    d="M2 5 C24 3.5, 52 4.8, 98 3.8"
+                    d="M2 5 C24 3.5, 52 5.2, 98 4"
                     stroke="currentColor"
-                    strokeWidth="2.6"
+                    strokeWidth="3.4"
                     strokeLinecap="round"
                     fill="none"
-                  />
-                  <path
-                    d="M9 8 C34 6.6, 62 7.3, 92 6.3"
-                    stroke="currentColor"
-                    strokeWidth="2.3"
-                    strokeLinecap="round"
-                    fill="none"
-                    opacity="0.95"
                   />
                 </svg>
               </span>
-              .
+              <span className="text-brand">.</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
               Paste your listing URL. We score 6 categories, flag the highest-impact gaps,
