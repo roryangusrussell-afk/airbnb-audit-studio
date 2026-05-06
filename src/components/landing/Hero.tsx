@@ -82,16 +82,6 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
                 <Link to="/sample">View sample report</Link>
               </Button>
             </div>
-
-            <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-              <span>Free</span>
-              <span className="text-border">•</span>
-              <span>Read-only</span>
-              <span className="text-border">•</span>
-              <span>No login</span>
-              <span className="text-border">•</span>
-              <span>Nothing edited</span>
-            </div>
           </div>
 
           <div className="lg:pl-6">
