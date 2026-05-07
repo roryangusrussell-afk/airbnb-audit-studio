@@ -69,7 +69,9 @@ export function ListingCard({ data }: { data: AuditResponse }) {
                 {data.reviewCount != null && <span>· {data.reviewCount} reviews</span>}
               </span>
             )}
-            <span>{data.amenities.length} amenities</span>
+            {data.amenities.length > 0 && (
+              <span>{data.amenities.length} amenities</span>
+            )}
             {notable && (
               <span className="inline-flex items-center gap-1 text-foreground">
                 <Sparkles className="h-3.5 w-3.5 text-brand" /> {notable}

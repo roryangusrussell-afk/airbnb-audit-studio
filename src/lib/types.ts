@@ -85,6 +85,7 @@ export interface AuditResponse {
   hostMessageResponseTime?: string | null;
   isGuestFavorite?: boolean | null;
   guestFavoriteTier?: "Top 1%" | "Top 5%" | "Top 10%" | string | null;
+  isElvisListing?: boolean;
   // Optional fields the API may return
   thumbnail?: string;
   rating?: number;

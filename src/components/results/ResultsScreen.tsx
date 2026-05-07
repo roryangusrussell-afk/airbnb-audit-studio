@@ -21,7 +21,7 @@ export function ResultsScreen({
   topSlot?: React.ReactNode;
 }) {
   return (
-    <div className="container max-w-[1360px] py-8 sm:py-10">
+    <div className="container max-w-[1180px] py-8 sm:py-10">
       {topSlot}
 
       <div className="mb-5 flex items-center justify-between gap-3">
