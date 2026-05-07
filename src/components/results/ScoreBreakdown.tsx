@@ -52,18 +52,18 @@ function ScoreRow({ cat, isLast }: { cat: Cat; isLast: boolean }) {
   const sub = SHORT_FB[cat.name] ?? cat.fb;
 
   return (
-    <li className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 py-2.5 ${isLast ? "" : "border-b border-border/40"}`}>
-      <Icon className={`h-4 w-4 ${textCls}`} />
+    <li className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 py-1.5 ${isLast ? "" : "border-b border-border/30"}`}>
+      <Icon className={`h-3.5 w-3.5 ${textCls}`} />
       <div className="min-w-0">
-        <div className="truncate text-[13px] font-semibold leading-tight text-foreground">{cat.name}</div>
-        <div className="truncate text-[11px] leading-tight text-muted-foreground">{sub}</div>
+        <div className="truncate text-[12.5px] font-semibold leading-tight text-foreground">{cat.name}</div>
+        <div className="truncate text-[10.5px] leading-tight text-muted-foreground">{sub}</div>
       </div>
-      <div className={`text-[12px] font-semibold tabular-nums ${textCls}`}>
+      <div className={`text-[11.5px] font-semibold tabular-nums ${textCls}`}>
         {cat.score}<span className="text-muted-foreground font-normal">/100</span>
       </div>
-      <div className="col-span-3 mt-1.5 h-[3px] overflow-hidden rounded-full bg-muted">
+      <div className="col-span-3 mt-1 h-[2px] overflow-hidden rounded-full bg-muted/70">
         <div
-          className={`h-full rounded-full ${fillCls}`}
+          className={`h-full rounded-full ${fillCls}/90`}
           style={{ width: `${Math.max(2, Math.min(100, cat.score))}%` }}
         />
       </div>
