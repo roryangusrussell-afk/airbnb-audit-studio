@@ -317,6 +317,8 @@ function MetricCard({ m }: { m: Metric }) {
 function buildMetrics(area: string, data: AuditResponse): Metric[] {
   if (area === "Photos") {
     const total = data.photoCount;
+    const captioned = data.captionedCount ?? 0;
+    const captionRatio = total > 0 ? captioned / total : 0;
     const lowLight = data.photoAnalysis.signals.filter((s) =>
       /low.?light|dim/i.test(s),
     ).length;
@@ -332,17 +334,22 @@ function buildMetrics(area: string, data: AuditResponse): Metric[] {
       },
       {
         Icon: FileText,
-        iconBg: "bg-muted",
-        iconText: "text-muted-foreground",
-        value: `0/${total}`,
+        iconBg: captionRatio >= 0.5 ? "bg-success-soft" : captioned > 0 ? "bg-warning-soft" : "bg-muted",
+        iconText: captionRatio >= 0.5 ? "text-success" : captioned > 0 ? "text-warning" : "text-muted-foreground",
+        value: `${captioned}/${total}`,
         label: "With captions",
-        note: "Major metadata gap",
-        noteTone: "bad",
+        note:
+          captionRatio >= 0.5
+            ? "Strong caption coverage"
+            : captioned > 0
+            ? "Partial coverage"
+            : "Major metadata gap",
+        noteTone: captionRatio >= 0.5 ? "good" : captioned > 0 ? "warn" : "bad",
       },
       {
         Icon: Camera,
-        iconBg: "bg-warning-soft",
-        iconText: "text-warning",
+        iconBg: lowLight > 0 ? "bg-warning-soft" : "bg-success-soft",
+        iconText: lowLight > 0 ? "text-warning" : "text-success",
         value: String(Math.max(lowLight, 0)),
         label: "Low-light flags",
         note: lowLight > 0 ? "Technical quality issue" : "No low-light flags",
@@ -453,41 +460,84 @@ function FoundList({ area, data }: { area: string; data: AuditResponse }) {
 
 function buildFound(area: string, data: AuditResponse): Found[] {
   if (area === "Photos") {
-    return [
-      {
-        Icon: CheckCircle2,
-        iconText: "text-success",
-        title: "Coverage is good",
+    const out: Found[] = [];
+    const total = data.photoCount;
+    const captioned = data.captionedCount ?? 0;
+    const verdict = data.photoAnalysis.verdict ?? "";
+    const tech = data.photoAnalysis.technicalScore ?? 0;
+    const aesthetic = data.photoAnalysis.aestheticScore ?? 0;
+    const signals = data.photoAnalysis.signals ?? [];
+    const missingRooms = data.photoAnalysis.missingRooms ?? [];
+
+    if (total > 0) {
+      out.push({
+        Icon: total >= 20 ? CheckCircle2 : AlertTriangle,
+        iconText: total >= 20 ? "text-success" : "text-warning",
+        title: total >= 20 ? "Photo count is healthy" : "Photo count is light",
         detail:
-          "All key spaces are represented with a balanced mix of wide and detail shots.",
-      },
-      {
+          total >= 20
+            ? `${total} photos give guests enough visual coverage to commit before booking.`
+            : `${total} photos is below the 20+ benchmark guests expect when scrolling for high-conviction listings.`,
+      });
+    }
+
+    if (captioned === 0 && total > 0) {
+      out.push({
         Icon: XCircle,
         iconText: "text-danger",
-        title: "Metadata is missing",
-        detail: `None of the ${data.photoCount} photos have captions, which reduces clarity, accessibility and SEO.`,
-      },
-      {
+        title: "No captions on any photo",
+        detail: `None of the ${total} photos carry captions, which is a free conversion lever you're leaving unused — captions add room context, amenity proof, and search depth.`,
+      });
+    } else if (captioned > 0 && captioned < total / 2) {
+      out.push({
         Icon: AlertTriangle,
         iconText: "text-warning",
-        title: "Technical quality is capped",
-        detail:
-          "Several images are flagged for low light; some are slightly soft with limited dynamic range.",
-      },
-      {
-        Icon: StarIcon,
+        title: "Caption coverage is partial",
+        detail: `Only ${captioned} of ${total} photos have captions. The uncaptioned majority misses a chance to add specifics that build trust before guests reach the description.`,
+      });
+    } else if (captioned >= total / 2 && captioned > 0) {
+      out.push({
+        Icon: CheckCircle2,
         iconText: "text-success",
-        title: "Aesthetic direction is strong",
-        detail: "Warm, inviting tones and tidy styling create a cohesive, welcoming feel.",
-      },
-      {
+        title: "Caption coverage is strong",
+        detail: `${captioned} of ${total} photos carry captions, adding context and specifics that lift conversion at the gallery stage.`,
+      });
+    }
+
+    if (verdict) {
+      const tone =
+        /professional/i.test(verdict)
+          ? { Icon: StarIcon, color: "text-success" }
+          : /amateur/i.test(verdict)
+          ? { Icon: AlertTriangle, color: "text-danger" }
+          : { Icon: MinusCircle, color: "text-warning" };
+      out.push({
+        Icon: tone.Icon,
+        iconText: tone.color,
+        title: `Vision verdict: ${verdict}`,
+        detail: `Technical quality scores ${tech}/100; aesthetic direction scores ${aesthetic}/100. The vision model treats this as ${verdict.toLowerCase()}-grade photography.`,
+      });
+    }
+
+    if (signals.length > 0) {
+      out.push({
+        Icon: AlertTriangle,
+        iconText: "text-warning",
+        title: "Vision signals to address",
+        detail: signals.slice(0, 3).join("; "),
+      });
+    }
+
+    if (missingRooms.length > 0) {
+      out.push({
         Icon: MinusCircle,
         iconText: "text-muted-foreground",
-        title: "Kitchen is weakest",
-        detail:
-          "Dim lighting and clutter reduce cleanliness perception and guest confidence.",
-      },
-    ];
+        title: "Room types not visible in sample",
+        detail: `The sampled photos didn't show: ${missingRooms.join(", ")}. Confirm these rooms are present in the wider gallery so guests can self-qualify.`,
+      });
+    }
+
+    return out;
   }
   return [];
 }

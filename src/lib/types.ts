@@ -79,6 +79,7 @@ export interface AuditResponse {
   descriptionConfidence?: DataConfidence;
   amenities: string[];
   photoCount: number;
+  captionedCount?: number;
   photoAnalysis: PhotoAnalysis;
   cats: Cat[];
   checks: Check[];
