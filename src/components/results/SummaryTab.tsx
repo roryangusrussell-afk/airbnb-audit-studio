@@ -7,7 +7,7 @@ import { PositioningSection } from "./PositioningSection";
 export function SummaryTab({ data }: { data: AuditResponse }) {
   return (
     <div className="space-y-8">
-      <section className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+      <section className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[1.2fr_0.8fr]">
         <ScoreBreakdownCard
           cats={data.cats}
           score={data.score}
