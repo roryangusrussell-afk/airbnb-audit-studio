@@ -45,7 +45,7 @@ export const sampleAudit: AuditResponse = {
       title: "Parking invisible above the fold",
       problem:
         "Private parking is rare in Cais do Sodré but missing from title and first photo",
-      action: "Add parking to title and photograph the space with a caption",
+      action: "Make private parking visible above the fold: add it to the title and photograph the space.",
     },
     {
       rank: "02",
