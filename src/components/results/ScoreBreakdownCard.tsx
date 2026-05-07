@@ -40,12 +40,16 @@ export function ScoreBreakdownCard({ cats, score, priorityFix }: Props) {
       </div>
 
       {priorityFix && (
-        <div className="mt-6 flex flex-col gap-2 rounded-2xl border border-[#FFD1DE] bg-[#FFF5F8] p-3.5 sm:flex-row sm:items-start sm:gap-3">
-          <div className="flex min-w-fit items-center gap-2 text-brand">
-            <Wand2 className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.12em]">Priority fix</span>
+        <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#FFD9E4] bg-[#FFF7FA] p-4">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-white text-brand shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            <Wand2 className="h-4 w-4" aria-hidden="true" />
           </div>
-          <div className="text-[13px] leading-5 text-[#1F1F24]">{priorityFix}</div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
+              Priority fix
+            </div>
+            <div className="mt-1 text-[13px] leading-[1.5] text-[#1F1F24]">{priorityFix}</div>
+          </div>
         </div>
       )}
     </div>
