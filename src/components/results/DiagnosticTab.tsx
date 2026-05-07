@@ -10,7 +10,6 @@ const CARDS: { id: string; label: string; area: string }[] = [
   { id: "title", label: "Title", area: "Title" },
   { id: "opening", label: "Opening description", area: "Overview" },
   { id: "full", label: "Full description", area: "Description" },
-  { id: "amenities", label: "Amenities", area: "Amenities" },
   { id: "photos", label: "Photos", area: "Photos" },
   { id: "reviews", label: "Reviews & rating", area: "Reviews & rating" },
 ];

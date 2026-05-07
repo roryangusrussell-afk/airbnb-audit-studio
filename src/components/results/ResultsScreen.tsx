@@ -21,7 +21,7 @@ export function ResultsScreen({
   topSlot?: React.ReactNode;
 }) {
   return (
-    <div className="container max-w-5xl py-8 sm:py-10">
+    <div className="container max-w-[1360px] py-8 sm:py-10">
       {topSlot}
 
       <div className="mb-5 flex items-center justify-between gap-3">
@@ -40,7 +40,7 @@ export function ResultsScreen({
       </div>
 
       <Tabs defaultValue="summary" className="mt-8">
-        <TabsList className="h-auto w-full justify-center gap-1.5 rounded-xl border bg-card p-1 shadow-card sm:w-auto">
+        <TabsList className="h-auto w-full justify-center gap-1 rounded-[16px] border bg-card p-1 shadow-card sm:w-auto">
           <TabsTrigger
             value="summary"
             className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"

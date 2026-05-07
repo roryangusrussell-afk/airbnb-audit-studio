@@ -14,6 +14,15 @@ export function verdictLabel(n: number): string {
   return "Critical";
 }
 
+// More diagnostic label used in the score breakdown card.
+export function diagnosticLabel(n: number): string {
+  if (n >= 80) return "Strong listing";
+  if (n >= 72) return "Strong";
+  if (n >= 60) return "Solid";
+  if (n >= 48) return "Needs work";
+  return "Critical";
+}
+
 export function categoryRatingBand(rating: string | number): Band {
   const r = typeof rating === "string" ? parseFloat(rating) : rating;
   if (Number.isNaN(r)) return "average";

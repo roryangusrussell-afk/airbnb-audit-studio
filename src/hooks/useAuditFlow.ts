@@ -84,7 +84,8 @@ export function useAuditFlow() {
         return;
       }
 
-      if (completedCountRef.current >= 1) {
+      const isLocalDev = typeof window !== "undefined" && window.location.hostname === "localhost";
+      if (completedCountRef.current >= 1 && !isLocalDev) {
         setCreditGateOpen(true);
         return;
       }
