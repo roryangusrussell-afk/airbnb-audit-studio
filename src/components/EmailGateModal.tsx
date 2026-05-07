@@ -30,9 +30,9 @@ export function EmailGateModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl">Enter your email to see your results</DialogTitle>
+          <DialogTitle className="text-xl">Save these rewrites to your inbox?</DialogTitle>
           <DialogDescription>
-            We'll send a copy of the audit so you can refer back to it later. No spam.
+            We'll email you a copy of the audit so you can come back to the rewrites whenever you're ready to paste them in. No spam.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handle} className="space-y-3">
@@ -49,8 +49,15 @@ export function EmailGateModal({
           />
           {err && <p className="text-sm text-danger">{err}</p>}
           <Button type="submit" className="w-full h-11">
-            See my audit
+            Email me my report
           </Button>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="block w-full text-center text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Skip — I'll just read it here
+          </button>
         </form>
       </DialogContent>
     </Dialog>

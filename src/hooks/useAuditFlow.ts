@@ -59,7 +59,9 @@ export function useAuditFlow() {
           localStorage.setItem(AUDITS_RUN_KEY, String(prev + 1));
         }
 
-        // Log every audit's email + listing context to the Sheet
+        // Log every audit's email + listing context to the Sheet (only if we
+        // already have an email — otherwise the post-audit modal will fire
+        // and capture there).
         if (withEmail) {
           captureLead({
             email: withEmail,
@@ -70,12 +72,16 @@ export function useAuditFlow() {
             rating: result.rating ?? null,
             reviewCount: result.reviewCount ?? null,
           });
+        } else {
+          // No email yet — show the post-audit save-to-inbox modal
+          pendingUrlRef.current = auditUrl;
+          setNeedsEmail(true);
         }
 
         // Redeem pending referral after first successful audit
         if (typeof window !== "undefined") {
           const pendingRef = localStorage.getItem(PENDING_REF_KEY);
-          if (pendingRef && completedCountRef.current === 1) {
+          if (pendingRef && completedCountRef.current === 1 && withEmail) {
             redeemRef(withEmail, pendingRef);
             localStorage.removeItem(PENDING_REF_KEY);
           }
@@ -107,13 +113,9 @@ export function useAuditFlow() {
         new URLSearchParams(window.location.search).get("dev") === "1";
       const bypassGates = isLocalDev || isDevBypass;
 
-      if (!storedEmail && !bypassGates) {
-        setNeedsEmail(true);
-        return;
-      }
-
       // Cap free audits at FREE_AUDIT_LIMIT per browser. Counter persists
-      // across reloads via localStorage.
+      // across reloads via localStorage. The email gate now fires AFTER
+      // the audit completes, not before — testers see the value first.
       const auditsRun =
         typeof window !== "undefined"
           ? parseInt(localStorage.getItem(AUDITS_RUN_KEY) || "0", 10) || 0
@@ -123,7 +125,7 @@ export function useAuditFlow() {
         return;
       }
 
-      await performAudit(auditUrl, storedEmail || "dev@auditable.local");
+      await performAudit(auditUrl, storedEmail || "");
     },
     [performAudit],
   );
@@ -132,12 +134,21 @@ export function useAuditFlow() {
     async (value: string) => {
       setEmail(value);
       setNeedsEmail(false);
+      // Email collected post-audit — log to Sheet with the result we already have
       const target = pendingUrlRef.current || url;
-      if (target) {
-        await performAudit(target, value);
+      if (data && target) {
+        captureLead({
+          email: value,
+          url: target,
+          listingId: data.listingId,
+          title: data.title,
+          score: data.score,
+          rating: data.rating ?? null,
+          reviewCount: data.reviewCount ?? null,
+        });
       }
     },
-    [email, performAudit, setEmail, url],
+    [data, setEmail, url],
   );
 
   const reset = useCallback(() => {
