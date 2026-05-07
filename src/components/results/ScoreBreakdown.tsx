@@ -31,11 +31,16 @@ export function ScoreBreakdown({ cats }: { cats: Cat[] }) {
   const ordered = [...cats].sort((a, b) => a.score - b.score);
 
   return (
-    <ul className="w-full">
-      {ordered.map((c, i) => (
-        <ScoreRow key={c.name} cat={c} isLast={i === ordered.length - 1} />
-      ))}
-    </ul>
+    <div className="w-full">
+      <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        Score breakdown
+      </h4>
+      <ul className="w-full">
+        {ordered.map((c, i) => (
+          <ScoreRow key={c.name} cat={c} isLast={i === ordered.length - 1} />
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -47,24 +52,20 @@ function ScoreRow({ cat, isLast }: { cat: Cat; isLast: boolean }) {
   const sub = SHORT_FB[cat.name] ?? cat.fb;
 
   return (
-    <li className={`flex items-center gap-3 py-2 ${isLast ? "" : "border-b border-border/50"}`}>
-      <Icon className={`h-3.5 w-3.5 flex-none ${textCls}`} />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-3">
-          <div className="truncate text-[13px] font-semibold text-foreground">{cat.name}</div>
-          <div className="text-[12px] font-medium tabular-nums text-muted-foreground">
-            {cat.score}
-          </div>
-        </div>
-        <div className="mt-1 flex items-center gap-2">
-          <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
-            <div
-              className={`h-full rounded-full ${fillCls}/80`}
-              style={{ width: `${Math.max(2, Math.min(100, cat.score))}%` }}
-            />
-          </div>
-        </div>
-        <p className="mt-1 truncate text-[11px] text-muted-foreground">{sub}</p>
+    <li className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 py-2.5 ${isLast ? "" : "border-b border-border/40"}`}>
+      <Icon className={`h-4 w-4 ${textCls}`} />
+      <div className="min-w-0">
+        <div className="truncate text-[13px] font-semibold leading-tight text-foreground">{cat.name}</div>
+        <div className="truncate text-[11px] leading-tight text-muted-foreground">{sub}</div>
+      </div>
+      <div className={`text-[12px] font-semibold tabular-nums ${textCls}`}>
+        {cat.score}<span className="text-muted-foreground font-normal">/100</span>
+      </div>
+      <div className="col-span-3 mt-1.5 h-[3px] overflow-hidden rounded-full bg-muted">
+        <div
+          className={`h-full rounded-full ${fillCls}`}
+          style={{ width: `${Math.max(2, Math.min(100, cat.score))}%` }}
+        />
       </div>
     </li>
   );
