@@ -18,51 +18,53 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "Reviews & rating": Star,
 };
 
+const SHORT_FB: Record<string, string> = {
+  Title: "No strong differentiator",
+  Photos: "Parking not shown",
+  Description: "Flat structure",
+  Overview: "Parking buried",
+  Amenities: "Strong coverage",
+  "Reviews & rating": "Strong social proof",
+};
+
 export function ScoreBreakdown({ cats }: { cats: Cat[] }) {
   const ordered = [...cats].sort((a, b) => a.score - b.score);
 
   return (
-    <div className="rounded-2xl border bg-card shadow-card">
-      <div className="border-b px-5 py-3">
-        <h4 className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-          Score breakdown
-        </h4>
-      </div>
-      <ul className="divide-y">
-        {ordered.map((c) => (
-          <ScoreRow key={c.name} cat={c} />
-        ))}
-      </ul>
-    </div>
+    <ul className="w-full">
+      {ordered.map((c, i) => (
+        <ScoreRow key={c.name} cat={c} isLast={i === ordered.length - 1} />
+      ))}
+    </ul>
   );
 }
 
-function ScoreRow({ cat }: { cat: Cat }) {
+function ScoreRow({ cat, isLast }: { cat: Cat; isLast: boolean }) {
   const band = scoreBand(cat.score);
   const Icon = ICONS[cat.name] ?? Type;
   const textCls = bandTextClass(band);
   const fillCls = bandBgClass(band);
+  const sub = SHORT_FB[cat.name] ?? cat.fb;
 
   return (
-    <li className="flex items-center gap-4 px-5 py-4">
-      <div className={`flex h-8 w-8 flex-none items-center justify-center rounded-full ${fillCls}/10`}>
-        <Icon className={`h-4 w-4 ${textCls}`} />
-      </div>
+    <li className={`flex items-center gap-3 py-2 ${isLast ? "" : "border-b border-border/50"}`}>
+      <Icon className={`h-3.5 w-3.5 flex-none ${textCls}`} />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
-          <div className="truncate text-sm font-semibold text-foreground">{cat.name}</div>
-          <div className="text-sm font-medium tabular-nums text-foreground">
+          <div className="truncate text-[13px] font-semibold text-foreground">{cat.name}</div>
+          <div className="text-[12px] font-medium tabular-nums text-muted-foreground">
             {cat.score}
-            <span className="text-muted-foreground">/100</span>
           </div>
         </div>
-        <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{cat.fb}</p>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-          <div
-            className={`h-full rounded-full ${fillCls}`}
-            style={{ width: `${Math.max(2, Math.min(100, cat.score))}%` }}
-          />
+        <div className="mt-1 flex items-center gap-2">
+          <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
+            <div
+              className={`h-full rounded-full ${fillCls}/80`}
+              style={{ width: `${Math.max(2, Math.min(100, cat.score))}%` }}
+            />
+          </div>
         </div>
+        <p className="mt-1 truncate text-[11px] text-muted-foreground">{sub}</p>
       </div>
     </li>
   );
