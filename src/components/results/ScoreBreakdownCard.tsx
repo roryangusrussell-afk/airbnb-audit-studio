@@ -67,8 +67,7 @@ function ScoreCategoryRow({ cat }: { cat: Cat }) {
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] ${meta.iconBg}`}
           >
             <Icon
-              className={meta.iconText}
-              style={{ width: 16, height: 16 }}
+              className={`h-4 w-4 ${meta.iconText}`}
               aria-hidden="true"
             />
           </span>
