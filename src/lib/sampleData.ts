@@ -50,7 +50,7 @@ export const sampleAudit: AuditResponse = {
     {
       rank: "02",
       impact: "medium",
-      title: "No photo captions",
+      title: "Photo metadata is missing",
       problem:
         "28 photos have no captions — a missed semantic signal for Airbnb search",
       action:
