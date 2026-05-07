@@ -2,7 +2,7 @@ import { Check, Minus } from "lucide-react";
 import type { AuditResponse, Fix } from "@/lib/types";
 import { Eyebrow } from "@/components/Eyebrow";
 import { ScoreRing, VerdictLabel } from "./ScoreRing";
-import { CategoryRow } from "./CategoryRow";
+import { ScoreBreakdown } from "./ScoreBreakdown";
 
 function buildOpening(data: AuditResponse): string {
   const top = data.issues[0];
