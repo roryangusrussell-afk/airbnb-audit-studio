@@ -24,8 +24,8 @@ export function ScoreRing({ score }: { score: number }) {
     return () => cancelAnimationFrame(raf);
   }, [score]);
 
-  const size = 200;
-  const stroke = 14;
+  const size = 172;
+  const stroke = 12;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c - (displayed / 100) * c;
@@ -57,7 +57,7 @@ export function ScoreRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className={`text-5xl font-extrabold tracking-tight tabular-nums ${numberColor}`}>
+        <div className={`text-4xl font-extrabold tracking-tight tabular-nums ${numberColor}`}>
           {displayed}
         </div>
         <div className="mt-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
