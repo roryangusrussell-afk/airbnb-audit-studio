@@ -50,7 +50,7 @@ export function ScoreBreakdownCard({ cats, score, priorityFix }: Props) {
             </div>
             <div className="mt-1 text-[13px] leading-[1.5] text-[#1F1F24]">{priorityFix}</div>
           </div>
-        </div>
+        </div></div>
       )}
     </div>
   );
