@@ -35,12 +35,12 @@ export function CreditGateModal({
       <div style={{
         position: "relative",
         width: "100%",
-        maxWidth: 760,
+        maxWidth: 820,
         background: "#fff",
         borderRadius: 24,
         border: "1px solid rgba(229,231,235,0.8)",
         boxShadow: "0 24px 64px rgba(17,24,39,0.16), 0 4px 16px rgba(17,24,39,0.08)",
-        padding: "clamp(22px, 4vw, 32px)",
+        padding: "clamp(24px, 4vw, 40px)",
         fontFamily: "Inter, sans-serif",
       }}>
 
@@ -82,7 +82,7 @@ export function CreditGateModal({
               color: "#e8185c",
               lineHeight: 1,
             }}>
-              You've used your free audit
+              Your free audit is done
             </span>
           </div>
           <h2 style={{
@@ -93,7 +93,7 @@ export function CreditGateModal({
             color: "#111827",
             margin: "0 0 12px",
           }}>
-            Want to audit another listing?
+            Found gaps in listing #1. How many are hiding in the rest?
           </h2>
           <p style={{
             fontSize: "clamp(15px, 2vw, 17px)",
@@ -101,7 +101,7 @@ export function CreditGateModal({
             color: "#6b7280",
             margin: 0,
           }}>
-            One referral unlocks one more free. Or buy credits instantly.
+            One referral unlocks another audit free. Or buy credits and check every listing you manage.
           </p>
         </header>
 
@@ -109,7 +109,7 @@ export function CreditGateModal({
         <div style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: 0,
+          gap: 20,
         }}
           className="credit-modal-grid"
         >
@@ -118,8 +118,7 @@ export function CreditGateModal({
             background: "#faf9f7",
             border: "1px solid #e5e7eb",
             borderRadius: 18,
-            padding: 24,
-            marginRight: 16,
+            padding: 28,
           }}>
             <span style={{
               display: "inline-flex",
@@ -144,7 +143,7 @@ export function CreditGateModal({
               color: "#111827",
               margin: "0 0 10px",
             }}>
-              Refer a host
+              Refer a host, get one free
             </h3>
 
             <p style={{
@@ -153,25 +152,33 @@ export function CreditGateModal({
               color: "#4b5563",
               margin: "0 0 18px",
             }}>
-              Share your link. When they complete an audit, you get one free.
+              Know a host whose listing could score better? Send them your link. When they run their first audit, yours unlocks instantly.
             </p>
 
             {/* Referral URL field */}
-            <div style={{
-              background: "#fff",
-              border: "1px solid #e5e7eb",
-              borderRadius: 12,
-              padding: "12px 14px",
-              fontSize: 13,
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-              color: "#4b5563",
-              marginBottom: 12,
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-            }}>
-              {link}
-            </div>
+            <input
+              readOnly
+              value={link}
+              onFocus={e => e.currentTarget.select()}
+              style={{
+                display: "block",
+                width: "100%",
+                boxSizing: "border-box",
+                background: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 12,
+                padding: "13px 16px",
+                fontSize: 13,
+                fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+                color: "#4b5563",
+                marginBottom: 14,
+                outline: "none",
+                cursor: "text",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            />
 
             {/* Copy button */}
             <button
@@ -209,8 +216,7 @@ export function CreditGateModal({
             background: "#fdf2f5",
             border: "1px solid rgba(232,24,92,0.14)",
             borderRadius: 18,
-            padding: 24,
-            marginLeft: 16,
+            padding: 28,
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
           }}>
             <span style={{
@@ -229,7 +235,26 @@ export function CreditGateModal({
               Buy
             </span>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <h3 style={{
+              fontSize: 22,
+              fontWeight: 750,
+              lineHeight: 1.2,
+              color: "#111827",
+              margin: "0 0 10px",
+            }}>
+              Buy credits
+            </h3>
+
+            <p style={{
+              fontSize: 15,
+              lineHeight: 1.55,
+              color: "#4b5563",
+              margin: "0 0 20px",
+            }}>
+              Most hosts manage multiple listings. One missed issue can cost you bookings for months. Credits don't expire — buy once, audit whenever.
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <BuyRow
                 label="1 audit"
                 price="$19"
@@ -239,6 +264,7 @@ export function CreditGateModal({
                 label="5 audits"
                 price="$79"
                 originalPrice="$95"
+                savingsNote="Save $16"
                 aria-label="Buy five audits for 79 dollars"
               />
               <BuyRow
@@ -256,13 +282,6 @@ export function CreditGateModal({
           .credit-modal-grid {
             grid-template-columns: 1fr !important;
           }
-          .credit-modal-grid > div:first-child {
-            margin-right: 0 !important;
-            margin-bottom: 16px !important;
-          }
-          .credit-modal-grid > div:last-child {
-            margin-left: 0 !important;
-          }
         }
       `}</style>
     </div>
@@ -273,12 +292,14 @@ function BuyRow({
   label,
   price,
   originalPrice,
+  savingsNote,
   contact,
   "aria-label": ariaLabel,
 }: {
   label: string;
   price?: string;
   originalPrice?: string;
+  savingsNote?: string;
   contact?: boolean;
   "aria-label": string;
 }) {
@@ -294,8 +315,8 @@ function BuyRow({
         background: "#fff",
         border: "1px solid #e5e7eb",
         borderRadius: 14,
-        padding: "18px 20px",
-        minHeight: 68,
+        padding: "16px 18px",
+        minHeight: 64,
         cursor: "pointer",
         textAlign: "left",
         transition: "background 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease",
@@ -319,17 +340,33 @@ function BuyRow({
       onFocus={e => { e.currentTarget.style.outline = "2px solid rgba(232,24,92,0.35)"; e.currentTarget.style.outlineOffset = "2px"; }}
       onBlur={e => { e.currentTarget.style.outline = "none"; }}
     >
-      <span style={{ fontSize: 16, fontWeight: 750, color: "#111827" }}>{label}</span>
+      <span style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{label}</span>
       {contact ? (
-        <span style={{ fontSize: 15, fontWeight: 750, color: "#e8185c" }}>Contact us →</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 15, fontWeight: 700, color: "#e8185c" }}>
+          Contact us <span style={{ fontSize: 17, lineHeight: 1 }}>→</span>
+        </span>
       ) : (
         <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 16, fontWeight: 750, color: "#111827" }}>{price}</span>
+          {savingsNote && (
+            <span style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#16a34a",
+              background: "#f0fdf4",
+              border: "1px solid #bbf7d0",
+              borderRadius: 6,
+              padding: "3px 7px",
+            }}>
+              {savingsNote}
+            </span>
+          )}
           {originalPrice && (
             <span style={{ fontSize: 14, color: "#9ca3af", textDecoration: "line-through" }}>
               {originalPrice}
             </span>
           )}
+          <span style={{ fontSize: 16, fontWeight: 750, color: "#111827" }}>{price}</span>
+          <span style={{ fontSize: 16, color: "#9ca3af", lineHeight: 1 }}>→</span>
         </span>
       )}
     </button>
