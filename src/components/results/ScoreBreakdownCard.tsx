@@ -40,7 +40,7 @@ export function ScoreBreakdownCard({ cats, score, priorityFix }: Props) {
       </div>
 
       {priorityFix && (
-        <div className="mt-auto flex items-start gap-3 rounded-2xl border border-[#FFD9E4] bg-[#FFF7FA] p-4 pt-4" style={{ marginTop: 'auto' }}>
+        <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#FFD9E4] bg-[#FFF7FA] p-4">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-white text-brand shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
             <Wand2 className="h-4 w-4" aria-hidden="true" />
           </div>
