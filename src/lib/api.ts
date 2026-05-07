@@ -75,6 +75,22 @@ export async function sendReport(payload: {
   }).catch(() => {});
 }
 
+export async function captureLead(payload: {
+  email: string;
+  url: string;
+  listingId?: string;
+  title?: string;
+  score?: number;
+  rating?: number | null;
+  reviewCount?: number | null;
+}): Promise<void> {
+  await fetch(`${BASE}/api/capture-lead`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}
+
 export async function redeemRef(email: string, refCode: string): Promise<void> {
   await fetch(`${BASE}/api/redeem-ref`, {
     method: "POST",

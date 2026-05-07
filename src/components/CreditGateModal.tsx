@@ -82,7 +82,7 @@ export function CreditGateModal({
               color: "#e8185c",
               lineHeight: 1,
             }}>
-              Your free audit is done
+              Free audits used
             </span>
           </div>
           <h2 style={{
@@ -93,7 +93,7 @@ export function CreditGateModal({
             color: "#111827",
             margin: "0 0 12px",
           }}>
-            Found gaps in listing #1. How many are hiding in the rest?
+            You've used your 5 free audits.
           </h2>
           <p style={{
             fontSize: "clamp(15px, 2vw, 17px)",

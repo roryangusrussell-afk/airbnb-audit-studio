@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AuditError, checkCredits, peekListing, redeemRef, runAudit, useCredit } from "@/lib/api";
+import { AuditError, captureLead, checkCredits, peekListing, redeemRef, runAudit, useCredit } from "@/lib/api";
 import type { PeekData } from "@/lib/api";
 import type { AuditResponse } from "@/lib/types";
 
@@ -7,6 +7,8 @@ export type FlowStatus = "landing" | "loading" | "results" | "error";
 
 const EMAIL_KEY = "auditEmail";
 const PENDING_REF_KEY = "pendingRef";
+const AUDITS_RUN_KEY = "auditsRun";
+const FREE_AUDIT_LIMIT = 5;
 
 export function useAuditFlow() {
   const [status, setStatus] = useState<FlowStatus>("landing");
@@ -51,6 +53,25 @@ export function useAuditFlow() {
         setStatus("results");
         completedCountRef.current += 1;
 
+        // Persist audit count so refreshes can't reset the cap
+        if (typeof window !== "undefined") {
+          const prev = parseInt(localStorage.getItem(AUDITS_RUN_KEY) || "0", 10) || 0;
+          localStorage.setItem(AUDITS_RUN_KEY, String(prev + 1));
+        }
+
+        // Log every audit's email + listing context to the Sheet
+        if (withEmail) {
+          captureLead({
+            email: withEmail,
+            url: auditUrl,
+            listingId: result.listingId,
+            title: result.title,
+            score: result.score,
+            rating: result.rating ?? null,
+            reviewCount: result.reviewCount ?? null,
+          });
+        }
+
         // Redeem pending referral after first successful audit
         if (typeof window !== "undefined") {
           const pendingRef = localStorage.getItem(PENDING_REF_KEY);
@@ -79,15 +100,30 @@ export function useAuditFlow() {
       const storedEmail =
         typeof window !== "undefined" ? localStorage.getItem(EMAIL_KEY) : "";
 
-      // Credit gate disabled while we test Diagnostic v2 rewrites.
-      // Re-enable by restoring the completedCountRef >= 1 branch when
-      // Stripe / referral plumbing is real.
-      if (!storedEmail) {
+      const isLocalDev =
+        typeof window !== "undefined" && window.location.hostname === "localhost";
+      const isDevBypass =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("dev") === "1";
+      const bypassGates = isLocalDev || isDevBypass;
+
+      if (!storedEmail && !bypassGates) {
         setNeedsEmail(true);
         return;
       }
 
-      await performAudit(auditUrl, storedEmail);
+      // Cap free audits at FREE_AUDIT_LIMIT per browser. Counter persists
+      // across reloads via localStorage.
+      const auditsRun =
+        typeof window !== "undefined"
+          ? parseInt(localStorage.getItem(AUDITS_RUN_KEY) || "0", 10) || 0
+          : 0;
+      if (auditsRun >= FREE_AUDIT_LIMIT && !bypassGates) {
+        setCreditGateOpen(true);
+        return;
+      }
+
+      await performAudit(auditUrl, storedEmail || "dev@auditable.local");
     },
     [performAudit],
   );
