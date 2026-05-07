@@ -2,7 +2,7 @@ import { Check, Minus } from "lucide-react";
 import type { AuditResponse, Fix } from "@/lib/types";
 import { Eyebrow } from "@/components/Eyebrow";
 import { ScoreRing, VerdictLabel } from "./ScoreRing";
-import { CategoryRow } from "./CategoryRow";
+import { ScoreBreakdown } from "./ScoreBreakdown";
 
 function buildOpening(data: AuditResponse): string {
   const top = data.issues[0];
@@ -26,28 +26,28 @@ export function SummaryTab({ data }: { data: AuditResponse }) {
     <div className="space-y-10">
       {/* Score + categories */}
       <section className="rounded-2xl border bg-card p-6 shadow-card sm:p-8">
-        <div className="grid items-center gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">
+        <div className="grid items-start gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             <ScoreRing score={data.score} />
             <div className="mt-5 space-y-2">
               <VerdictLabel score={data.score} />
-              <p className="max-w-xs text-sm text-muted-foreground">{data.verdict}</p>
+              <p className="max-w-xs text-sm text-muted-foreground">
+                Strong review base, but the listing is underusing its main USP.
+              </p>
             </div>
-            {mainOpportunity && (
-              <div className="mt-4 w-full max-w-sm rounded-lg border-l-2 border-brand bg-brand-soft/60 px-3 py-2 text-left">
-                <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">
-                  Main opportunity
-                </div>
-                <p className="mt-1 text-sm leading-snug text-foreground">{mainOpportunity}</p>
-              </div>
-            )}
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {data.cats.map((c) => (
-              <CategoryRow key={c.name} cat={c} />
-            ))}
-          </div>
+          <ScoreBreakdown cats={data.cats} />
         </div>
+        {mainOpportunity && (
+          <div className="mt-6 rounded-xl border border-brand-border bg-brand-soft/60 px-5 py-4">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-3">
+              <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">
+                Priority fix
+              </div>
+              <p className="text-sm leading-snug text-foreground">{mainOpportunity}</p>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Listing signals */}
