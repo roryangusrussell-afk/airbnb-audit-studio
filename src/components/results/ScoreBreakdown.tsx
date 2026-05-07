@@ -1,22 +1,6 @@
-import {
-  Type,
-  AlignLeft,
-  FileText,
-  ListChecks,
-  Image as ImageIcon,
-  Star,
-} from "lucide-react";
 import type { Cat } from "@/lib/types";
 import { scoreBand, bandTextClass, bandBgClass } from "@/lib/scoring";
-
-const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Title: Type,
-  Overview: AlignLeft,
-  Description: FileText,
-  Amenities: ListChecks,
-  Photos: ImageIcon,
-  "Reviews & rating": Star,
-};
+import { getCategoryMeta } from "@/lib/categoryMeta";
 
 const SHORT_FB: Record<string, string> = {
   Title: "No strong differentiator",
