@@ -5,6 +5,7 @@ import {
   Home,
   Image as ImageIcon,
   Star,
+  type LucideIcon,
 } from "lucide-react";
 
 export type CategoryKey =
@@ -16,7 +17,7 @@ export type CategoryKey =
   | "Reviews & rating";
 
 export interface CategoryMeta {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   /** Tailwind text colour class for the icon */
   iconText: string;
   /** Tailwind background class for the icon tile */
