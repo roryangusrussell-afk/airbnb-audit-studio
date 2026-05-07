@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListingCard } from "./ListingCard";
 import { BottomTenRiskBanner } from "./BottomTenRiskBanner";
-import { EmailReportBar } from "./EmailReportBar";
+import { FeedbackButton } from "./FeedbackModal";
 import { SummaryTab } from "./SummaryTab";
 import { DiagnosticTab } from "./DiagnosticTab";
 import { NextStepTab } from "./NextStepTab";
@@ -26,15 +26,17 @@ export function ResultsScreen({
 
       <div className="mb-5 flex items-center justify-between gap-3">
         <div className="eyebrow">Your audit report</div>
-        <Button variant="outline" size="sm" onClick={onAuditAnother} className="gap-1.5">
-          <ArrowLeft className="h-3.5 w-3.5" /> Audit another listing
-        </Button>
+        <div className="flex items-center gap-2">
+          <FeedbackButton listingId={data.listingId} />
+          <Button variant="outline" size="sm" onClick={onAuditAnother} className="gap-1.5">
+            <ArrowLeft className="h-3.5 w-3.5" /> Audit another listing
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-4">
         <ListingCard data={data} />
         {data.bottomTenRisk && <BottomTenRiskBanner />}
-        <EmailReportBar email={email} data={data} />
       </div>
 
       <Tabs defaultValue="summary" className="mt-8">

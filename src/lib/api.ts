@@ -103,3 +103,15 @@ export async function useCredit(email: string): Promise<void> {
     body: JSON.stringify({ email }),
   }).catch(() => {});
 }
+
+export async function submitFeedback(payload: {
+  listingId: string;
+  rating: string;
+  comment?: string;
+}): Promise<void> {
+  await fetch(`${BASE}/api/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}

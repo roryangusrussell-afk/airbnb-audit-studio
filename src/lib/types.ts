@@ -13,10 +13,18 @@ export interface Cat {
 
 export interface Issue {
   rank: string;
+  type?: "gap" | "perception_risk" | "opportunity" | string;
   impact: "high" | "medium" | "low" | string;
   title: string;
   problem: string;
   action: string;
+}
+
+export interface PositioningDiagnosis {
+  targetGuest: string;
+  promise: string;
+  reviewAlignment: string;
+  adjustment: string;
 }
 
 export type FixTier = "quick_win" | "refinement" | string;
@@ -84,4 +92,6 @@ export interface AuditResponse {
   propertyType?: string;
   guests?: number;
   formulaBreakdown?: Record<string, number>;
+  listingSignals?: string;
+  positioningDiagnosis?: PositioningDiagnosis;
 }

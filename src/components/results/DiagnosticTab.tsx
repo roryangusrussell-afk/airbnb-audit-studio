@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { TrendingUp, ArrowUpRight, Minus, ChevronDown, MessageCircle, Clock, CheckCircle2, Sparkles, Star, Award } from "lucide-react";
+import { ChevronDown, MessageCircle, Clock, CheckCircle2, Sparkles, Star, Award, ArrowUpRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CopyButton } from "@/components/CopyButton";
 import { categoryRatingBand, bandTextClass, scoreBand } from "@/lib/scoring";
@@ -15,17 +15,6 @@ const CARDS: { id: string; label: string; area: string }[] = [
   { id: "reviews", label: "Reviews & rating", area: "Reviews & rating" },
 ];
 
-type Lift = "high" | "medium" | "low";
-
-function potentialLift(fixes: Fix[], score: number): Lift {
-  const hasQuickWin = fixes.some((f) => f.tier === "quick_win");
-  if (hasQuickWin && score < 75) return "high";
-  if (hasQuickWin) return "medium";
-  if (fixes.length > 0 && score < 70) return "high";
-  if (fixes.length > 0) return "medium";
-  return "low";
-}
-
 function ScoreBar({ score }: { score: number }) {
   const band = scoreBand(score);
   const fill = band === "strong" ? "bg-success" : band === "average" ? "bg-warning" : "bg-warning";
@@ -36,39 +25,6 @@ function ScoreBar({ score }: { score: number }) {
         style={{ width: `${Math.max(4, Math.min(100, score))}%` }}
       />
     </div>
-  );
-}
-
-function LiftBadge({ lift }: { lift: Lift }) {
-  const cfg = {
-    high: {
-      label: "High potential lift",
-      cls: "border-brand-border bg-brand-soft text-brand",
-      Icon: TrendingUp,
-    },
-    medium: {
-      label: "Medium potential lift",
-      cls: "border-warning-border bg-warning-soft text-warning",
-      Icon: ArrowUpRight,
-    },
-    low: {
-      label: "Low potential lift",
-      cls: "border-success-border bg-success-soft text-success",
-      Icon: Minus,
-    },
-  }[lift];
-  const { Icon } = cfg;
-  return (
-    <span
-      className={
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold " +
-        cfg.cls
-      }
-    >
-      <Icon className="h-3 w-3" />
-      <span className="hidden sm:inline">{cfg.label}</span>
-      <span className="sm:hidden">{lift === "high" ? "High lift" : lift === "medium" ? "Med lift" : "Low lift"}</span>
-    </span>
   );
 }
 
@@ -91,9 +47,8 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
     let best: { id: string; score: number } | null = null;
     for (const c of CARDS) {
       const fixes = fixesByArea[c.area] ?? [];
-      const lift = potentialLift(fixes, catByName[c.area]?.score ?? 100);
-      if (lift === "high") {
-        const s = catByName[c.area]?.score ?? 100;
+      const s = catByName[c.area]?.score ?? 100;
+      if (fixes.some(f => f.tier === "quick_win") && s < 75) {
         if (!best || s < best.score) best = { id: c.id, score: s };
       }
     }
@@ -108,7 +63,6 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
         const score = cat?.score ?? 0;
         const meta = getCategoryMeta(card.area);
         const Icon = meta.icon;
-        const lift = potentialLift(fixes, score);
         const band = scoreBand(score);
         return (
           <AccordionItem
@@ -138,7 +92,6 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
                     <span className="text-muted-foreground font-normal">/100</span>
                   </span>
                 </div>
-                <LiftBadge lift={lift} />
                 <ChevronDown className="h-4 w-4 flex-none text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </div>
             </AccordionTrigger>

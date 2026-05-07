@@ -1,4 +1,4 @@
-import { MapPin, Star, Sparkles, Home } from "lucide-react";
+import { MapPin, Star, Sparkles, Home, CheckCircle2 } from "lucide-react";
 import type { AuditResponse } from "@/lib/types";
 
 const NOTABLE = [
@@ -32,12 +32,18 @@ export function ListingCard({ data }: { data: AuditResponse }) {
     <div className="rounded-2xl border bg-card p-4 shadow-card sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row">
         {data.thumbnail ? (
-          <div className="aspect-[3/2] w-full overflow-hidden rounded-xl bg-muted sm:w-48 sm:flex-none">
+          <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl bg-muted sm:w-48 sm:flex-none">
             <img
               src={data.thumbnail}
               alt={data.title}
               className="h-full w-full object-cover"
             />
+            <div className="absolute left-2 top-2">
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+                <CheckCircle2 className="h-2.5 w-2.5" />
+                Analysed
+              </span>
+            </div>
           </div>
         ) : (
           <div className="flex aspect-[3/2] w-full items-center justify-center rounded-xl bg-muted text-muted-foreground sm:w-48 sm:flex-none">

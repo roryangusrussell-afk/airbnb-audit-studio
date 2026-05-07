@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link2, Mail, Check } from "lucide-react";
+import { Check, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/Eyebrow";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
@@ -9,10 +8,7 @@ export function NextStepTab({ email, data }: { email: string; data: AuditRespons
   return (
     <div className="grid gap-5 lg:grid-cols-3">
       <StrategyCallCard data={data} />
-      <div className="grid gap-5 lg:col-span-1">
-        <ReferralCard email={email} />
-        <NewsletterCard />
-      </div>
+      <GetMoreCard email={email} />
     </div>
   );
 }
@@ -74,54 +70,75 @@ function StrategyCallCard({ data }: { data: AuditResponse }) {
   );
 }
 
-function ReferralCard({ email }: { email: string }) {
+function GetMoreCard({ email }: { email: string }) {
   const refCode = email ? btoa(email).slice(0, 10) : "";
-  const link = `https://airbnb-audit-rho.vercel.app/audit?ref=${refCode}`;
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const link = `${origin}/audit?ref=${refCode}`;
   const { copied, copy } = useCopyToClipboard(2000);
 
   return (
-    <div className="rounded-2xl border bg-card p-5 shadow-card">
-      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft">
-        <Link2 className="h-3.5 w-3.5 text-brand" />
+    <div className="lg:col-span-1 rounded-2xl border bg-card p-5 shadow-card flex flex-col gap-4">
+      <div>
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft">
+          <Link2 className="h-3.5 w-3.5 text-brand" />
+        </div>
+        <Eyebrow className="mt-3">Get more audits</Eyebrow>
+        <h4 className="mt-1 text-base font-bold tracking-tight">Audit another listing</h4>
       </div>
-      <Eyebrow className="mt-3">Get more audits</Eyebrow>
-      <h4 className="mt-1 text-base font-bold tracking-tight">Unlock more free audits</h4>
-      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-        Share your link with another host. When they complete an audit, you unlock one extra free audit.
-      </p>
-      <Button
-        variant="outline"
-        size="sm"
-        className="mt-4 w-full"
-        onClick={() => copy(link)}
-      >
-        {copied ? "Copied!" : "Copy my link"}
-      </Button>
-    </div>
-  );
-}
 
-function NewsletterCard() {
-  const [joined, setJoined] = useState(false);
-  return (
-    <div className="rounded-2xl border bg-card p-5 shadow-card">
-      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-soft">
-        <Mail className="h-3.5 w-3.5 text-brand" />
+      {/* Free path */}
+      <div className="rounded-xl bg-muted/40 p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Free
+        </p>
+        <p className="mt-1 text-sm font-medium">Refer another host</p>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          Share your link. When they complete an audit, you unlock one more free.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-3 w-full"
+          onClick={() => copy(link)}
+        >
+          {copied ? "Copied!" : "Copy my referral link"}
+        </Button>
       </div>
-      <Eyebrow className="mt-3">Stay informed</Eyebrow>
-      <h4 className="mt-1 text-base font-bold tracking-tight">Get the operator newsletter</h4>
-      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-        Practical listing teardowns, positioning ideas, and STR systems from the field.
-      </p>
-      <Button
-        variant="outline"
-        size="sm"
-        className="mt-4 w-full"
-        onClick={() => setJoined(true)}
-        disabled={joined}
-      >
-        {joined ? "You're in." : "Join free"}
-      </Button>
+
+      {/* Buy path */}
+      <div className="rounded-xl border border-brand-border bg-brand-soft p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-brand">
+          Buy
+        </p>
+        <div className="mt-3 flex flex-col gap-2">
+          <button
+            type="button"
+            className="flex items-center justify-between rounded-lg border bg-card px-3 py-2.5 text-sm hover:bg-muted/50 transition-colors"
+          >
+            <span className="font-medium">1 audit</span>
+            <span className="font-bold">$19</span>
+          </button>
+          <button
+            type="button"
+            className="flex items-center justify-between rounded-lg border bg-card px-3 py-2.5 text-sm hover:bg-muted/50 transition-colors"
+          >
+            <span className="font-medium">5 audits</span>
+            <span className="flex items-center gap-1.5 font-bold">
+              $79{" "}
+              <span className="text-[11px] font-normal text-muted-foreground line-through">
+                $95
+              </span>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="flex items-center justify-between rounded-lg border bg-card px-3 py-2.5 text-sm hover:bg-muted/50 transition-colors"
+          >
+            <span className="font-medium">Portfolio / Enterprise</span>
+            <span className="text-xs font-semibold text-brand">Contact us</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

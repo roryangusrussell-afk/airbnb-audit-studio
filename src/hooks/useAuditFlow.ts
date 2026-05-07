@@ -84,15 +84,9 @@ export function useAuditFlow() {
         return;
       }
 
-      // Subsequent audits: gate by credits
       if (completedCountRef.current >= 1) {
-        const credits = await checkCredits(storedEmail);
-        if (credits > 0) {
-          await useCredit(storedEmail);
-        } else {
-          setCreditGateOpen(true);
-          return;
-        }
+        setCreditGateOpen(true);
+        return;
       }
 
       await performAudit(auditUrl, storedEmail);
