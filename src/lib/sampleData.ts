@@ -197,4 +197,76 @@ export const sampleAudit: AuditResponse = {
         "Top 5% is the kind of social proof new listings spend years building. It's earning conversion before guests even read the copy. Don't break what's earning it.",
     },
   ],
+  positioningDiagnosis: {
+    targetGuest:
+      "Independent travellers and small groups visiting Lisbon for nightlife, food and city exploration who also need to drive or arrive by car.",
+    promise:
+      "A bright, well-equipped flat in the heart of Cais do Sodré with the rare luxury of a private parking space and a south-facing balcony.",
+    reviewAlignment:
+      "Reviews repeatedly validate the parking, the location and the cleanliness — all pillars of the implied promise.",
+    adjustment:
+      "Private parking is already validated by reviews, but the listing under-displays it in the title and gallery. The shift is treating parking as the headline differentiator, not a footnote.",
+  },
+  performancePattern: {
+    strengths: [
+      {
+        category: "Reviews",
+        title: "Early trust is unusually strong",
+        detail:
+          "A 4.87 rating across 94 reviews and Top 5% Guest Favourite status creates strong proof and reduces booking friction for new visitors.",
+      },
+      {
+        category: "Overview",
+        title: "The space has a real point of view",
+        detail:
+          "Wooden floors, high ceilings and a south-facing balcony give the apartment a memorable personality beyond a generic city flat.",
+      },
+      {
+        category: "Amenities",
+        title: "Guest expectations are well managed",
+        detail:
+          "Private parking, balcony, kitchen and workspace are all declared upfront, helping guests self-qualify before they book.",
+      },
+    ],
+    gaps: [
+      {
+        category: "Title",
+        title: "Strongest USP is buried",
+        detail:
+          "Private parking is the rarest signal in Cais do Sodré, but it doesn't appear in the title and isn't shown in the first photo.",
+      },
+      {
+        category: "Photos",
+        title: "Photo metadata is underdeveloped",
+        detail:
+          "None of the 28 photos carry captions, so the gallery doesn't explain room function, amenities or neighbourhood context to guests.",
+      },
+      {
+        category: "Description",
+        title: "Description structure flattens the story",
+        detail:
+          "A single block of copy treats the balcony, parking and neighbourhood as equal — and undersells each individual signal.",
+      },
+    ],
+    leverage: [
+      {
+        category: "Title",
+        title: "The cultural positioning could be more visible",
+        detail:
+          "The listing has a distinctive identity, but the title and opening copy could surface the Cais do Sodré character more clearly.",
+      },
+      {
+        category: "Reviews",
+        title: "The review profile can work harder",
+        detail:
+          "94 strong reviews are enough to start building visible host credibility if the host engages publicly with recent ones.",
+      },
+      {
+        category: "Photos",
+        title: "The gallery can carry more selling power",
+        detail:
+          "The room is visually distinctive, but the gallery is not yet doing enough explanatory work for guests scanning quickly on mobile.",
+      },
+    ],
+  },
 };
