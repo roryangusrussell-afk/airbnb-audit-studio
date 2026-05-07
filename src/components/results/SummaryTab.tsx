@@ -1,4 +1,4 @@
-import { Check, Minus } from "lucide-react";
+import { Check, Minus, Wand2 } from "lucide-react";
 import type { AuditResponse, Fix } from "@/lib/types";
 import { Eyebrow } from "@/components/Eyebrow";
 import { ScoreRing, VerdictLabel } from "./ScoreRing";
@@ -26,22 +26,24 @@ export function SummaryTab({ data }: { data: AuditResponse }) {
     <div className="space-y-10">
       {/* Score + categories */}
       <section className="rounded-2xl border bg-card p-5 shadow-card sm:p-6">
-        <div className="grid items-center gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-10">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+        <div className="grid items-center gap-6 lg:grid-cols-[auto_1px_minmax(0,1fr)] lg:gap-8">
+          <div className="flex flex-col items-center text-center">
             <ScoreRing score={data.score} />
-            <div className="mt-4 space-y-1.5">
+            <div className="mt-4 flex flex-col items-center gap-2">
               <VerdictLabel score={data.score} />
-              <p className="max-w-[14rem] text-xs leading-snug text-muted-foreground">
+              <p className="max-w-[15rem] text-xs leading-snug text-muted-foreground">
                 Strong review base, but the listing is underusing its main USP.
               </p>
             </div>
           </div>
-          <div className="lg:max-w-md">
+          <div className="hidden lg:block self-stretch w-px bg-border/60" />
+          <div>
             <ScoreBreakdown cats={data.cats} />
           </div>
         </div>
         {mainOpportunity && (
-          <div className="mt-5 flex flex-col gap-1 rounded-lg border border-brand-border bg-brand-soft/50 px-4 py-2.5 sm:flex-row sm:items-baseline sm:gap-3">
+          <div className="mt-5 flex items-center gap-3 rounded-lg border border-brand-border bg-brand-soft/50 px-4 py-2.5">
+            <Wand2 className="h-4 w-4 flex-none text-brand" />
             <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">
               Priority fix
             </div>
