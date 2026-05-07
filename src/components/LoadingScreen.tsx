@@ -38,7 +38,7 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
 
   useEffect(() => {
     if (step >= STEPS.length - 1) return;
-    const t = setTimeout(() => setStep((s) => s + 1), 1800);
+    const t = setTimeout(() => setStep((s) => s + 1), 1200);
     return () => clearTimeout(t);
   }, [step]);
 
@@ -277,10 +277,18 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
                       padding: "16px 20px",
                       borderRadius: 14,
                       minHeight: 76,
-                      border: active ? `1px solid ${PINK_BORDER}` : `1px solid ${BORDER}`,
-                      background: active ? PALE_PINK : "#FAFAFA",
-                      boxShadow: done ? "0 2px 8px rgba(15,23,42,0.03)" : "none",
-                      transition: "background 0.3s ease, border-color 0.3s ease",
+                      border: active
+                        ? `1.5px solid ${PINK_BORDER}`
+                        : done
+                          ? "1px solid rgba(47,163,107,0.22)"
+                          : `1px solid ${BORDER}`,
+                      background: active
+                        ? "rgba(232,24,92,0.07)"
+                        : done
+                          ? "rgba(47,163,107,0.05)"
+                          : "#F8F8F8",
+                      boxShadow: active ? "0 4px 16px rgba(232,24,92,0.08)" : "none",
+                      transition: "background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease",
                     }}
                   >
                     {/* Left: icon + text */}
@@ -341,17 +349,16 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
                       <div style={{ minWidth: 0 }}>
                         <p style={{
                           fontSize: 16,
-                          fontWeight: 700,
-                          color: done || active ? DARK : "#94A3B8",
+                          fontWeight: done ? 600 : active ? 700 : 500,
+                          color: done ? DARK : active ? DARK : "#B0BAC9",
                           margin: 0,
                         }}>
                           {s.title}
                         </p>
                         <p style={{
-                          marginTop: 3,
                           fontSize: 14,
                           lineHeight: 1.4,
-                          color: done || active ? MUTED : "#94A3B8",
+                          color: done ? MUTED : active ? MUTED : "#C4CCDA",
                           margin: "3px 0 0",
                         }}>
                           {s.desc}
