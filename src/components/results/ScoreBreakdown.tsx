@@ -37,18 +37,18 @@ function ScoreRow({ cat, isLast }: { cat: Cat; isLast: boolean }) {
   const sub = SHORT_FB[cat.name] ?? cat.fb;
 
   return (
-    <li className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 py-1.5 ${isLast ? "" : "border-b border-border/30"}`}>
-      <span className={`flex h-5 w-5 items-center justify-center rounded-md ${meta.iconBg}`}>
-        <Icon className={`h-3 w-3 ${meta.iconText}`} />
+    <li className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 py-3 ${isLast ? "" : "border-b border-border/30"}`}>
+      <span className={`flex h-9 w-9 flex-none items-center justify-center rounded-lg ${meta.iconBg}`}>
+        <Icon className={`h-4.5 w-4.5 ${meta.iconText}`} style={{ width: 18, height: 18 }} />
       </span>
       <div className="min-w-0">
-        <div className="truncate text-[12.5px] font-semibold leading-tight text-foreground">{cat.name}</div>
-        <div className="truncate text-[10.5px] leading-tight text-muted-foreground">{sub}</div>
+        <div className="truncate text-sm font-semibold leading-snug text-foreground">{cat.name}</div>
+        <div className="truncate text-xs leading-snug text-muted-foreground mt-0.5">{sub}</div>
       </div>
-      <div className={`text-[11.5px] font-semibold tabular-nums ${textCls}`}>
-        {cat.score}<span className="text-muted-foreground font-normal">/100</span>
+      <div className={`text-base font-bold tabular-nums ${textCls}`}>
+        {cat.score}<span className="text-muted-foreground font-normal text-sm">/100</span>
       </div>
-      <div className="col-span-3 mt-1 h-[2px] overflow-hidden rounded-full bg-muted/70">
+      <div className="col-span-3 mt-1.5 h-[3px] overflow-hidden rounded-full bg-muted/70">
         <div
           className={`h-full rounded-full ${fillCls}/90`}
           style={{ width: `${Math.max(2, Math.min(100, cat.score))}%` }}
