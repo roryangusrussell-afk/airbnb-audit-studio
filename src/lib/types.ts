@@ -27,6 +27,11 @@ export interface PositioningDiagnosis {
   adjustment: string;
 }
 
+export interface SummaryAction {
+  title: string;
+  detail: string;
+}
+
 export type FixTier = "quick_win" | "refinement" | string;
 export type Difficulty = "Easy" | "Medium" | "Hard" | string;
 
@@ -102,4 +107,9 @@ export interface AuditResponse {
   formulaBreakdown?: Record<string, number>;
   listingSignals?: string;
   positioningDiagnosis?: PositioningDiagnosis;
+  // New Summary tab shape (session 7) — replaces listingSignals + positioningDiagnosis
+  summary?: string;
+  start?: SummaryAction[];
+  stop?: SummaryAction[];
+  continue?: SummaryAction[];
 }

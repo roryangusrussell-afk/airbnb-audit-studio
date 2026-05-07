@@ -2,8 +2,7 @@ import type { AuditResponse } from "./types";
 
 export const sampleAudit: AuditResponse = {
   score: 71,
-  verdict:
-    "Solid listing with a strong review base but key USPs missing from the title and photos.",
+  verdict: "Strong reviews held back by a buried parking USP.",
   title: "Light-filled 1BR flat with balcony & private parking in Cais do Sodré",
   location: "Lisbon, Portugal",
   overview:
@@ -145,4 +144,57 @@ export const sampleAudit: AuditResponse = {
   hostMessageResponseTime: "Responds within an hour",
   isGuestFavorite: true,
   guestFavoriteTier: "Top 5%",
+  summary:
+    "This listing reads as a base for travellers who want to be in the heart of Lisbon's nightlife and food scene with the rare luxury of a private parking space. The promise is delivering: 4.87 across 94 reviews, Guest Favourite status, 5.0 communication, and 4.9 location and cleanliness. Recent reviews mention the parking by name.\n\nThe fundamental tension is that the rarest signal on this listing, private parking in Cais do Sodré, is invisible above the fold. The title doesn't mention it, and the first photo doesn't show it. The shift worth making is treating parking as the primary differentiator, not a footnote in paragraph three.",
+  start: [
+    {
+      title: "Add parking to the title",
+      detail:
+        "Private parking is rare in Cais do Sodré and currently missing from your title. Guests filtering for parking will see your listing before they open it, which is the highest-leverage edit available.",
+    },
+    {
+      title: "Caption every photo",
+      detail:
+        "28 photos with no captions is 28 missed semantic signals. Each caption is a free conversion tool: room name plus one specific feature like 'south-facing balcony at golden hour'.",
+    },
+    {
+      title: "Photograph the parking space",
+      detail:
+        "Parking is your strongest differentiator and there isn't a photo of it. A single shot with the gate or door visible would close the credibility gap for guests filtering on it.",
+    },
+  ],
+  stop: [
+    {
+      title: "Burying parking in paragraph three",
+      detail:
+        "Most guests read only the first two lines of the overview. Putting parking after a generic 'beautifully designed' opener wastes the highest-leverage real estate on the page.",
+    },
+    {
+      title: "Letting the description run flat",
+      detail:
+        "One paragraph for the whole space, balcony, and parking. Hard to scan on mobile, and it undersells each individual signal by treating them all the same.",
+    },
+    {
+      title: "Claiming a workspace you don't show",
+      detail:
+        "Workspace is declared but not evidenced in any of the 28 photos. Either show it or remove the claim. Guests filtering on it will downgrade trust either way.",
+    },
+  ],
+  continue: [
+    {
+      title: "Replying within the hour, every time",
+      detail:
+        "100% messaging response rate at 'within an hour' is top-tier territory and a direct ranking signal in Airbnb's algorithm. Most hosts can't sustain this.",
+    },
+    {
+      title: "Whatever you're doing on cleanliness",
+      detail:
+        "4.9 cleanliness across 94 reviews is rare. Whatever the operating routine is, protect it. This is the foundation everything else stands on.",
+    },
+    {
+      title: "Holding Top 5% Guest Favourite status",
+      detail:
+        "Top 5% is the kind of social proof new listings spend years building. It's earning conversion before guests even read the copy. Don't break what's earning it.",
+    },
+  ],
 };

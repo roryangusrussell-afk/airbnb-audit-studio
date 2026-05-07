@@ -20,9 +20,9 @@ export function ScoreBreakdownCard({ cats, score, priorityFix }: Props) {
         Score breakdown
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[170px_1fr]">
+      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[124px_1fr]">
         <div className="flex flex-col items-center justify-center">
-          <ScoreRing score={score} size={156} />
+          <ScoreRing score={score} size={112} />
           <div className="mt-3">
             <span
               className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] ${bandSoftClasses(band)}`}
