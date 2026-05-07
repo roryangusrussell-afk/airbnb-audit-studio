@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, Star } from "lucide-react";
+import type { PeekData } from "@/lib/api";
 
 const STEPS = [
   "Fetching listing data",
@@ -8,7 +9,7 @@ const STEPS = [
   "Generating your audit report",
 ];
 
-export function LoadingScreen({ url }: { url: string }) {
+export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | null }) {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
@@ -21,8 +22,37 @@ export function LoadingScreen({ url }: { url: string }) {
     <div className="container flex min-h-[70vh] flex-col items-center justify-center py-16">
       <div className="w-full max-w-xl rounded-2xl border bg-card p-8 shadow-card">
         <div className="eyebrow">Auditing</div>
-        <p className="mt-2 break-all text-sm text-muted-foreground">{url}</p>
-        <h2 className="mt-1 text-2xl font-bold tracking-tight">
+
+        {peek?.imageUrl ? (
+          <div className="mt-3 flex items-center gap-4">
+            <img
+              src={peek.imageUrl}
+              alt={peek.title ?? "Listing"}
+              className="h-16 w-24 rounded-lg object-cover flex-none"
+            />
+            <div className="min-w-0">
+              {peek.title && (
+                <p className="truncate text-sm font-semibold text-foreground">{peek.title}</p>
+              )}
+              {(peek.rating || peek.reviewCount) && (
+                <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  {peek.rating && (
+                    <span className="flex items-center gap-0.5">
+                      <Star className="h-3 w-3 fill-warning text-warning" />
+                      <span className="font-medium text-foreground">{peek.rating}</span>
+                    </span>
+                  )}
+                  {peek.rating && peek.reviewCount && <span>·</span>}
+                  {peek.reviewCount && <span>{peek.reviewCount} reviews</span>}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <p className="mt-2 break-all text-sm text-muted-foreground">{url}</p>
+        )}
+
+        <h2 className="mt-4 text-2xl font-bold tracking-tight">
           Reading your listing the way Airbnb does.
         </h2>
 

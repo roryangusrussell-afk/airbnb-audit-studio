@@ -41,6 +41,26 @@ export async function runAudit(url: string): Promise<AuditResponse> {
   }
 }
 
+export interface PeekData {
+  imageUrl: string | null;
+  title: string | null;
+  rating: string | null;
+  reviewCount: number | null;
+  host: string | null;
+}
+
+export async function peekListing(url: string): Promise<PeekData | null> {
+  try {
+    const idMatch = url.match(/\/rooms\/(\d+)/);
+    if (!idMatch) return null;
+    const res = await fetch(`${BASE}/api/peek?id=${idMatch[1]}`);
+    if (!res.ok) return null;
+    return (await res.json()) as PeekData;
+  } catch {
+    return null;
+  }
+}
+
 export async function sendReport(payload: {
   email: string;
   listingId: string;

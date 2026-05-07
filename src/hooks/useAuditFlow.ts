@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AuditError, checkCredits, redeemRef, runAudit, useCredit } from "@/lib/api";
+import { AuditError, checkCredits, peekListing, redeemRef, runAudit, useCredit } from "@/lib/api";
+import type { PeekData } from "@/lib/api";
 import type { AuditResponse } from "@/lib/types";
 
 export type FlowStatus = "landing" | "loading" | "results" | "error";
@@ -14,6 +15,7 @@ export function useAuditFlow() {
     typeof window !== "undefined" ? localStorage.getItem(EMAIL_KEY) ?? "" : "",
   );
   const [data, setData] = useState<AuditResponse | null>(null);
+  const [peekData, setPeekData] = useState<PeekData | null>(null);
   const [error, setError] = useState<string>("");
   const [needsEmail, setNeedsEmail] = useState(false);
   const [creditGateOpen, setCreditGateOpen] = useState(false);
@@ -41,6 +43,8 @@ export function useAuditFlow() {
     async (auditUrl: string, withEmail: string) => {
       setStatus("loading");
       setError("");
+      setPeekData(null);
+      peekListing(auditUrl).then(d => { if (d) setPeekData(d); });
       try {
         const result = await runAudit(auditUrl);
         setData(result);
@@ -129,6 +133,7 @@ export function useAuditFlow() {
     url,
     email,
     data,
+    peekData,
     error,
     needsEmail,
     creditGateOpen,

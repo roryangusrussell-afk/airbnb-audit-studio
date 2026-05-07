@@ -12,7 +12,7 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background">
       {flow.status === "landing" && <Hero onSubmit={flow.submitUrl} />}
-      {flow.status === "loading" && <LoadingScreen url={flow.url} />}
+      {flow.status === "loading" && <LoadingScreen url={flow.url} peek={flow.peekData} />}
       {flow.status === "error" && (
         <ErrorScreen message={flow.error} onRetry={flow.retry} onReset={flow.reset} />
       )}
