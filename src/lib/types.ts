@@ -72,6 +72,11 @@ export interface AuditResponse {
   bottomTenRisk: boolean;
   hostResponseRatio: number;
   listingId: string;
+  // New optional review/host signals
+  hostMessageResponseRate?: number | null;
+  hostMessageResponseTime?: string | null;
+  isGuestFavorite?: boolean | null;
+  guestFavoriteTier?: "Top 1%" | "Top 5%" | "Top 10%" | string | null;
   // Optional fields the API may return
   thumbnail?: string;
   rating?: number;

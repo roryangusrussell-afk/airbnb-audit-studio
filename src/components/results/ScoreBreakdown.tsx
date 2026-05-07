@@ -1,22 +1,6 @@
-import {
-  Type,
-  AlignLeft,
-  FileText,
-  ListChecks,
-  Image as ImageIcon,
-  Star,
-} from "lucide-react";
 import type { Cat } from "@/lib/types";
 import { scoreBand, bandTextClass, bandBgClass } from "@/lib/scoring";
-
-const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Title: Type,
-  Overview: AlignLeft,
-  Description: FileText,
-  Amenities: ListChecks,
-  Photos: ImageIcon,
-  "Reviews & rating": Star,
-};
+import { getCategoryMeta } from "@/lib/categoryMeta";
 
 const SHORT_FB: Record<string, string> = {
   Title: "No strong differentiator",
@@ -46,14 +30,17 @@ export function ScoreBreakdown({ cats }: { cats: Cat[] }) {
 
 function ScoreRow({ cat, isLast }: { cat: Cat; isLast: boolean }) {
   const band = scoreBand(cat.score);
-  const Icon = ICONS[cat.name] ?? Type;
+  const meta = getCategoryMeta(cat.name);
+  const Icon = meta.icon;
   const textCls = bandTextClass(band);
   const fillCls = bandBgClass(band);
   const sub = SHORT_FB[cat.name] ?? cat.fb;
 
   return (
     <li className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 py-1.5 ${isLast ? "" : "border-b border-border/30"}`}>
-      <Icon className={`h-3.5 w-3.5 ${textCls}`} />
+      <span className={`flex h-5 w-5 items-center justify-center rounded-md ${meta.iconBg}`}>
+        <Icon className={`h-3 w-3 ${meta.iconText}`} />
+      </span>
       <div className="min-w-0">
         <div className="truncate text-[12.5px] font-semibold leading-tight text-foreground">{cat.name}</div>
         <div className="truncate text-[10.5px] leading-tight text-muted-foreground">{sub}</div>

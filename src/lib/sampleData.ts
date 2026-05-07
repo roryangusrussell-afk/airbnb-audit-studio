@@ -141,4 +141,8 @@ export const sampleAudit: AuditResponse = {
   reviewCount: 94,
   propertyType: "Entire apartment",
   guests: 3,
+  hostMessageResponseRate: 100,
+  hostMessageResponseTime: "Responds within an hour",
+  isGuestFavorite: true,
+  guestFavoriteTier: "Top 5%",
 };

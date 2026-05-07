@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText, Activity, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListingCard } from "./ListingCard";
@@ -38,14 +38,26 @@ export function ResultsScreen({
       </div>
 
       <Tabs defaultValue="summary" className="mt-8">
-        <TabsList className="h-auto rounded-xl bg-muted/60 p-1">
-          <TabsTrigger value="summary" className="rounded-lg px-4 py-2 text-sm">
+        <TabsList className="h-auto w-full justify-center gap-1.5 rounded-xl border bg-card p-1 shadow-card sm:w-auto">
+          <TabsTrigger
+            value="summary"
+            className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
+          >
+            <FileText className="h-3.5 w-3.5" />
             Summary
           </TabsTrigger>
-          <TabsTrigger value="diagnostic" className="rounded-lg px-4 py-2 text-sm">
+          <TabsTrigger
+            value="diagnostic"
+            className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
+          >
+            <Activity className="h-3.5 w-3.5" />
             Diagnostic
           </TabsTrigger>
-          <TabsTrigger value="next" className="rounded-lg px-4 py-2 text-sm">
+          <TabsTrigger
+            value="next"
+            className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
+          >
+            <Rocket className="h-3.5 w-3.5" />
             Next step
           </TabsTrigger>
         </TabsList>
