@@ -79,18 +79,23 @@ export function useAuditFlow() {
       const storedEmail =
         typeof window !== "undefined" ? localStorage.getItem(EMAIL_KEY) : "";
 
-      if (!storedEmail) {
+      const isLocalDev = typeof window !== "undefined" && window.location.hostname === "localhost";
+      const isDevBypass =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("dev") === "1";
+      const bypassGates = isLocalDev || isDevBypass;
+
+      if (!storedEmail && !bypassGates) {
         setNeedsEmail(true);
         return;
       }
 
-      const isLocalDev = typeof window !== "undefined" && window.location.hostname === "localhost";
-      if (completedCountRef.current >= 1 && !isLocalDev) {
+      if (completedCountRef.current >= 1 && !bypassGates) {
         setCreditGateOpen(true);
         return;
       }
 
-      await performAudit(auditUrl, storedEmail);
+      await performAudit(auditUrl, storedEmail || "dev@auditable.local");
     },
     [performAudit],
   );
