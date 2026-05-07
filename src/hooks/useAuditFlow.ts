@@ -79,23 +79,15 @@ export function useAuditFlow() {
       const storedEmail =
         typeof window !== "undefined" ? localStorage.getItem(EMAIL_KEY) : "";
 
-      const isLocalDev = typeof window !== "undefined" && window.location.hostname === "localhost";
-      const isDevBypass =
-        typeof window !== "undefined" &&
-        new URLSearchParams(window.location.search).get("dev") === "1";
-      const bypassGates = isLocalDev || isDevBypass;
-
-      if (!storedEmail && !bypassGates) {
+      // Credit gate disabled while we test Diagnostic v2 rewrites.
+      // Re-enable by restoring the completedCountRef >= 1 branch when
+      // Stripe / referral plumbing is real.
+      if (!storedEmail) {
         setNeedsEmail(true);
         return;
       }
 
-      if (completedCountRef.current >= 1 && !bypassGates) {
-        setCreditGateOpen(true);
-        return;
-      }
-
-      await performAudit(auditUrl, storedEmail || "dev@auditable.local");
+      await performAudit(auditUrl, storedEmail);
     },
     [performAudit],
   );
