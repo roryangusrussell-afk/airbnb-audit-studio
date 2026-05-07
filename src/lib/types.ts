@@ -112,4 +112,17 @@ export interface AuditResponse {
   start?: SummaryAction[];
   stop?: SummaryAction[];
   continue?: SummaryAction[];
+  // Session 8: Performance pattern (Strengths / Gaps & Risks / Untapped Leverage)
+  performancePattern?: {
+    strengths: PatternItem[];
+    gaps: PatternItem[];
+    leverage: PatternItem[];
+  };
+}
+
+export interface PatternItem {
+  title: string;
+  detail: string;
+  /** Optional category hint to choose an icon. */
+  category?: string;
 }
