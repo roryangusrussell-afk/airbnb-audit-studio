@@ -48,10 +48,13 @@ function ScoreRow({ cat, isLast }: { cat: Cat; isLast: boolean }) {
       <div className={`text-base font-bold tabular-nums ${textCls}`}>
         {cat.score}<span className="text-muted-foreground font-normal text-sm">/100</span>
       </div>
-      <div className="col-span-3 mt-1.5 h-[3px] overflow-hidden rounded-full bg-muted/70">
+      <div className="col-span-3 mt-2 h-[6px] overflow-hidden rounded-full bg-muted/40">
         <div
-          className={`h-full rounded-full ${fillCls}/90`}
-          style={{ width: `${Math.max(2, Math.min(100, cat.score))}%` }}
+          className={`h-full rounded-full ${fillCls}`}
+          style={{
+            width: `${Math.max(2, Math.min(100, cat.score))}%`,
+            transition: "width 0.6s ease",
+          }}
         />
       </div>
     </li>
