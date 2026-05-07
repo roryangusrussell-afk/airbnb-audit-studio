@@ -12,7 +12,7 @@ export class AuditError extends Error {
 
 export async function runAudit(url: string): Promise<AuditResponse> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 90_000);
+  const timeout = setTimeout(() => controller.abort(), 180_000);
   try {
     const res = await fetch(`${BASE}/api/audit`, {
       method: "POST",
