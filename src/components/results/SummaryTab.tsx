@@ -25,27 +25,27 @@ export function SummaryTab({ data }: { data: AuditResponse }) {
   return (
     <div className="space-y-10">
       {/* Score + categories */}
-      <section className="rounded-2xl border bg-card p-6 shadow-card sm:p-8">
-        <div className="grid items-start gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">
+      <section className="rounded-2xl border bg-card p-5 shadow-card sm:p-6">
+        <div className="grid items-center gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-10">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             <ScoreRing score={data.score} />
-            <div className="mt-5 space-y-2">
+            <div className="mt-4 space-y-1.5">
               <VerdictLabel score={data.score} />
-              <p className="max-w-xs text-sm text-muted-foreground">
+              <p className="max-w-[14rem] text-xs leading-snug text-muted-foreground">
                 Strong review base, but the listing is underusing its main USP.
               </p>
             </div>
           </div>
-          <ScoreBreakdown cats={data.cats} />
+          <div className="lg:max-w-md">
+            <ScoreBreakdown cats={data.cats} />
+          </div>
         </div>
         {mainOpportunity && (
-          <div className="mt-6 rounded-xl border border-brand-border bg-brand-soft/60 px-5 py-4">
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-3">
-              <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">
-                Priority fix
-              </div>
-              <p className="text-sm leading-snug text-foreground">{mainOpportunity}</p>
+          <div className="mt-5 flex flex-col gap-1 rounded-lg border border-brand-border bg-brand-soft/50 px-4 py-2.5 sm:flex-row sm:items-baseline sm:gap-3">
+            <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">
+              Priority fix
             </div>
+            <p className="text-[13px] leading-snug text-foreground">{mainOpportunity}</p>
           </div>
         )}
       </section>
