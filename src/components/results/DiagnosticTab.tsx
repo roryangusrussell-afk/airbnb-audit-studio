@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/CopyButton";
-import { categoryRatingBand, bandTextClass, scoreBand } from "@/lib/scoring";
+import { bandTextClass, scoreBand } from "@/lib/scoring";
 import { getCategoryMeta } from "@/lib/categoryMeta";
 import type { AuditResponse, Fix } from "@/lib/types";
 
