@@ -91,6 +91,8 @@ export interface AuditResponse {
   isGuestFavorite?: boolean | null;
   guestFavoriteTier?: "Top 1%" | "Top 5%" | "Top 10%" | string | null;
   isElvisListing?: boolean;
+  // Host portfolio signals
+  hostListingCount?: number | null;
   // Optional fields the API may return
   thumbnail?: string;
   rating?: number;
