@@ -190,11 +190,10 @@ function CurrentBlock({ area, data }: { area: string; data: AuditResponse }) {
   }
   if (area === "Description") {
     const txt = data.description ?? "";
-    const display = txt.length > 300 ? txt.slice(0, 300) + "..." : txt;
     return (
       <div className={wrapper}>
         {eyebrow}
-        <p className="mt-1.5 leading-relaxed text-foreground">{display}</p>
+        <p className="mt-1.5 whitespace-pre-line leading-relaxed text-foreground">{txt}</p>
       </div>
     );
   }
