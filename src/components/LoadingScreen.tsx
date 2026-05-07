@@ -389,18 +389,6 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
                     </div>
                   </div>
 
-                  {/* Active detail line */}
-                  {active && (
-                    <p style={{
-                      marginTop: 8,
-                      marginLeft: 60,
-                      fontSize: 13,
-                      lineHeight: 1.5,
-                      color: MUTED,
-                    }}>
-                      Now prioritising fixes by likely impact on visibility, conversion and guest trust.
-                    </p>
-                  )}
                 </div>
               );
             })}
