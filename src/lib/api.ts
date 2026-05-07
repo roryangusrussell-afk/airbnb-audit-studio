@@ -124,6 +124,8 @@ export async function submitFeedback(payload: {
   listingId: string;
   rating: string;
   comment?: string;
+  email?: string;
+  url?: string;
 }): Promise<void> {
   await fetch(`${BASE}/api/feedback`, {
     method: "POST",

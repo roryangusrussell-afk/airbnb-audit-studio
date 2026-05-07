@@ -14,13 +14,40 @@ type FeedbackRating = (typeof RATINGS)[number]["value"];
 
 export function FeedbackButton({
   listingId,
+  email,
+  url,
+  variant = "pill",
 }: {
   listingId: string;
+  email?: string;
+  url?: string;
+  variant?: "pill" | "panel";
 }) {
   const [open, setOpen] = useState(false);
 
-  return (
-    <>
+  const trigger =
+    variant === "panel" ? (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex w-full items-start gap-3 rounded-2xl border border-brand-border bg-brand-soft p-4 text-left transition-colors hover:border-brand hover:bg-brand-soft/80"
+      >
+        <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-white text-brand">
+          <MessageSquare className="h-4 w-4" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-brand">
+            Beta feedback wanted
+          </span>
+          <span className="mt-1 block text-[14px] font-semibold text-foreground">
+            How did this audit land for you?
+          </span>
+          <span className="mt-1 block text-[13px] text-muted-foreground">
+            Two clicks. Tells us what's useful, what's off, what's missing.
+          </span>
+        </span>
+      </button>
+    ) : (
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -29,9 +56,19 @@ export function FeedbackButton({
         <MessageSquare className="h-3 w-3" />
         Beta feedback
       </button>
+    );
+
+  return (
+    <>
+      {trigger}
 
       {open && (
-        <FeedbackModal listingId={listingId} onClose={() => setOpen(false)} />
+        <FeedbackModal
+          listingId={listingId}
+          email={email}
+          url={url}
+          onClose={() => setOpen(false)}
+        />
       )}
     </>
   );
@@ -39,9 +76,13 @@ export function FeedbackButton({
 
 function FeedbackModal({
   listingId,
+  email,
+  url,
   onClose,
 }: {
   listingId: string;
+  email?: string;
+  url?: string;
   onClose: () => void;
 }) {
   const [selected, setSelected] = useState<FeedbackRating | null>(null);
@@ -51,7 +92,13 @@ function FeedbackModal({
   const handleSubmit = () => {
     if (!selected) return;
     setState("sent");
-    submitFeedback({ listingId, rating: selected, comment: comment.trim() });
+    submitFeedback({
+      listingId,
+      rating: selected,
+      comment: comment.trim(),
+      email,
+      url,
+    });
     setTimeout(onClose, 1800);
   };
 

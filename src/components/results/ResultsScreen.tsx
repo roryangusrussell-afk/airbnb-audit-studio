@@ -27,7 +27,11 @@ export function ResultsScreen({
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="eyebrow">Your audit report</div>
         <div className="flex items-center gap-2">
-          <FeedbackButton listingId={data.listingId} />
+          <FeedbackButton
+            listingId={data.listingId}
+            email={email}
+            url={`https://www.airbnb.com/rooms/${data.listingId}`}
+          />
           <Button variant="outline" size="sm" onClick={onAuditAnother} className="gap-1.5">
             <ArrowLeft className="h-3.5 w-3.5" /> Audit another listing
           </Button>
@@ -73,6 +77,15 @@ export function ResultsScreen({
           <NextStepTab email={email} data={data} />
         </TabsContent>
       </Tabs>
+
+      <div className="mt-8">
+        <FeedbackButton
+          listingId={data.listingId}
+          email={email}
+          url={`https://www.airbnb.com/rooms/${data.listingId}`}
+          variant="panel"
+        />
+      </div>
     </div>
   );
 }
