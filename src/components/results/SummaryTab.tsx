@@ -114,9 +114,9 @@ export function SummaryTab({ data }: { data: AuditResponse }) {
   const introText = data.listingSignals || buildFallbackSignals(data);
 
   return (
-    <div className="space-y-6">
-      {/* Diagnostic hero: score left, commentary right */}
-      <section className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.18fr_0.92fr]">
+    <div className="space-y-5">
+      {/* Level 1 — primary: score + commentary */}
+      <section className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <ScoreBreakdownCard
           cats={data.cats}
           score={data.score}
@@ -125,45 +125,41 @@ export function SummaryTab({ data }: { data: AuditResponse }) {
         <AnalystCommentaryCard data={data} introText={introText} />
       </section>
 
-      {/* Three insight cards */}
-      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      {/* Level 2 — secondary: signal cards */}
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <InsightCard variant="strengths" items={strengths} />
         <InsightCard variant="gaps" items={gapsAndRisks} />
         <InsightCard variant="opportunities" items={opportunities} />
       </section>
 
-      {/* Positioning */}
+      {/* Level 3 — supporting: positioning. Quieter visual treatment. */}
       {data.positioningDiagnosis && (
         <section>
-          <div className="mb-4">
-            <div className="text-xs font-bold uppercase tracking-[0.16em] text-brand">
+          <div className="mb-3">
+            <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
               Positioning
             </div>
-            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#1F1F24]">
+            <h3 className="mt-1 text-lg font-semibold tracking-[-0.02em] text-foreground">
               How guests read this listing.
-            </h2>
+            </h3>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {POSITIONING_CONFIG.map(({ key, title, Icon, softBg, iconText }) => {
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {POSITIONING_CONFIG.map(({ key, title, Icon }) => {
               const body = data.positioningDiagnosis![key];
               if (!body) return null;
               return (
                 <div
                   key={key}
-                  className="rounded-[20px] border border-[#EDE8E6] bg-white p-5 shadow-[0_8px_30px_rgba(15,23,42,0.03)]"
+                  className="rounded-2xl border border-[#EDE8E6] bg-white p-4"
                 >
-                  <div className="mb-3 flex items-center gap-2">
-                    <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] ${softBg} ${iconText}`}
-                    >
-                      <Icon className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                    <div className="text-xs font-bold uppercase tracking-[0.12em] text-[#6D6E78]">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Icon className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+                    <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                       {title}
                     </div>
                   </div>
-                  <p className="text-sm leading-6 text-[#3F4048]">{body}</p>
+                  <p className="text-[13px] leading-5 text-[#3F4048]">{body}</p>
                 </div>
               );
             })}

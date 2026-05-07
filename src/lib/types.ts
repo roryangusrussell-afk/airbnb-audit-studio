@@ -60,13 +60,18 @@ export interface CategoryRating {
   localizedRating: string;
 }
 
+export type DataConfidence = "high" | "low" | "absent";
+
 export interface AuditResponse {
   score: number;
   verdict: string;
   title: string;
+  subtitle?: string;
   location: string;
   overview: string;
+  overviewConfidence?: DataConfidence;
   description: string;
+  descriptionConfidence?: DataConfidence;
   amenities: string[];
   photoCount: number;
   photoAnalysis: PhotoAnalysis;

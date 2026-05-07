@@ -29,10 +29,10 @@ export function ListingCard({ data }: { data: AuditResponse }) {
   });
 
   return (
-    <div className="rounded-2xl border bg-card p-4 shadow-card sm:p-5">
-      <div className="flex flex-col gap-4 sm:flex-row">
+    <div className="rounded-2xl border bg-card p-3 shadow-card sm:p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
         {data.thumbnail ? (
-          <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl bg-muted sm:w-48 sm:flex-none">
+          <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl bg-muted sm:w-40 sm:flex-none">
             <img
               src={data.thumbnail}
               alt={data.title}
@@ -46,15 +46,21 @@ export function ListingCard({ data }: { data: AuditResponse }) {
             </div>
           </div>
         ) : (
-          <div className="flex aspect-[3/2] w-full items-center justify-center rounded-xl bg-muted text-muted-foreground sm:w-48 sm:flex-none">
+          <div className="flex aspect-[3/2] w-full items-center justify-center rounded-xl bg-muted text-muted-foreground sm:w-40 sm:flex-none">
             <Home className="h-8 w-8 opacity-50" />
           </div>
         )}
 
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-bold leading-tight tracking-tight sm:text-xl">
+          <h2 className="line-clamp-2 text-lg font-bold leading-tight tracking-tight text-foreground sm:text-xl">
             {data.title}
           </h2>
+
+          {data.subtitle && (
+            <p className="mt-1 line-clamp-2 text-sm leading-snug text-muted-foreground">
+              {data.subtitle}
+            </p>
+          )}
 
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground sm:text-sm">
             {data.location && (
@@ -79,7 +85,7 @@ export function ListingCard({ data }: { data: AuditResponse }) {
             )}
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             {data.propertyType && (
               <span className="rounded-full border border-brand-border bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand">
                 {data.propertyType}

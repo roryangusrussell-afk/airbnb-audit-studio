@@ -79,44 +79,43 @@ export function AnalystCommentaryCard({ data, introText }: Props) {
   }));
 
   return (
-    <div className="rounded-[24px] border border-[#EDE8E6] bg-white p-7 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
-      <div className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-brand">
+    <div className="rounded-[20px] border border-[#EDE8E6] bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+      <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-brand">
         Analyst commentary
       </div>
-      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1F1F24]">
+      <h2 className="text-xl font-semibold tracking-[-0.02em] text-[#1F1F24]">
         What we picked up.
       </h2>
-      <p className="mt-3 text-sm leading-6 text-[#3F4048]">
+      <p className="mt-2 text-[13px] leading-6 text-[#3F4048]">
         {firstNSentences(introText, 3)}
       </p>
 
-      <div className="mt-6 space-y-3">
+      <ul className="mt-5 divide-y divide-[#EFEAE7] border-y border-[#EFEAE7]">
         {rows.map((row, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-4 rounded-[18px] border border-[#EDE8E6] bg-white p-4"
-          >
+          <li key={i} className="flex items-center gap-3 py-3">
             <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] ${row.softBg} ${row.iconText}`}
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] ${row.softBg} ${row.iconText}`}
             >
-              <row.icon className="h-4 w-4" aria-hidden="true" />
+              <row.icon className="h-3.5 w-3.5" aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-[#1F1F24]">{row.title}</div>
-              <div className="mt-0.5 text-xs leading-5 text-[#6D6E78] line-clamp-2">{row.body}</div>
+              <div className="text-[13px] font-semibold text-[#1F1F24]">{row.title}</div>
+              <div className="mt-0.5 text-xs leading-5 text-[#6D6E78] line-clamp-2">
+                {row.body}
+              </div>
             </div>
-            <ChevronRight className="h-4 w-4 shrink-0 text-[#8A8B95]" aria-hidden="true" />
-          </div>
+            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#8A8B95]" aria-hidden="true" />
+          </li>
         ))}
-      </div>
+      </ul>
 
-      <div className="mt-4 flex items-start gap-4 rounded-[18px] border border-[#F9D99B] bg-[#FFF7E8] p-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white text-[#F59E0B]">
-          <Star className="h-5 w-5 fill-current" aria-hidden="true" />
+      <div className="mt-4 flex items-start gap-3 rounded-2xl border border-[#F9D99B] bg-[#FFF7E8] p-3.5">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-white text-[#F59E0B]">
+          <Star className="h-4 w-4 fill-current" aria-hidden="true" />
         </div>
         <div>
-          <div className="text-sm font-semibold text-[#F59E0B]">Bottom line takeaway</div>
-          <div className="mt-1 text-xs leading-5 text-[#3F4048]">
+          <div className="text-[13px] font-semibold text-[#F59E0B]">Bottom line takeaway</div>
+          <div className="mt-0.5 text-xs leading-5 text-[#3F4048]">
             {firstNSentences(data.verdict, 2)}
           </div>
         </div>

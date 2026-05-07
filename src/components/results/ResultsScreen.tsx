@@ -21,10 +21,10 @@ export function ResultsScreen({
   topSlot?: React.ReactNode;
 }) {
   return (
-    <div className="container max-w-[1180px] py-8 sm:py-10">
+    <div className="container max-w-[1180px] px-6 py-6 sm:py-8 lg:px-8">
       {topSlot}
 
-      <div className="mb-5 flex items-center justify-between gap-3">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div className="eyebrow">Your audit report</div>
         <div className="flex items-center gap-2">
           <FeedbackButton listingId={data.listingId} />
@@ -34,12 +34,12 @@ export function ResultsScreen({
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <ListingCard data={data} />
         {data.bottomTenRisk && <BottomTenRiskBanner />}
       </div>
 
-      <Tabs defaultValue="summary" className="mt-8">
+      <Tabs defaultValue="summary" className="mt-4">
         <TabsList className="h-auto w-full justify-center gap-1 rounded-[16px] border bg-card p-1 shadow-card sm:w-auto">
           <TabsTrigger
             value="summary"
@@ -63,13 +63,13 @@ export function ResultsScreen({
             Next step
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="summary" className="mt-6">
+        <TabsContent value="summary" className="mt-5">
           <SummaryTab data={data} />
         </TabsContent>
-        <TabsContent value="diagnostic" className="mt-6">
+        <TabsContent value="diagnostic" className="mt-5">
           <DiagnosticTab data={data} />
         </TabsContent>
-        <TabsContent value="next" className="mt-6">
+        <TabsContent value="next" className="mt-5">
           <NextStepTab email={email} data={data} />
         </TabsContent>
       </Tabs>

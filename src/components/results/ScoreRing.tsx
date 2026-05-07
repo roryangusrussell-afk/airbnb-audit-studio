@@ -8,7 +8,7 @@ function bandStrokeVar(score: number): string {
   return "hsl(var(--danger))";
 }
 
-export function ScoreRing({ score }: { score: number }) {
+export function ScoreRing({ score, size = 172 }: { score: number; size?: number }) {
   const [displayed, setDisplayed] = useState(0);
   useEffect(() => {
     const start = performance.now();
@@ -24,8 +24,7 @@ export function ScoreRing({ score }: { score: number }) {
     return () => cancelAnimationFrame(raf);
   }, [score]);
 
-  const size = 172;
-  const stroke = 12;
+  const stroke = size >= 170 ? 12 : 10;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c - (displayed / 100) * c;
@@ -57,10 +56,12 @@ export function ScoreRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className={`text-4xl font-extrabold tracking-tight tabular-nums ${numberColor}`}>
+        <div
+          className={`font-extrabold tracking-tight tabular-nums ${numberColor} ${size >= 170 ? "text-4xl" : "text-[32px]"}`}
+        >
           {displayed}
         </div>
-        <div className="mt-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
           / 100
         </div>
       </div>
