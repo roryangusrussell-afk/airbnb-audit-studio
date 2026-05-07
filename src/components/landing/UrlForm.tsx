@@ -18,23 +18,31 @@ export function UrlForm({
 
   const handle = (e: FormEvent) => {
     e.preventDefault();
-    const trimmed = value.trim();
-    if (!trimmed) {
+    const raw = value.trim();
+    if (!raw) {
       setErr("Please paste your Airbnb listing URL.");
       return;
     }
+    const normalised = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+    let u: URL;
     try {
-      const u = new URL(trimmed);
-      if (!u.hostname.includes("airbnb.")) {
-        setErr("That doesn't look like an Airbnb URL. Paste a link from airbnb.com.");
-        return;
-      }
+      u = new URL(normalised);
     } catch {
-      setErr("Please paste a full URL, including https://");
+      setErr("That URL doesn't look right. Paste a link from airbnb.com.");
+      return;
+    }
+    if (!u.hostname.includes("airbnb.")) {
+      setErr("That doesn't look like an Airbnb URL. Paste a link from airbnb.com.");
+      return;
+    }
+    if (!/\/rooms\/\d+/.test(u.pathname)) {
+      setErr(
+        "Open the listing on airbnb.com, then copy the URL — we need the one with /rooms/ in it.",
+      );
       return;
     }
     setErr("");
-    onSubmit(trimmed);
+    onSubmit(normalised);
   };
 
   return (
