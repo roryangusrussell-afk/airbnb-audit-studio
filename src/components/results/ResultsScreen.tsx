@@ -63,13 +63,13 @@ export function ResultsScreen({
             Next step
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="summary" className="mt-5">
+        <TabsContent value="summary" className="mt-3">
           <SummaryTab data={data} />
         </TabsContent>
-        <TabsContent value="diagnostic" className="mt-5">
+        <TabsContent value="diagnostic" className="mt-3">
           <DiagnosticTab data={data} />
         </TabsContent>
-        <TabsContent value="next" className="mt-5">
+        <TabsContent value="next" className="mt-3">
           <NextStepTab email={email} data={data} />
         </TabsContent>
       </Tabs>
