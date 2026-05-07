@@ -119,6 +119,10 @@ export interface AuditResponse {
     gaps: PatternItem[];
     leverage: PatternItem[];
   };
+  // Session 9: paste-ready rewrites for each editor field
+  subsections?: ListingSubsections;
+  houseRules?: string;
+  rewrites?: Rewrites;
 }
 
 export interface PatternItem {
@@ -126,4 +130,42 @@ export interface PatternItem {
   detail: string;
   /** Optional category hint to choose an icon. */
   category?: string;
+}
+
+export type RewriteTone = "Concise" | "Premium" | "Warm";
+
+export interface RewriteOption {
+  tone: RewriteTone;
+  recommended: boolean;
+  text: string;
+  why: string;
+}
+
+export interface MultiToneRewrite {
+  keepAsIs: boolean;
+  why?: string;
+  options?: RewriteOption[];
+}
+
+export interface SingleRewrite {
+  keepAsIs: boolean;
+  why?: string;
+  text?: string;
+}
+
+export interface Rewrites {
+  title: MultiToneRewrite;
+  opening: MultiToneRewrite;
+  theSpace: SingleRewrite;
+  guestAccess: SingleRewrite;
+  otherNotes: SingleRewrite;
+  neighborhood: SingleRewrite;
+  houseRules: SingleRewrite;
+}
+
+export interface ListingSubsections {
+  theSpace?: string;
+  guestAccess?: string;
+  otherNotes?: string;
+  neighborhood?: string;
 }

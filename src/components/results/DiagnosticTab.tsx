@@ -10,7 +10,6 @@ import {
   ChevronRight,
   MessageCircle,
   Clock,
-  Award,
   Camera,
   Image as ImageIconLucide,
   Type as TypeIcon,
@@ -18,19 +17,58 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CopyButton } from "@/components/CopyButton";
 import { bandTextClass, scoreBand } from "@/lib/scoring";
 import { getCategoryMeta } from "@/lib/categoryMeta";
-import type { AuditResponse, Fix } from "@/lib/types";
+import { MultiToneRewriteCard, SingleRewriteCard } from "./RewriteCard";
+import type {
+  AuditResponse,
+  Fix,
+  MultiToneRewrite,
+  SingleRewrite,
+} from "@/lib/types";
 
-const CARDS: { id: string; label: string; area: string }[] = [
-  { id: "title", label: "Title", area: "Title" },
-  { id: "opening", label: "Opening description", area: "Overview" },
-  { id: "full", label: "Full description", area: "Description" },
-  { id: "photos", label: "Photos", area: "Photos" },
-  { id: "amenities", label: "Amenities", area: "Amenities" },
-  { id: "reviews", label: "Reviews & rating", area: "Reviews & rating" },
+type RewriteKind = "multi" | "single" | "none";
+
+interface CardDef {
+  id: string;
+  label: string;
+  area: string;
+  rewriteKey?: keyof NonNullable<AuditResponse["rewrites"]>;
+  rewriteKind: RewriteKind;
+}
+
+const CARDS: CardDef[] = [
+  { id: "title", label: "Title", area: "Title", rewriteKey: "title", rewriteKind: "multi" },
+  { id: "opening", label: "Opening description", area: "Overview", rewriteKey: "opening", rewriteKind: "multi" },
+  { id: "theSpace", label: "The space", area: "TheSpace", rewriteKey: "theSpace", rewriteKind: "single" },
+  { id: "guestAccess", label: "Guest access", area: "GuestAccess", rewriteKey: "guestAccess", rewriteKind: "single" },
+  { id: "otherNotes", label: "Other things to note", area: "OtherNotes", rewriteKey: "otherNotes", rewriteKind: "single" },
+  { id: "neighborhood", label: "Neighborhood", area: "Neighborhood", rewriteKey: "neighborhood", rewriteKind: "single" },
+  { id: "houseRules", label: "House rules", area: "HouseRules", rewriteKey: "houseRules", rewriteKind: "single" },
+  { id: "photos", label: "Photos", area: "Photos", rewriteKind: "none" },
+  { id: "reviews", label: "Reviews & rating", area: "Reviews & rating", rewriteKind: "none" },
 ];
+
+function getCurrentText(area: string, data: AuditResponse): string {
+  switch (area) {
+    case "Title":
+      return data.title || "";
+    case "Overview":
+      return data.overview || "";
+    case "TheSpace":
+      return data.subsections?.theSpace || "";
+    case "GuestAccess":
+      return data.subsections?.guestAccess || "";
+    case "OtherNotes":
+      return data.subsections?.otherNotes || "";
+    case "Neighborhood":
+      return data.subsections?.neighborhood || "";
+    case "HouseRules":
+      return data.houseRules || "";
+    default:
+      return "";
+  }
+}
 
 function ScoreBar({ score }: { score: number }) {
   const band = scoreBand(score);
@@ -58,26 +96,29 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
     return m;
   }, [data.cats]);
 
-  // Default = first weakest area with quick_win.
+  // Hide rewrite sections when both the source data and the rewrite are absent —
+  // means we couldn't extract it AND Claude didn't return one.
+  const availableCards = CARDS.filter((c) => {
+    if (c.rewriteKind === "none") {
+      return catByName[c.area] !== undefined;
+    }
+    const hasCurrent = getCurrentText(c.area, data).length > 0;
+    const rewrite = c.rewriteKey ? data.rewrites?.[c.rewriteKey] : undefined;
+    const hasRewrite = !!rewrite && (rewrite.keepAsIs || ("text" in rewrite ? !!rewrite.text : !!(rewrite as MultiToneRewrite).options?.length));
+    return hasCurrent || hasRewrite;
+  });
+
+  // Default to the first card with an actionable rewrite (not keepAsIs).
   const defaultId = useMemo(() => {
-    let best: { id: string; score: number } | null = null;
-    for (const c of CARDS) {
-      const fixes = fixesByArea[c.area] ?? [];
-      const s = catByName[c.area]?.score ?? 100;
-      if (fixes.some((f) => f.tier === "quick_win") && s < 75) {
-        if (!best || s < best.score) best = { id: c.id, score: s };
+    for (const c of availableCards) {
+      if (c.rewriteKey && data.rewrites?.[c.rewriteKey]?.keepAsIs === false) {
+        return c.id;
       }
     }
-    return best?.id ?? CARDS[0].id;
-  }, [fixesByArea, catByName]);
+    return availableCards[0]?.id ?? CARDS[0].id;
+  }, [availableCards, data.rewrites]);
 
   const [activeId, setActiveId] = useState(defaultId);
-
-  // Hide areas without data.
-  const availableCards = CARDS.filter((c) => {
-    if (c.area === "Amenities") return data.amenities.length > 0;
-    return catByName[c.area] !== undefined;
-  });
 
   const active = availableCards.find((c) => c.id === activeId) ?? availableCards[0];
   const activeIndex = availableCards.findIndex((c) => c.id === active.id);
@@ -94,7 +135,7 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
         card={active}
         data={data}
         fixes={fixesByArea[active.area] ?? []}
-        catScore={catByName[active.area]?.score ?? 0}
+        catScore={catByName[active.area]?.score ?? null}
         catFb={catByName[active.area]?.fb}
         nextCard={next}
         onGoNext={(id) => setActiveId(id)}
@@ -108,7 +149,7 @@ function AuditAreasRail({
   activeId,
   onSelect,
 }: {
-  cards: { id: string; label: string; area: string }[];
+  cards: CardDef[];
   activeId: string;
   onSelect: (id: string) => void;
 }) {
@@ -169,16 +210,18 @@ function DetailPanel({
   nextCard,
   onGoNext,
 }: {
-  card: { id: string; label: string; area: string };
+  card: CardDef;
   data: AuditResponse;
   fixes: Fix[];
-  catScore: number;
+  catScore: number | null;
   catFb?: string;
-  nextCard: { id: string; label: string; area: string } | null;
+  nextCard: CardDef | null;
   onGoNext: (id: string) => void;
 }) {
   const meta = getCategoryMeta(card.area);
-  const band = scoreBand(catScore);
+
+  const rewrite = card.rewriteKey ? data.rewrites?.[card.rewriteKey] : undefined;
+  const isRewriteSection = card.rewriteKind !== "none";
 
   return (
     <div className="rounded-2xl border bg-card p-5 shadow-card sm:p-6">
@@ -190,43 +233,17 @@ function DetailPanel({
           </h2>
           <p className="mt-1 text-[13px] text-muted-foreground">{meta.subtext}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className={`text-[18px] font-bold tabular-nums ${bandTextClass(band)}`}>
-            {catScore}
-            <span className="font-normal text-muted-foreground">/100</span>
-          </span>
-          <ScoreBar score={catScore} />
-        </div>
+        <HeaderStatus
+          catScore={catScore}
+          rewriteKeepAsIs={rewrite?.keepAsIs}
+          hasRewrite={!!rewrite}
+        />
       </div>
 
-      {/* Current read */}
-      <div className="mt-5">
-        <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-          <Eye className="h-3.5 w-3.5" />
-          Current read
-        </div>
-        <p className="text-[13.5px] leading-6 text-foreground">
-          {catFb ?? "No diagnosis available for this area."}
-        </p>
-      </div>
-
-      {/* Signal cards */}
-      <SignalCards area={card.area} data={data} />
-
-      {/* What we found */}
-      <FoundList area={card.area} data={data} />
-
-      {/* Fix cards */}
-      {fixes.length > 0 ? (
-        <div className="mt-5 space-y-3">
-          {fixes.map((f) => (
-            <FixCard key={f.rank + f.title} fix={f} />
-          ))}
-        </div>
+      {isRewriteSection ? (
+        <RewriteSection card={card} data={data} rewrite={rewrite} catFb={catFb} />
       ) : (
-        <div className="mt-5 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
-          No recommended fixes in this category — this area is performing well.
-        </div>
+        <DiagnosticSection card={card} data={data} fixes={fixes} catFb={catFb} />
       )}
 
       {/* Next-area navigation */}
@@ -257,6 +274,142 @@ function DetailPanel({
         </div>
       )}
     </div>
+  );
+}
+
+function HeaderStatus({
+  catScore,
+  rewriteKeepAsIs,
+  hasRewrite,
+}: {
+  catScore: number | null;
+  rewriteKeepAsIs?: boolean;
+  hasRewrite: boolean;
+}) {
+  if (typeof catScore === "number") {
+    const band = scoreBand(catScore);
+    return (
+      <div className="flex items-center gap-3">
+        <span className={`text-[18px] font-bold tabular-nums ${bandTextClass(band)}`}>
+          {catScore}
+          <span className="font-normal text-muted-foreground">/100</span>
+        </span>
+        <ScoreBar score={catScore} />
+      </div>
+    );
+  }
+  if (!hasRewrite) return null;
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+        rewriteKeepAsIs
+          ? "border-success-border bg-success-soft text-success"
+          : "border-brand-border bg-brand-soft text-brand"
+      }`}
+    >
+      {rewriteKeepAsIs ? (
+        <>
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Keep as is
+        </>
+      ) : (
+        <>
+          <ArrowRight className="h-3.5 w-3.5" />
+          Rewrite ready
+        </>
+      )}
+    </span>
+  );
+}
+
+function RewriteSection({
+  card,
+  data,
+  rewrite,
+  catFb,
+}: {
+  card: CardDef;
+  data: AuditResponse;
+  rewrite: MultiToneRewrite | SingleRewrite | undefined;
+  catFb?: string;
+}) {
+  const current = getCurrentText(card.area, data);
+
+  if (!rewrite) {
+    return (
+      <div className="mt-5 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
+        Rewrite not available for this section yet — try re-running the audit.
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {catFb && (
+        <div className="mt-5">
+          <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            <Eye className="h-3.5 w-3.5" />
+            What's weak
+          </div>
+          <p className="text-[13.5px] leading-6 text-foreground">{catFb}</p>
+        </div>
+      )}
+
+      <div className="mt-5">
+        {card.rewriteKind === "multi" ? (
+          <MultiToneRewriteCard
+            current={current}
+            rewrite={rewrite as MultiToneRewrite}
+          />
+        ) : (
+          <SingleRewriteCard
+            current={current}
+            rewrite={rewrite as SingleRewrite}
+          />
+        )}
+      </div>
+    </>
+  );
+}
+
+function DiagnosticSection({
+  card,
+  data,
+  fixes,
+  catFb,
+}: {
+  card: CardDef;
+  data: AuditResponse;
+  fixes: Fix[];
+  catFb?: string;
+}) {
+  return (
+    <>
+      <div className="mt-5">
+        <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+          <Eye className="h-3.5 w-3.5" />
+          Current read
+        </div>
+        <p className="text-[13.5px] leading-6 text-foreground">
+          {catFb ?? "No diagnosis available for this area."}
+        </p>
+      </div>
+
+      <SignalCards area={card.area} data={data} />
+      <FoundList area={card.area} data={data} />
+
+      {fixes.length > 0 ? (
+        <div className="mt-5 space-y-3">
+          {fixes.map((f) => (
+            <FixCard key={f.rank + f.title} fix={f} />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-5 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
+          No recommended fixes in this category — this area is performing well.
+        </div>
+      )}
+    </>
   );
 }
 
