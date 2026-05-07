@@ -39,7 +39,7 @@ function ScoreRow({ cat, isLast }: { cat: Cat; isLast: boolean }) {
   return (
     <li className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 py-2 ${isLast ? "" : "border-b border-border/30"}`}>
       <span className={`flex h-7 w-7 flex-none items-center justify-center rounded-lg ${meta.iconBg}`}>
-        <Icon className={`${meta.iconText}`} style={{ width: 16, height: 16 }} />
+        <Icon className={`h-4 w-4 ${meta.iconText}`} />
       </span>
       <div className="min-w-0">
         <div className="truncate text-sm font-semibold leading-snug text-foreground">{cat.name}</div>
