@@ -103,3 +103,40 @@
     box-shadow: var(--shadow-elevated);
   }
 }
+
+@media print {
+  @page {
+    margin: 14mm 12mm;
+  }
+  body {
+    background: #fff !important;
+  }
+  [data-print-hide] {
+    display: none !important;
+  }
+  /* Drop shadows print muddy; rely on borders for separation. */
+  .shadow-card,
+  .shadow-elevated {
+    box-shadow: none !important;
+  }
+  /* Keep audit cards intact across page breaks where possible. */
+  .rounded-2xl,
+  .rounded-xl {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Each top-level print section starts on a fresh page. */
+  .print-section {
+    break-before: page;
+    page-break-before: always;
+  }
+  .print-section:first-of-type {
+    break-before: auto;
+    page-break-before: auto;
+  }
+  /* Hide things that don't belong in a printed report. */
+  [role="dialog"],
+  [data-radix-popper-content-wrapper] {
+    display: none !important;
+  }
+}

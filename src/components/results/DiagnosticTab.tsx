@@ -85,7 +85,7 @@ function ScoreBar({ score }: { score: number }) {
   );
 }
 
-export function DiagnosticTab({ data }: { data: AuditResponse }) {
+export function DiagnosticTab({ data, printMode = false }: { data: AuditResponse; printMode?: boolean }) {
   const fixesByArea = useMemo(() => {
     const map: Record<string, Fix[]> = {};
     for (const f of data.fixes) (map[f.area] ||= []).push(f);
@@ -121,6 +121,25 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
   }, [availableCards, data.rewrites]);
 
   const [activeId, setActiveId] = useState(defaultId);
+
+  if (printMode) {
+    return (
+      <div className="space-y-6">
+        {availableCards.map((c) => (
+          <DetailPanel
+            key={c.id}
+            card={c}
+            data={data}
+            fixes={fixesByArea[c.area] ?? []}
+            catScore={catByName[c.area]?.score ?? null}
+            catFb={catByName[c.area]?.fb}
+            nextCard={null}
+            onGoNext={() => {}}
+          />
+        ))}
+      </div>
+    );
+  }
 
   const active = availableCards.find((c) => c.id === activeId) ?? availableCards[0];
   const activeIndex = availableCards.findIndex((c) => c.id === active.id);
