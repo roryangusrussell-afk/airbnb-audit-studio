@@ -71,6 +71,7 @@ export function useAuditFlow() {
             score: result.score,
             rating: result.rating ?? null,
             reviewCount: result.reviewCount ?? null,
+            result,
           });
         } else {
           // No email yet — show the post-audit save-to-inbox modal
@@ -134,7 +135,7 @@ export function useAuditFlow() {
     async (value: string) => {
       setEmail(value);
       setNeedsEmail(false);
-      // Email collected post-audit — log to Sheet with the result we already have
+      // Email collected post-audit — log to Sheet + send report email to the tester
       const target = pendingUrlRef.current || url;
       if (data && target) {
         captureLead({
@@ -145,6 +146,7 @@ export function useAuditFlow() {
           score: data.score,
           rating: data.rating ?? null,
           reviewCount: data.reviewCount ?? null,
+          result: data,
         });
       }
     },

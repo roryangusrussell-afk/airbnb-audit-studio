@@ -110,6 +110,7 @@ export async function captureLead(payload: {
   score?: number;
   rating?: number | null;
   reviewCount?: number | null;
+  result?: AuditResponse;
 }): Promise<void> {
   await fetch(`${BASE}/api/capture-lead`, {
     method: "POST",
