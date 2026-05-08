@@ -21,10 +21,10 @@ export function ResultsScreen({
   topSlot?: React.ReactNode;
 }) {
   return (
-    <div className="container max-w-[1180px] px-6 py-6 sm:py-8 lg:px-8">
+    <div className="container max-w-[1180px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       {topSlot}
 
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="eyebrow">Your audit report</div>
         <div className="flex items-center gap-2">
           <FeedbackButton
@@ -33,7 +33,9 @@ export function ResultsScreen({
             url={`https://www.airbnb.com/rooms/${data.listingId}`}
           />
           <Button variant="outline" size="sm" onClick={onAuditAnother} className="gap-1.5">
-            <ArrowLeft className="h-3.5 w-3.5" /> Audit another listing
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Audit another listing</span>
+            <span className="sm:hidden">Another listing</span>
           </Button>
         </div>
       </div>

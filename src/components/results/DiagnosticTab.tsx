@@ -154,21 +154,24 @@ function AuditAreasRail({
   onSelect: (id: string) => void;
 }) {
   return (
-    <aside className="rounded-2xl border bg-card p-3 shadow-card">
-      <div className="px-2 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+    <aside className="rounded-2xl border bg-card shadow-card lg:p-3">
+      <div className="hidden px-2 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground lg:block">
         Audit areas
       </div>
-      <ul className="space-y-1">
+      {/* Horizontal scrolling pills on mobile/tablet, vertical list on lg+ */}
+      <ul
+        className="flex gap-1.5 overflow-x-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-col lg:gap-0 lg:space-y-1 lg:overflow-visible lg:p-0"
+      >
         {cards.map((c) => {
           const meta = getCategoryMeta(c.area);
           const Icon = meta.icon;
           const isActive = c.id === activeId;
           return (
-            <li key={c.id}>
+            <li key={c.id} className="flex-none lg:flex-1">
               <button
                 type="button"
                 onClick={() => onSelect(c.id)}
-                className={`group flex w-full items-center gap-2.5 rounded-xl px-2 py-2 text-left transition-colors ${
+                className={`group flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-left transition-colors lg:w-full lg:gap-2.5 lg:px-2 ${
                   isActive
                     ? "bg-brand-soft"
                     : "hover:bg-muted/60"
@@ -176,9 +179,9 @@ function AuditAreasRail({
                 aria-current={isActive ? "true" : undefined}
               >
                 <span
-                  className={`flex h-8 w-8 flex-none items-center justify-center rounded-[10px] ${meta.iconBg}`}
+                  className={`flex h-7 w-7 flex-none items-center justify-center rounded-[10px] lg:h-8 lg:w-8 ${meta.iconBg}`}
                 >
-                  <Icon className={`h-4 w-4 ${meta.iconText}`} />
+                  <Icon className={`h-3.5 w-3.5 lg:h-4 lg:w-4 ${meta.iconText}`} />
                 </span>
                 <span
                   className={`min-w-0 flex-1 truncate text-[13px] font-semibold tracking-tight ${
@@ -188,7 +191,7 @@ function AuditAreasRail({
                   {c.label}
                 </span>
                 <ChevronRight
-                  className={`h-3.5 w-3.5 flex-none ${
+                  className={`hidden h-3.5 w-3.5 flex-none lg:block ${
                     isActive ? "text-brand" : "text-muted-foreground/70"
                   }`}
                 />

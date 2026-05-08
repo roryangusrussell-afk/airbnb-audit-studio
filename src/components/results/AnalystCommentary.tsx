@@ -22,7 +22,7 @@ export function AnalystCommentary({ data }: { data: AuditResponse }) {
     .map((p) => firstNSentences(p, 2));
 
   return (
-    <div className="flex h-full flex-col rounded-[20px] border border-[#EDE8E6] bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+    <div className="flex h-full flex-col rounded-[20px] border border-[#EDE8E6] bg-white p-4 shadow-[0_8px_30px_rgba(15,23,42,0.04)] sm:p-6">
       <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-brand">
         Analyst commentary
       </div>
