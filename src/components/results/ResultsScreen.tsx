@@ -53,11 +53,10 @@ export function ResultsScreen({
             variant="outline"
             size="sm"
             onClick={() => setPrintMode(true)}
-            className="gap-1.5"
+            className="hidden gap-1.5 sm:inline-flex"
           >
             <Download className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Download PDF</span>
-            <span className="sm:hidden">PDF</span>
+            Download PDF
           </Button>
           <Button variant="outline" size="sm" onClick={onAuditAnother} className="gap-1.5">
             <ArrowLeft className="h-3.5 w-3.5" />
