@@ -11,34 +11,61 @@ export class AuditError extends Error {
 }
 
 export async function runAudit(url: string): Promise<AuditResponse> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 180_000);
-  try {
-    const res = await fetch(`${BASE}/api/audit`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-      signal: controller.signal,
-    });
-    if (res.status === 422) {
-      throw new AuditError(
-        "This listing could not be found. Check the URL is public and try again.",
-        422,
-      );
+  // One transparent retry on transient backend failures (5xx, network errors).
+  // 4xx (e.g. invalid URL) and AbortError pass through immediately.
+  const MAX_ATTEMPTS = 2;
+  let lastError: AuditError | null = null;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 180_000);
+    try {
+      const res = await fetch(`${BASE}/api/audit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (res.status === 422) {
+        throw new AuditError(
+          "This listing could not be found. Check the URL is public and try again.",
+          422,
+        );
+      }
+      if (res.status >= 400 && res.status < 500) {
+        throw new AuditError(`Audit failed (${res.status}). Please try again.`, res.status);
+      }
+      if (!res.ok) {
+        // 5xx — retryable
+        lastError = new AuditError(`Audit failed (${res.status}). Please try again.`, res.status);
+        if (attempt < MAX_ATTEMPTS) {
+          await new Promise(r => setTimeout(r, 2000));
+          continue;
+        }
+        throw lastError;
+      }
+      return (await res.json()) as AuditResponse;
+    } catch (err) {
+      clearTimeout(timeout);
+      if (err instanceof AuditError) {
+        // 4xx and other AuditErrors don't retry
+        if (err.status && err.status >= 400 && err.status < 500) throw err;
+        // 5xx already handled above; for safety fall through
+        lastError = err;
+      } else if ((err as Error).name === "AbortError") {
+        throw new AuditError("The audit is taking longer than expected. Please try again.");
+      } else {
+        // Network error — retryable
+        lastError = new AuditError("Could not reach the audit service. Please try again.");
+      }
+      if (attempt < MAX_ATTEMPTS) {
+        await new Promise(r => setTimeout(r, 2000));
+        continue;
+      }
+      throw lastError;
     }
-    if (!res.ok) {
-      throw new AuditError(`Audit failed (${res.status}). Please try again.`, res.status);
-    }
-    return (await res.json()) as AuditResponse;
-  } catch (err) {
-    if (err instanceof AuditError) throw err;
-    if ((err as Error).name === "AbortError") {
-      throw new AuditError("The audit is taking longer than expected. Please try again.");
-    }
-    throw new AuditError("Could not reach the audit service. Please try again.");
-  } finally {
-    clearTimeout(timeout);
   }
+  throw lastError ?? new AuditError("Audit failed. Please try again.");
 }
 
 export interface PeekData {
