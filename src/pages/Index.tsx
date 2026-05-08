@@ -2,7 +2,6 @@ import { Hero } from "@/components/landing/Hero";
 import { EmailGateModal } from "@/components/EmailGateModal";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { ErrorScreen } from "@/components/ErrorScreen";
-import { CreditGateModal } from "@/components/CreditGateModal";
 import { ResultsScreen } from "@/components/results/ResultsScreen";
 import { useAuditFlow } from "@/hooks/useAuditFlow";
 
@@ -28,11 +27,6 @@ const Index = () => {
         open={flow.needsEmail}
         onOpenChange={flow.setNeedsEmail}
         onSubmit={flow.submitEmail}
-      />
-      <CreditGateModal
-        open={flow.creditGateOpen}
-        onOpenChange={(v) => !v && flow.closeCreditGate()}
-        email={flow.email}
       />
     </main>
   );

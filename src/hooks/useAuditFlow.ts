@@ -114,25 +114,8 @@ export function useAuditFlow() {
       const storedEmail =
         typeof window !== "undefined" ? localStorage.getItem(EMAIL_KEY) : "";
 
-      const isLocalDev =
-        typeof window !== "undefined" && window.location.hostname === "localhost";
-      const isDevBypass =
-        typeof window !== "undefined" &&
-        new URLSearchParams(window.location.search).get("dev") === "1";
-      const bypassGates = isLocalDev || isDevBypass;
-
-      // Cap free audits at FREE_AUDIT_LIMIT per browser. Counter persists
-      // across reloads via localStorage. The email gate now fires AFTER
-      // the audit completes, not before — testers see the value first.
-      const auditsRun =
-        typeof window !== "undefined"
-          ? parseInt(localStorage.getItem(AUDITS_RUN_KEY) || "0", 10) || 0
-          : 0;
-      if (auditsRun >= FREE_AUDIT_LIMIT && !bypassGates) {
-        setCreditGateOpen(true);
-        return;
-      }
-
+      // Credit gate disabled until Stripe is wired. Counter still increments
+      // (line ~60) so the gate can be re-enabled later.
       await performAudit(auditUrl, storedEmail || "");
     },
     [performAudit],
