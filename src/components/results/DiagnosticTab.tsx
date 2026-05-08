@@ -85,7 +85,7 @@ function ScoreBar({ score }: { score: number }) {
   );
 }
 
-export function DiagnosticTab({ data }: { data: AuditResponse }) {
+export function DiagnosticTab({ data, printMode = false }: { data: AuditResponse; printMode?: boolean }) {
   const fixesByArea = useMemo(() => {
     const map: Record<string, Fix[]> = {};
     for (const f of data.fixes) (map[f.area] ||= []).push(f);
@@ -121,6 +121,25 @@ export function DiagnosticTab({ data }: { data: AuditResponse }) {
   }, [availableCards, data.rewrites]);
 
   const [activeId, setActiveId] = useState(defaultId);
+
+  if (printMode) {
+    return (
+      <div className="space-y-6">
+        {availableCards.map((c) => (
+          <DetailPanel
+            key={c.id}
+            card={c}
+            data={data}
+            fixes={fixesByArea[c.area] ?? []}
+            catScore={catByName[c.area]?.score ?? null}
+            catFb={catByName[c.area]?.fb}
+            nextCard={null}
+            onGoNext={() => {}}
+          />
+        ))}
+      </div>
+    );
+  }
 
   const active = availableCards.find((c) => c.id === activeId) ?? availableCards[0];
   const activeIndex = availableCards.findIndex((c) => c.id === active.id);
@@ -231,7 +250,7 @@ function DetailPanel({
   return (
     <div className="rounded-2xl border bg-card p-5 shadow-card sm:p-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <h2 className="text-[20px] font-semibold tracking-[-0.01em] text-foreground">
             {card.label}
@@ -253,7 +272,7 @@ function DetailPanel({
 
       {/* Next-area navigation */}
       {nextCard && (
-        <div className="mt-6 flex items-center justify-between gap-3 rounded-xl border bg-muted/30 px-4 py-3">
+        <div className="mt-6 flex flex-col gap-3 rounded-xl border bg-muted/30 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-card text-foreground">
               <ArrowRight className="h-4 w-4" />
@@ -271,7 +290,7 @@ function DetailPanel({
             variant="outline"
             size="sm"
             onClick={() => onGoNext(nextCard.id)}
-            className="gap-1.5"
+            className="w-full gap-1.5 sm:w-auto"
           >
             Go to {nextCard.label}
             <ChevronRight className="h-3.5 w-3.5" />

@@ -19,6 +19,7 @@ export function useAuditFlow() {
   const [data, setData] = useState<AuditResponse | null>(null);
   const [peekData, setPeekData] = useState<PeekData | null>(null);
   const [error, setError] = useState<string>("");
+  const [errorDetail, setErrorDetail] = useState<string>("");
   const [needsEmail, setNeedsEmail] = useState(false);
   const [creditGateOpen, setCreditGateOpen] = useState(false);
   const completedCountRef = useRef(0);
@@ -45,6 +46,7 @@ export function useAuditFlow() {
     async (auditUrl: string, withEmail: string) => {
       setStatus("loading");
       setError("");
+      setErrorDetail("");
       setPeekData(null);
       peekListing(auditUrl).then(d => { if (d) setPeekData(d); });
       try {
@@ -92,7 +94,12 @@ export function useAuditFlow() {
           err instanceof AuditError
             ? err.message
             : "Something went wrong. Please try again.";
+        const detail =
+          err instanceof AuditError && err.detail
+            ? `${err.status ?? "?"}: ${err.detail}`
+            : "";
         setError(msg);
+        setErrorDetail(detail);
         setStatus("error");
       }
     },
@@ -157,6 +164,7 @@ export function useAuditFlow() {
     setStatus("landing");
     setData(null);
     setError("");
+    setErrorDetail("");
     setUrl("");
     pendingUrlRef.current = "";
   }, []);
@@ -176,6 +184,7 @@ export function useAuditFlow() {
     data,
     peekData,
     error,
+    errorDetail,
     needsEmail,
     creditGateOpen,
     submitUrl,

@@ -4,9 +4,23 @@ const BASE = "https://airbnb-audit-rho.vercel.app";
 
 export class AuditError extends Error {
   status?: number;
-  constructor(message: string, status?: number) {
+  detail?: string;
+  constructor(message: string, status?: number, detail?: string) {
     super(message);
     this.status = status;
+    this.detail = detail;
+  }
+}
+
+async function readBodySnippet(res: Response): Promise<string | undefined> {
+  try {
+    const text = await res.text();
+    if (!text) return undefined;
+    // Strip HTML tags from Vercel/CDN error pages, collapse whitespace, cap length.
+    const cleaned = text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return cleaned.slice(0, 500) || undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -27,17 +41,26 @@ export async function runAudit(url: string): Promise<AuditResponse> {
       });
       clearTimeout(timeout);
       if (res.status === 422) {
-        throw new AuditError(
+        const detail = await readBodySnippet(res);
+        const err = new AuditError(
           "This listing could not be found. Check the URL is public and try again.",
           422,
+          detail,
         );
+        console.error("[runAudit] 422", { url, attempt, detail });
+        throw err;
       }
       if (res.status >= 400 && res.status < 500) {
-        throw new AuditError(`Audit failed (${res.status}). Please try again.`, res.status);
+        const detail = await readBodySnippet(res);
+        const err = new AuditError(`Audit failed (${res.status}). Please try again.`, res.status, detail);
+        console.error("[runAudit] 4xx", { url, attempt, status: res.status, detail });
+        throw err;
       }
       if (!res.ok) {
         // 5xx — retryable
-        lastError = new AuditError(`Audit failed (${res.status}). Please try again.`, res.status);
+        const detail = await readBodySnippet(res);
+        lastError = new AuditError(`Audit failed (${res.status}). Please try again.`, res.status, detail);
+        console.error("[runAudit] 5xx", { url, attempt, status: res.status, detail });
         if (attempt < MAX_ATTEMPTS) {
           await new Promise(r => setTimeout(r, 2000));
           continue;
@@ -53,10 +76,14 @@ export async function runAudit(url: string): Promise<AuditResponse> {
         // 5xx already handled above; for safety fall through
         lastError = err;
       } else if ((err as Error).name === "AbortError") {
-        throw new AuditError("The audit is taking longer than expected. Please try again.");
+        const e = new AuditError("The audit is taking longer than expected. Please try again.", undefined, "client timeout (240s)");
+        console.error("[runAudit] timeout", { url, attempt });
+        throw e;
       } else {
         // Network error — retryable
-        lastError = new AuditError("Could not reach the audit service. Please try again.");
+        const message = (err as Error)?.message || String(err);
+        lastError = new AuditError("Could not reach the audit service. Please try again.", undefined, message);
+        console.error("[runAudit] network", { url, attempt, message });
       }
       if (attempt < MAX_ATTEMPTS) {
         await new Promise(r => setTimeout(r, 2000));

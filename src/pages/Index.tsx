@@ -14,7 +14,7 @@ const Index = () => {
       {flow.status === "landing" && <Hero onSubmit={flow.submitUrl} />}
       {flow.status === "loading" && <LoadingScreen url={flow.url} peek={flow.peekData} />}
       {flow.status === "error" && (
-        <ErrorScreen message={flow.error} onRetry={flow.retry} onReset={flow.reset} />
+        <ErrorScreen message={flow.error} detail={flow.errorDetail} onRetry={flow.retry} onReset={flow.reset} />
       )}
       {flow.status === "results" && flow.data && (
         <ResultsScreen
