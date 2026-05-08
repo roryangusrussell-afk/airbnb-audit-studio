@@ -14,7 +14,7 @@ function FloatingPill({ icon, label, status, tone, className = "" }: PillProps) 
   const statusText = tone === "good" ? "text-success" : "text-warning";
   return (
     <div
-      className={`absolute z-10 flex items-center gap-3 rounded-2xl border border-border/60 bg-card/95 px-3.5 py-2.5 shadow-elevated backdrop-blur-sm ${className}`}
+      className={`absolute z-10 hidden items-center gap-3 rounded-2xl border border-border/60 bg-card/95 px-3.5 py-2.5 shadow-elevated backdrop-blur-sm sm:flex ${className}`}
     >
       <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
         {icon}
@@ -70,17 +70,17 @@ function ScoreRingMini() {
 export function PreviewPanel() {
   return (
     <div className="relative">
-      {/* Hero image */}
+      {/* Hero image — shorter on mobile so the score card sits closer */}
       <div className="relative overflow-hidden rounded-[2rem] shadow-elevated">
         <img
           src={heroApartment}
           alt="Bright modern Airbnb living room with plants"
-          className="h-[520px] w-full object-cover sm:h-[560px]"
+          className="h-64 w-full object-cover sm:h-[560px]"
           loading="eager"
         />
       </div>
 
-      {/* Floating pills */}
+      {/* Floating pills (desktop only — clutter mobile) */}
       <FloatingPill
         icon={<Camera className="h-4 w-4" />}
         label="Photo Quality"
@@ -110,8 +110,8 @@ export function PreviewPanel() {
         className="bottom-6 right-6 sm:right-16"
       />
 
-      {/* Score card */}
-      <div className="absolute -right-2 top-12 z-20 w-[260px] rounded-2xl border border-border/70 bg-card p-5 shadow-elevated sm:-right-8 sm:top-16">
+      {/* Score card — stacks below image on mobile (relative + negative margin to overlap slightly), absolute-positioned on desktop */}
+      <div className="relative z-20 mx-auto -mt-12 w-[88%] max-w-[300px] rounded-2xl border border-border/70 bg-card p-5 shadow-elevated sm:absolute sm:-right-8 sm:top-16 sm:mt-0 sm:w-[260px] sm:max-w-none">
         <div className="text-center">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Overall Score
