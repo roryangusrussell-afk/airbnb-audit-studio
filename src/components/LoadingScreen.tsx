@@ -10,26 +10,36 @@ const DARK = "#111827";
 const MUTED = "#64748B";
 const BORDER = "rgba(15,23,42,0.08)";
 
-const STEPS = [
+// Per-step dwell time before advancing to the next step. The audit itself
+// is one async blob (Apify -> Sonnet vision -> Haiku) running in parallel,
+// so these are pure-perception timings. Tuned so steps 1-4 consume ~30s
+// (matching the meatier end of the typical 30-60s audit). Step 5 holds
+// indefinitely until the audit resolves and the screen unmounts.
+const STEPS: Array<{ title: string; desc: string; dwellMs: number }> = [
   {
     title: "Listing data",
     desc: "Fetching title, description, amenities, photos and reviews",
+    dwellMs: 5000,
   },
   {
     title: "Copy clarity",
     desc: "Reading the title, overview and description for conversion strength",
+    dwellMs: 7000,
   },
   {
     title: "Photo intelligence",
     desc: "Scanning the first photos for quality, clarity and guest appeal",
+    dwellMs: 9000,
   },
   {
     title: "Guest trust signals",
     desc: "Checking ratings, review patterns, amenities and friction points",
+    dwellMs: 9000,
   },
   {
     title: "Priority fix list",
     desc: "Compiling the highest-impact actions for your listing",
+    dwellMs: 0,
   },
 ];
 
@@ -38,7 +48,7 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
 
   useEffect(() => {
     if (step >= STEPS.length - 1) return;
-    const t = setTimeout(() => setStep((s) => s + 1), 1200);
+    const t = setTimeout(() => setStep((s) => s + 1), STEPS[step].dwellMs);
     return () => clearTimeout(t);
   }, [step]);
 
