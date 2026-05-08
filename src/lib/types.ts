@@ -53,6 +53,30 @@ export interface PhotoAnalysis {
   score: number;
   signals: string[];
   missingRooms: string[];
+  detectedAmenities?: string[];
+}
+
+export type ArchetypeLabel =
+  | "Remote worker"
+  | "City break couple"
+  | "Family"
+  | "Group of friends"
+  | "Solo explorer"
+  | "Business traveller"
+  | "Long-stay / digital nomad"
+  | string;
+
+export interface Archetype {
+  primary: ArchetypeLabel;
+  secondary: ArchetypeLabel | null;
+  confidence: "high" | "medium" | "low";
+}
+
+export interface ArchetypeAlignment {
+  score: number;
+  strengths: string[];
+  gaps: string[];
+  mismatches: string[];
 }
 
 export interface AdvisoryNote {
@@ -108,6 +132,10 @@ export interface AuditResponse {
   formulaBreakdown?: Record<string, number>;
   listingSignals?: string;
   positioningDiagnosis?: PositioningDiagnosis;
+  archetype?: Archetype;
+  archetypeAlignment?: ArchetypeAlignment;
+  neighbourhood?: string | null;
+  petPolicy?: string | null;
   // New Summary tab shape (session 7) — replaces listingSignals + positioningDiagnosis
   summary?: string;
   start?: SummaryAction[];
