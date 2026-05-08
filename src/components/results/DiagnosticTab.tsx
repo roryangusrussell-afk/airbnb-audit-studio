@@ -14,8 +14,10 @@ import {
   Image as ImageIconLucide,
   Type as TypeIcon,
   FileText,
+  ListChecks,
   type LucideIcon,
 } from "lucide-react";
+import { CopyButton } from "@/components/CopyButton";
 import { Button } from "@/components/ui/button";
 import { bandTextClass, scoreBand } from "@/lib/scoring";
 import { getCategoryMeta } from "@/lib/categoryMeta";
@@ -569,7 +571,7 @@ function buildMetrics(area: string, data: AuditResponse): Metric[] {
   if (area === "Amenities") {
     return [
       {
-        Icon: Award,
+        Icon: ListChecks,
         iconBg: "bg-success-soft",
         iconText: "text-success",
         value: String(data.amenities.length),
