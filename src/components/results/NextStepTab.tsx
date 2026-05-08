@@ -1,9 +1,11 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
+  Check,
   ChevronRight,
   Copy,
   Gift,
+  Mail,
   Sparkles,
   TrendingUp,
   FileSearch,
@@ -16,6 +18,7 @@ import {
 } from "lucide-react";
 import { Eyebrow } from "@/components/Eyebrow";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import { captureLead } from "@/lib/api";
 import type { AuditResponse } from "@/lib/types";
 import {
   getHostListingCount,
@@ -105,6 +108,7 @@ export function NextStepTab({ email, data }: { email: string; data: AuditRespons
   }, [route, data]);
 
   const content = useMemo(() => buildRouteContent(route, data), [route, data]);
+  const emailReportRow = <EmailReportRow data={data} initialEmail={email} />;
   const referralRow = <ReferralRow email={email} />;
 
   return (
@@ -129,6 +133,7 @@ export function NextStepTab({ email, data }: { email: string; data: AuditRespons
           Other useful options
         </h3>
         <div className="mt-3 space-y-2.5">
+          {emailReportRow}
           {content.secondaryRows.map((row, i) => (
             <SecondaryRow key={i} spec={row} />
           ))}
@@ -217,6 +222,136 @@ function SecondaryRow({ spec }: { spec: SecondaryRowSpec }) {
       </span>
       <ChevronRight className="h-4 w-4 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-brand" />
     </button>
+  );
+}
+
+function EmailReportRow({
+  data,
+  initialEmail,
+}: {
+  data: AuditResponse;
+  initialEmail: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState(initialEmail);
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const send = async () => {
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setState("error");
+      return;
+    }
+    setState("sending");
+    try {
+      // Persist for future sessions on this browser
+      if (typeof window !== "undefined") {
+        localStorage.setItem("auditEmail", trimmed);
+      }
+      await captureLead({
+        email: trimmed,
+        url: `https://www.airbnb.com/rooms/${data.listingId}`,
+        listingId: data.listingId,
+        title: data.title,
+        score: data.score,
+        rating: data.rating ?? null,
+        reviewCount: data.reviewCount ?? null,
+        result: data,
+      });
+      setState("sent");
+    } catch {
+      setState("error");
+    }
+  };
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="group flex w-full items-center gap-3.5 rounded-[12px] border bg-card px-4 py-3.5 text-left transition-colors hover:border-brand-border hover:bg-brand-soft/30"
+      >
+        <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-brand-soft">
+          <Mail className="h-4 w-4 text-brand" />
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="block text-[13.5px] font-semibold text-foreground">
+            Email this report to me
+          </span>
+          <span className="mt-0.5 block truncate text-[12.5px] text-muted-foreground">
+            All rewrites in your inbox so you can paste them later.
+          </span>
+        </span>
+        <ChevronRight className="h-4 w-4 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-brand" />
+      </button>
+    );
+  }
+
+  return (
+    <div className="rounded-[12px] border bg-card p-4">
+      {state === "sent" ? (
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-success-soft">
+            <Check className="h-4 w-4 text-success" />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-[13.5px] font-semibold text-foreground">
+              Sent
+            </span>
+            <span className="mt-0.5 block truncate text-[12.5px] text-muted-foreground">
+              Check {email} in a minute or two.
+            </span>
+          </span>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-3 mb-3">
+            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-brand-soft">
+              <Mail className="h-4 w-4 text-brand" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[13.5px] font-semibold text-foreground">
+                Email this report to me
+              </div>
+              <div className="mt-0.5 text-[12.5px] text-muted-foreground">
+                All rewrites in your inbox so you can paste them later.
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              type="email"
+              autoFocus
+              placeholder="you@host.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (state === "error") setState("idle");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") send();
+              }}
+              className="h-10 flex-1 rounded-[10px] border bg-card px-3 text-[13.5px] text-foreground outline-none transition-colors focus:border-brand"
+              disabled={state === "sending"}
+            />
+            <button
+              type="button"
+              onClick={send}
+              disabled={state === "sending"}
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-[10px] bg-brand px-5 text-[13px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90 disabled:opacity-60"
+            >
+              {state === "sending" ? "Sending..." : "Send report"}
+              {state !== "sending" && <ArrowRight className="h-3.5 w-3.5" />}
+            </button>
+          </div>
+          {state === "error" && (
+            <p className="mt-2 text-[12px] text-danger">
+              That doesn't look like a valid email. Try again?
+            </p>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 
