@@ -2,6 +2,23 @@ import type { AuditResponse } from "./types";
 
 const BASE = "https://airbnb-audit-rho.vercel.app";
 
+// Optional shared secret for the backend's X-Audit-Token gate. Set
+// VITE_AUDIT_TOKEN at build time and the backend's AUDIT_FRONTEND_TOKEN env
+// var to the same value. Leaving both unset preserves the previous unauthed
+// behaviour, but the production backend will reject requests once
+// AUDIT_FRONTEND_TOKEN is configured. The value is bundled into the JS so
+// it's not a real auth boundary; treat it as a rotatable speed bump that
+// stops the casual curl abuse path.
+const AUDIT_TOKEN: string | undefined = (import.meta as { env?: Record<string, string> }).env?.VITE_AUDIT_TOKEN;
+
+function authHeaders(extra: Record<string, string> = {}): HeadersInit {
+  return {
+    "Content-Type": "application/json",
+    ...(AUDIT_TOKEN ? { "X-Audit-Token": AUDIT_TOKEN } : {}),
+    ...extra,
+  };
+}
+
 export class AuditError extends Error {
   status?: number;
   detail?: string;
@@ -35,16 +52,27 @@ export async function runAudit(url: string): Promise<AuditResponse> {
     try {
       const res = await fetch(`${BASE}/api/audit`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({ url }),
         signal: controller.signal,
       });
       clearTimeout(timeout);
 
-      // Pre-streaming responses (URL validation, method-not-allowed) come back
-      // with non-200 HTTP status. The streaming /api/audit path always returns
-      // 200 and encodes status in the body via { ok, status, error } so Safari
-      // doesn't kill long fetches.
+      // Pre-streaming responses (URL validation, method-not-allowed, rate
+      // limit, forbidden) come back with non-200 HTTP status. The streaming
+      // /api/audit path always returns 200 and encodes status in the body
+      // via { ok, status, error } so Safari doesn't kill long fetches.
+      if (res.status === 429) {
+        const detail = await readBodySnippet(res);
+        const err = new AuditError(detail || "You're going too fast. Please wait a moment.", 429, detail);
+        console.error("[runAudit] 429", { url, attempt, detail });
+        throw err;
+      }
+      if (res.status === 403) {
+        const err = new AuditError("Audit service is unavailable from this site.", 403);
+        console.error("[runAudit] 403", { url, attempt });
+        throw err;
+      }
       if (res.status >= 400 && res.status < 500) {
         const detail = await readBodySnippet(res);
         const err = new AuditError(`Audit failed (${res.status}). Please try again.`, res.status, detail);
@@ -131,11 +159,32 @@ export async function peekListing(url: string): Promise<PeekData | null> {
   try {
     const idMatch = url.match(/\/rooms\/(\d+)/);
     if (!idMatch) return null;
-    const res = await fetch(`${BASE}/api/peek?id=${idMatch[1]}`);
+    const res = await fetch(`${BASE}/api/peek?id=${idMatch[1]}`, {
+      headers: authHeaders(),
+    });
     if (!res.ok) return null;
     return (await res.json()) as PeekData;
   } catch {
     return null;
+  }
+}
+
+// Best-effort POST. Logs failures to the console rather than swallowing
+// silently, but never throws — these are non-blocking side effects from the
+// caller's perspective.
+async function postBestEffort(path: string, body: unknown, label: string): Promise<void> {
+  try {
+    const res = await fetch(`${BASE}${path}`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const detail = await readBodySnippet(res);
+      console.warn(`[${label}] non-OK`, { status: res.status, detail });
+    }
+  } catch (err) {
+    console.warn(`[${label}] failed`, (err as Error)?.message);
   }
 }
 
@@ -145,12 +194,7 @@ export async function sendReport(payload: {
   score: number;
   title: string;
 }): Promise<void> {
-  // TODO: wire up Resend on the server
-  await fetch(`${BASE}/api/send-report`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
+  await postBestEffort("/api/send-report", payload, "sendReport");
 }
 
 export async function captureLead(payload: {
@@ -163,25 +207,20 @@ export async function captureLead(payload: {
   reviewCount?: number | null;
   result?: AuditResponse;
 }): Promise<void> {
-  await fetch(`${BASE}/api/capture-lead`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
+  await postBestEffort("/api/capture-lead", payload, "captureLead");
 }
 
 export async function redeemRef(email: string, refCode: string): Promise<void> {
-  await fetch(`${BASE}/api/redeem-ref`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, refCode }),
-  }).catch(() => {});
+  // Backend now expects the field name `refereeEmail` so it can apply the
+  // self-referral guard. Keep the call signature stable for callers.
+  await postBestEffort("/api/redeem-ref", { refereeEmail: email, refCode }, "redeemRef");
 }
 
-export async function checkCredits(email: string): Promise<number> {
+export async function checkCredits(refCode: string): Promise<number> {
   try {
     const res = await fetch(
-      `${BASE}/api/check-credits?email=${encodeURIComponent(email)}`,
+      `${BASE}/api/check-credits?refCode=${encodeURIComponent(refCode)}`,
+      { headers: authHeaders() },
     );
     if (!res.ok) return 0;
     const data = (await res.json()) as { credits?: number };
@@ -191,12 +230,8 @@ export async function checkCredits(email: string): Promise<number> {
   }
 }
 
-export async function useCredit(email: string): Promise<void> {
-  await fetch(`${BASE}/api/use-credit`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  }).catch(() => {});
+export async function useCredit(refCode: string): Promise<void> {
+  await postBestEffort("/api/use-credit", { refCode }, "useCredit");
 }
 
 export async function submitFeedback(payload: {
@@ -206,9 +241,5 @@ export async function submitFeedback(payload: {
   email?: string;
   url?: string;
 }): Promise<void> {
-  await fetch(`${BASE}/api/feedback`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
+  await postBestEffort("/api/feedback", payload, "submitFeedback");
 }
