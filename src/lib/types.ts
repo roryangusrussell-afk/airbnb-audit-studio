@@ -123,6 +123,7 @@ export interface AuditResponse {
   isElvisListing?: boolean;
   // Host portfolio signals
   hostListingCount?: number | null;
+  hostStatus?: "individual" | "business" | null;
   // Optional fields the API may return
   thumbnail?: string;
   rating?: number;

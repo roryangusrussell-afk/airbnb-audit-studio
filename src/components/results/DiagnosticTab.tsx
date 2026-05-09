@@ -656,8 +656,10 @@ function SubratingsBreakdown({ area, data }: { area: string; data: AuditResponse
     return ai - bi;
   });
   return (
-    <div className="mt-2.5 grid grid-cols-3 gap-2 sm:grid-cols-6">
-      {sorted.map((r) => {
+    <>
+      <HostStatusBadge status={data.hostStatus} />
+      <div className="mt-2.5 grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {sorted.map((r) => {
         const n = parseFloat(r.localizedRating);
         const valueCls = !isFinite(n)
           ? "text-muted-foreground"
@@ -680,7 +682,8 @@ function SubratingsBreakdown({ area, data }: { area: string; data: AuditResponse
           </div>
         );
       })}
-    </div>
+      </div>
+    </>
   );
 }
 
