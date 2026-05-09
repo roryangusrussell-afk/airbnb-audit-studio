@@ -40,16 +40,11 @@ export async function runAudit(url: string): Promise<AuditResponse> {
         signal: controller.signal,
       });
       clearTimeout(timeout);
-      if (res.status === 422) {
-        const detail = await readBodySnippet(res);
-        const err = new AuditError(
-          "This listing could not be found. Check the URL is public and try again.",
-          422,
-          detail,
-        );
-        console.error("[runAudit] 422", { url, attempt, detail });
-        throw err;
-      }
+
+      // Pre-streaming responses (URL validation, method-not-allowed) come back
+      // with non-200 HTTP status. The streaming /api/audit path always returns
+      // 200 and encodes status in the body via { ok, status, error } so Safari
+      // doesn't kill long fetches.
       if (res.status >= 400 && res.status < 500) {
         const detail = await readBodySnippet(res);
         const err = new AuditError(`Audit failed (${res.status}). Please try again.`, res.status, detail);
@@ -57,7 +52,6 @@ export async function runAudit(url: string): Promise<AuditResponse> {
         throw err;
       }
       if (!res.ok) {
-        // 5xx — retryable
         const detail = await readBodySnippet(res);
         lastError = new AuditError(`Audit failed (${res.status}). Please try again.`, res.status, detail);
         console.error("[runAudit] 5xx", { url, attempt, status: res.status, detail });
@@ -67,7 +61,37 @@ export async function runAudit(url: string): Promise<AuditResponse> {
         }
         throw lastError;
       }
-      return (await res.json()) as AuditResponse;
+
+      const body = await res.json();
+
+      // Body-encoded error from the streaming handler
+      if (body && body.ok === false) {
+        const status = typeof body.status === "number" ? body.status : 500;
+        const errorText = typeof body.error === "string" ? body.error : "Unknown error";
+        if (status === 422) {
+          const err = new AuditError(
+            "This listing could not be found. Check the URL is public and try again.",
+            422,
+            errorText,
+          );
+          console.error("[runAudit] body-422", { url, attempt, errorText });
+          throw err;
+        }
+        if (status >= 500) {
+          lastError = new AuditError(`Audit failed (${status}). Please try again.`, status, errorText);
+          console.error("[runAudit] body-5xx", { url, attempt, status, errorText });
+          if (attempt < MAX_ATTEMPTS) {
+            await new Promise(r => setTimeout(r, 2000));
+            continue;
+          }
+          throw lastError;
+        }
+        const err = new AuditError(`Audit failed (${status}). Please try again.`, status, errorText);
+        console.error("[runAudit] body-4xx", { url, attempt, status, errorText });
+        throw err;
+      }
+
+      return body as AuditResponse;
     } catch (err) {
       clearTimeout(timeout);
       if (err instanceof AuditError) {
