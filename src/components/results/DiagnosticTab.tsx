@@ -146,7 +146,7 @@ export function DiagnosticTab({ data, printMode = false }: { data: AuditResponse
   const next = availableCards[activeIndex + 1] ?? null;
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[220px_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
       <AuditAreasRail
         cards={availableCards}
         activeId={active.id}
@@ -205,9 +205,10 @@ function AuditAreasRail({
                   <Icon className={`h-3.5 w-3.5 lg:h-4 lg:w-4 ${meta.iconText}`} />
                 </span>
                 <span
-                  className={`min-w-0 flex-1 truncate text-[13px] font-semibold tracking-tight ${
+                  className={`min-w-0 flex-1 text-[13px] font-semibold leading-tight tracking-tight lg:whitespace-normal ${
                     isActive ? "text-brand" : "text-foreground"
                   }`}
+                  title={c.label}
                 >
                   {c.label}
                 </span>
@@ -261,6 +262,7 @@ function DetailPanel({
           catScore={catScore}
           rewriteKeepAsIs={rewrite?.keepAsIs}
           hasRewrite={!!rewrite}
+          currentEmpty={isRewriteSection && getCurrentText(card.area, data).trim().length === 0}
         />
       </div>
 
@@ -305,10 +307,12 @@ function HeaderStatus({
   catScore,
   rewriteKeepAsIs,
   hasRewrite,
+  currentEmpty,
 }: {
   catScore: number | null;
   rewriteKeepAsIs?: boolean;
   hasRewrite: boolean;
+  currentEmpty?: boolean;
 }) {
   if (typeof catScore === "number") {
     const band = scoreBand(catScore);
@@ -323,12 +327,13 @@ function HeaderStatus({
     );
   }
   if (!hasRewrite) return null;
+  const isAdd = !rewriteKeepAsIs && currentEmpty;
   return (
     <span
       className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
         rewriteKeepAsIs
           ? "border-success-border bg-success-soft text-success"
-          : "border-brand-border bg-brand-soft text-brand"
+          : "border-border bg-card text-foreground"
       }`}
     >
       {rewriteKeepAsIs ? (
@@ -338,8 +343,8 @@ function HeaderStatus({
         </>
       ) : (
         <>
-          <ArrowRight className="h-3.5 w-3.5" />
-          Rewrite ready
+          <ArrowRight className="h-3.5 w-3.5 text-brand" />
+          {isAdd ? "Add ready" : "Rewrite ready"}
         </>
       )}
     </span>

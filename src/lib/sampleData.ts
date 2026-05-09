@@ -207,6 +207,88 @@ export const sampleAudit: AuditResponse = {
     adjustment:
       "Private parking is already validated by reviews, but the listing under-displays it in the title and gallery. The shift is treating parking as the headline differentiator, not a footnote.",
   },
+  subsections: {
+    theSpace:
+      "Welcome to our home! This beautiful home is close to many of Lisbon's top attractions! This minimalist apartment comes with open living and dining areas as well as a fully fitted kitchen, the home acts as a peaceful retreat after a day out in the city. The kitchen is fully equipped with essential cookware and cutlery. The 2 bedrooms come with a comfy double beds. The beds are fitted with complimentary hotel-quality linens for maximum comfort. There's also another single couch bed in the living room should you need it. The bathroom has all the amenities you'll need to freshen up such as a shower, a toilet, and a sink. Fresh towels and free toiletries will also be supplied for your convenience. The flat is always professionally cleaned and sanitized for your health and safety. Enjoy!",
+    guestAccess: "Guests have access to the entire property.",
+    otherNotes:
+      "This property is a self-check-in property, and you will be requested to verify your identity before checking into the property. Check-in can be done from 3 PM, pending availability and confirmation. Once a reservation is confirmed, guests are requested to complete a guest registration form following the legal obligations stipulated by local authorities in Portugal. There is a zero-tolerance policy for smoking on the property. If our team discovers evidence that this rule has been breached (e.g., smoke smell, ashes, butts, etc.), we fully reserve the right to charge a 200 euro smoking fee at minimum. Please note that for stays longer than 30 nights, a fair use policy of the utilities will apply with a limit of 80 euros. For the first days, we provide the basic amenities: samples of shower gel, shampoo, soap, toilet paper, kitchen roll, sponge, dishwashing products and bin bag. Extra keys: 20 euros. Extra cleaning with linen: the price of a cleaning fee. Extra Clothing: 30 euros (Towels and sheets for 2pax, i.e. when the sofa bed is not included).",
+    neighborhood: "",
+  },
+  houseRules: "",
+  rewrites: {
+    title: {
+      keepAsIs: false,
+      options: [
+        {
+          tone: "Concise",
+          recommended: true,
+          text: "Cais do Sodré 1BR with private parking & balcony",
+          why: "Leads with the rarest USP (private parking) and the neighbourhood that filters guests in. Drops 'Light-filled' which is generic and unproven.",
+        },
+        {
+          tone: "Premium",
+          recommended: false,
+          text: "Cais do Sodré apartment, private parking, south-facing balcony",
+          why: "Adds the balcony orientation as a second specific. Keeps parking up front so the title still earns the parking-filter click.",
+        },
+        {
+          tone: "Warm",
+          recommended: false,
+          text: "Bright Cais do Sodré flat, balcony at golden hour, private parking",
+          why: "Trades a small amount of scannability for personality. Still keeps the parking USP visible in the second clause.",
+        },
+      ],
+    },
+    opening: {
+      keepAsIs: false,
+      options: [
+        {
+          tone: "Concise",
+          recommended: true,
+          text: "A one-bedroom apartment in Cais do Sodré with a south-facing balcony and one of the few private parking spaces in the neighbourhood.",
+          why: "Leads with the strongest two specifics: balcony orientation and parking rarity. Drops 'beautifully designed' which adds nothing the photos can't prove.",
+        },
+        {
+          tone: "Premium",
+          recommended: false,
+          text: "One bedroom in Cais do Sodré with rare private parking, a south-facing balcony, and a 5-minute walk to the riverside.",
+          why: "Adds a third specific (walk time) without bloat. Premium voice earned through specificity, not adjectives.",
+        },
+        {
+          tone: "Warm",
+          recommended: false,
+          text: "Our place is in Cais do Sodré with a south-facing balcony for afternoon sun and a private parking space, which is rare around here.",
+          why: "Operator voice without slipping into 'home away from home' territory. Still surfaces the parking and balcony as specifics.",
+        },
+      ],
+    },
+    theSpace: {
+      keepAsIs: false,
+      text: "Two bedrooms with double beds, hotel-quality linens, and a sofa bed in the living room for a fourth guest. Open-plan living and dining area with a glass dining table for 4. Fully fitted kitchen with oven, induction hob, microwave, coffee machine, kettle, and toaster. All cookware and cutlery provided. Bathroom with walk-in shower, marble-effect tiles, and fresh towels. Air conditioning throughout. Flat-screen TV and console table workspace. Professionally cleaned and sanitized before each stay. Fresh toiletries, shower gel, shampoo, and basic supplies provided on arrival.",
+      why: "Removes 'Welcome to our home', 'peaceful retreat', and generic adjectives. Leads with room count and sleeping arrangements (key for families). Adds specific kitchen appliances and workspace detail visible in photos. Factual and scannable.",
+    },
+    guestAccess: {
+      keepAsIs: false,
+      text: "Entire apartment. Self check-in via keypad or lockbox. You will be asked to verify your identity before arrival. Check-in from 3 PM pending availability. Guest registration form required on arrival (Portuguese legal requirement).",
+      why: "Procedural and clear. Sets identity verification and registration expectations upfront so guests aren't surprised on arrival. Operator voice.",
+    },
+    otherNotes: {
+      keepAsIs: false,
+      text: "Zero-tolerance smoking policy. Smoking evidence (smell, ashes, butts) will incur a 200 euro minimum fee. For stays over 30 nights, utilities capped at 80 euros. Basic amenities provided on arrival; extra keys 20 euros, extra cleaning [cleaning fee], extra linens 30 euros. Building has stairs to entrance. Quiet neighbourhood but tram noise audible early mornings and evenings.",
+      why: "Consolidates house rules and fees into one honest disclosure. Adds 'stairs to entrance' and 'tram noise' as friction-point disclosures (reviews mention tram proximity; honesty protects future reviews). Removes marketing language.",
+    },
+    neighborhood: {
+      keepAsIs: false,
+      text: "Cais do Sodré, on the Tagus riverside. 5 minutes to Time Out Market, 10 minutes to Bairro Alto for nightlife, 15 minutes by tram to Belém. Cais do Sodré train station is a 3-minute walk for trains to Cascais and Estoril. Two supermarkets within 200m. Pingo Doce on Rua do Alecrim is the closer of the two. [Add your favourite breakfast spot within 5 minutes].",
+      why: "Replaces empty section with specific names, walk times and a transit anchor. Brackets a single owner-only detail rather than fabricating a recommendation.",
+    },
+    houseRules: {
+      keepAsIs: false,
+      text: "No smoking (200 euro minimum fee if breached). No parties or events. Quiet hours 10 PM to 8 AM. Maximum 4 guests including infants. Pets considered case by case, please ask before booking. Check-in from 3 PM, check-out by 11 AM.",
+      why: "Adds quiet hours and explicit guest cap, which the current rules don't carry. Pet policy framed as 'ask first' rather than absolute, opens optionality without committing.",
+    },
+  },
   performancePattern: {
     strengths: [
       {
