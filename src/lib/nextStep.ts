@@ -1,3 +1,4 @@
+import { track } from "@vercel/analytics";
 import type { AuditResponse } from "./types";
 
 export type NextStepRoute =
@@ -95,9 +96,32 @@ export type AnalyticsEvent =
   | "clicked_automation_playbook"
   | "clicked_second_opinion";
 
+type AllowedPropertyValue = string | number | boolean | null;
+
+function toAnalyticsProperties(
+  payload: Record<string, unknown>,
+): Record<string, AllowedPropertyValue> {
+  const result: Record<string, AllowedPropertyValue> = {};
+  for (const [key, value] of Object.entries(payload)) {
+    if (
+      value === null ||
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    ) {
+      result[key] = value;
+    } else if (value !== undefined) {
+      result[key] = JSON.stringify(value);
+    }
+  }
+  return result;
+}
+
 export function trackEvent(event: AnalyticsEvent, payload: Record<string, unknown> = {}): void {
-  // TODO: wire up to real analytics provider once selected.
-  if (typeof window !== "undefined") {
-    console.log(`[analytics] ${event}`, payload);
+  if (typeof window === "undefined") return;
+  const properties = toAnalyticsProperties(payload);
+  track(event, properties);
+  if (import.meta.env?.DEV) {
+    console.log(`[analytics] ${event}`, properties);
   }
 }
