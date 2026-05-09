@@ -133,14 +133,14 @@ describe("useAuditFlow", () => {
     expect(result.current.needsEmail).toBe(false);
   });
 
-  it("triggers the post-audit email modal when no email is stored", async () => {
+  it("does not auto-open the email modal when no email is stored (ResultsScreen fires it on scroll)", async () => {
     const { result } = renderHook(() => useAuditFlow());
 
     await act(async () => {
       await result.current.submitUrl(URL);
     });
 
-    expect(result.current.needsEmail).toBe(true);
+    expect(result.current.needsEmail).toBe(false);
     expect(captureLead).not.toHaveBeenCalled();
   });
 
@@ -149,6 +149,9 @@ describe("useAuditFlow", () => {
 
     await act(async () => {
       await result.current.submitUrl(URL);
+    });
+    act(() => {
+      result.current.setNeedsEmail(true);
     });
     expect(result.current.needsEmail).toBe(true);
 

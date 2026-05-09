@@ -62,7 +62,7 @@ interface PrimaryCardSpec {
   body: string;
   visual: React.ReactNode;
   pill?: InlinePill;
-  primaryCta: CtaSpec;
+  primaryCta?: CtaSpec;
   secondaryCta?: CtaSpec;
 }
 
@@ -80,6 +80,15 @@ const VALID_ROUTES: NextStepRoute[] = [
   "improve-this-listing",
   "fix-this-listing",
 ];
+
+// CTAs that have no destination yet. Hidden until they're wired to a real
+// link (Calendly, Stripe, etc.). Keep this list narrow — it's a kill switch
+// for visible-but-broken buttons, not a policy lever.
+const HIDDEN_CTA_EVENTS: ReadonlySet<AnalyticsEvent> = new Set([
+  "clicked_buy_one_audit",
+  "clicked_buy_five_audits",
+  "clicked_get_quote",
+]);
 
 function readDevRouteOverride(): NextStepRoute | null {
   if (!import.meta.env.DEV) return null;
@@ -107,7 +116,25 @@ export function NextStepTab({ email, data }: { email: string; data: AuditRespons
     });
   }, [route, data]);
 
-  const content = useMemo(() => buildRouteContent(route, data), [route, data]);
+  const content = useMemo(() => {
+    const raw = buildRouteContent(route, data);
+    return {
+      ...raw,
+      primary: {
+        ...raw.primary,
+        primaryCta: HIDDEN_CTA_EVENTS.has(raw.primary.primaryCta.event)
+          ? undefined
+          : raw.primary.primaryCta,
+        secondaryCta:
+          raw.primary.secondaryCta && HIDDEN_CTA_EVENTS.has(raw.primary.secondaryCta.event)
+            ? undefined
+            : raw.primary.secondaryCta,
+      },
+      secondaryRows: raw.secondaryRows.filter(
+        (row) => !HIDDEN_CTA_EVENTS.has(row.cta.event),
+      ),
+    };
+  }, [route, data]);
   const emailReportRow = <EmailReportRow data={data} initialEmail={email} />;
   const referralRow = <ReferralRow email={email} />;
 
@@ -168,25 +195,29 @@ function PrimaryCard({ spec }: { spec: PrimaryCardSpec }) {
 
           {spec.pill && <InlinePillView pill={spec.pill} />}
 
-          <div className="mt-3 flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
-            {spec.secondaryCta && (
-              <button
-                type="button"
-                onClick={() => trackEvent(spec.secondaryCta!.event)}
-                className="inline-flex h-10 items-center justify-center rounded-[10px] border bg-card px-4 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted/40"
-              >
-                {spec.secondaryCta.label}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => trackEvent(spec.primaryCta.event)}
-              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-[10px] bg-brand px-5 text-[13px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90"
-            >
-              {spec.primaryCta.label}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
+          {(spec.primaryCta || spec.secondaryCta) && (
+            <div className="mt-3 flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
+              {spec.secondaryCta && (
+                <button
+                  type="button"
+                  onClick={() => trackEvent(spec.secondaryCta!.event)}
+                  className="inline-flex h-10 items-center justify-center rounded-[10px] border bg-card px-4 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted/40"
+                >
+                  {spec.secondaryCta.label}
+                </button>
+              )}
+              {spec.primaryCta && (
+                <button
+                  type="button"
+                  onClick={() => trackEvent(spec.primaryCta!.event)}
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-[10px] bg-brand px-5 text-[13px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90"
+                >
+                  {spec.primaryCta.label}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

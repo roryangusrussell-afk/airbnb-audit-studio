@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, FileText, Activity, Rocket, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,14 +14,40 @@ export function ResultsScreen({
   data,
   email,
   onAuditAnother,
+  onRequestEmailGate,
   topSlot,
 }: {
   data: AuditResponse;
   email: string;
   onAuditAnother: () => void;
+  onRequestEmailGate?: () => void;
   topSlot?: React.ReactNode;
 }) {
   const [printMode, setPrintMode] = useState(false);
+  const summarySentinelRef = useRef<HTMLDivElement>(null);
+  const emailGateFiredRef = useRef(false);
+
+  useEffect(() => {
+    if (email || !onRequestEmailGate || emailGateFiredRef.current) return;
+    const el = summarySentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (
+          !entry.isIntersecting &&
+          entry.boundingClientRect.top < 0 &&
+          !emailGateFiredRef.current
+        ) {
+          emailGateFiredRef.current = true;
+          onRequestEmailGate();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [email, onRequestEmailGate]);
 
   // When entering print mode, give React a tick to render the expanded view
   // before opening the print dialog. afterprint flips back to the tabbed view.
@@ -70,6 +96,7 @@ export function ResultsScreen({
         <ListingCard data={data} />
         {data.bottomTenRisk && <BottomTenRiskBanner />}
       </div>
+      <div ref={summarySentinelRef} aria-hidden className="h-px" data-print-hide />
 
       {printMode ? (
         <div className="mt-6 space-y-8">

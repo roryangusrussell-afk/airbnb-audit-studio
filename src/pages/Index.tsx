@@ -20,6 +20,7 @@ const Index = () => {
           data={flow.data}
           email={flow.email}
           onAuditAnother={flow.reset}
+          onRequestEmailGate={() => flow.setNeedsEmail(true)}
         />
       )}
 

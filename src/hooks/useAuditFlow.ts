@@ -61,9 +61,9 @@ export function useAuditFlow() {
           localStorage.setItem(AUDITS_RUN_KEY, String(prev + 1));
         }
 
-        // Log every audit's email + listing context to the Sheet (only if we
-        // already have an email — otherwise the post-audit modal will fire
-        // and capture there).
+        // Log this audit to the Sheet only if we already have an email.
+        // Without one, ResultsScreen fires setNeedsEmail when the user
+        // scrolls past the summary, and submitEmail captures the lead then.
         if (withEmail) {
           captureLead({
             email: withEmail,
@@ -76,9 +76,7 @@ export function useAuditFlow() {
             result,
           });
         } else {
-          // No email yet — show the post-audit save-to-inbox modal
           pendingUrlRef.current = auditUrl;
-          setNeedsEmail(true);
         }
 
         // Redeem pending referral after first successful audit
