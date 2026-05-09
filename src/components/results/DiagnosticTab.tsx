@@ -420,6 +420,7 @@ function DiagnosticSection({
       </div>
 
       <SignalCards area={card.area} data={data} />
+      <SubratingsBreakdown area={card.area} data={data} />
       <FoundList area={card.area} data={data} />
 
       {fixes.length > 0 ? (
@@ -601,6 +602,86 @@ function buildMetrics(area: string, data: AuditResponse): Metric[] {
     ];
   }
   return [];
+}
+
+// ---------- subratings breakdown ----------
+
+const SUBRATING_ORDER = [
+  "Cleanliness",
+  "Accuracy",
+  "Check-in",
+  "Communication",
+  "Location",
+  "Value",
+];
+
+function HostStatusBadge({ status }: { status?: "individual" | "business" | null }) {
+  if (!status) return null;
+  const label = status === "business" ? "Business host" : "Individual host";
+  const sub =
+    status === "business"
+      ? "Self-declared trader under EU disclosure rules"
+      : "Non-trader (private host) under EU disclosure rules";
+  const dotCls = status === "business" ? "bg-brand" : "bg-muted-foreground";
+  return (
+    <div className="mt-2.5 flex items-center gap-2.5 rounded-xl border bg-card px-3.5 py-2.5">
+      <span className={`h-1.5 w-1.5 rounded-full ${dotCls}`} />
+      <div className="min-w-0">
+        <div className="text-[12.5px] font-semibold text-foreground">{label}</div>
+        <div className="truncate text-[11px] text-muted-foreground">{sub}</div>
+      </div>
+    </div>
+  );
+}
+
+function SubratingsBreakdown({ area, data }: { area: string; data: AuditResponse }) {
+  if (area !== "Reviews & rating") return null;
+  const ratings = data.categoryRatings ?? [];
+  if (ratings.length === 0) {
+    return (
+      <>
+        <HostStatusBadge status={data.hostStatus} />
+        <div className="mt-2.5 rounded-xl border bg-card px-4 py-3 text-[12px] text-muted-foreground">
+          Sub-rating breakdown appears once the listing has a few reviews.
+        </div>
+      </>
+    );
+  }
+  const sorted = [...ratings].sort((a, b) => {
+    const ai = SUBRATING_ORDER.indexOf(a.label);
+    const bi = SUBRATING_ORDER.indexOf(b.label);
+    if (ai === -1 && bi === -1) return 0;
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+  return (
+    <div className="mt-2.5 grid grid-cols-3 gap-2 sm:grid-cols-6">
+      {sorted.map((r) => {
+        const n = parseFloat(r.localizedRating);
+        const valueCls = !isFinite(n)
+          ? "text-muted-foreground"
+          : n >= 4.8
+          ? "text-success"
+          : n >= 4.5
+          ? "text-warning"
+          : "text-danger";
+        return (
+          <div
+            key={r.label}
+            className="rounded-xl border bg-card px-3 py-2.5 text-center"
+          >
+            <div className={`text-[15px] font-bold tabular-nums ${valueCls}`}>
+              {r.localizedRating}
+            </div>
+            <div className="mt-0.5 truncate text-[11px] text-muted-foreground">
+              {r.label}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 // ---------- found list ----------
