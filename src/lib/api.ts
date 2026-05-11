@@ -219,12 +219,16 @@ export async function redeemRef(email: string, refCode: string): Promise<void> {
   await postBestEffort("/api/redeem-ref", { refereeEmail: email, refCode }, "redeemRef");
 }
 
-export async function checkCredits(refCode: string): Promise<number> {
+export async function checkCredits(
+  identity: { refCode: string } | { email: string },
+): Promise<number> {
+  const param = "refCode" in identity
+    ? `refCode=${encodeURIComponent(identity.refCode)}`
+    : `email=${encodeURIComponent(identity.email)}`;
   try {
-    const res = await fetch(
-      `${BASE}/api/check-credits?refCode=${encodeURIComponent(refCode)}`,
-      { headers: authHeaders() },
-    );
+    const res = await fetch(`${BASE}/api/check-credits?${param}`, {
+      headers: authHeaders(),
+    });
     if (!res.ok) return 0;
     const data = (await res.json()) as { credits?: number };
     return data.credits ?? 0;
@@ -233,8 +237,21 @@ export async function checkCredits(refCode: string): Promise<number> {
   }
 }
 
-export async function useCredit(refCode: string): Promise<void> {
-  await postBestEffort("/api/use-credit", { refCode }, "useCredit");
+export async function useCredit(
+  identity: { refCode: string } | { email: string },
+): Promise<{ ok: boolean; remaining?: number }> {
+  try {
+    const res = await fetch(`${BASE}/api/use-credit`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(identity),
+    });
+    if (!res.ok) return { ok: false };
+    const data = (await res.json()) as { ok?: boolean; remaining?: number };
+    return { ok: !!data.ok, remaining: data.remaining };
+  } catch {
+    return { ok: false };
+  }
 }
 
 export async function submitFeedback(payload: {

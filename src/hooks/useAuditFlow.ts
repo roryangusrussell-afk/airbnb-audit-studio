@@ -1,14 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AuditError, captureLead, checkCredits, peekListing, redeemRef, runAudit, useCredit } from "@/lib/api";
+import {
+  AuditError,
+  captureLead,
+  checkCredits,
+  peekListing,
+  redeemRef,
+  runAudit,
+  useCredit,
+} from "@/lib/api";
 import type { PeekData } from "@/lib/api";
 import type { AuditResponse } from "@/lib/types";
 
-export type FlowStatus = "landing" | "loading" | "results" | "error";
+export type FlowStatus = "landing" | "loading" | "results" | "error" | "paywall";
 
 const EMAIL_KEY = "auditEmail";
 const PENDING_REF_KEY = "pendingRef";
 const AUDITS_RUN_KEY = "auditsRun";
-const FREE_AUDIT_LIMIT = 5;
+const FREE_AUDIT_USED_KEY = "freeAuditUsed";
 
 export function useAuditFlow() {
   const [status, setStatus] = useState<FlowStatus>("landing");
@@ -24,6 +32,9 @@ export function useAuditFlow() {
   const [creditGateOpen, setCreditGateOpen] = useState(false);
   const completedCountRef = useRef(0);
   const pendingUrlRef = useRef<string>("");
+  // Set when the current audit is consuming a paid credit (audit 2+ after free).
+  // Drives the post-success useCredit decrement.
+  const consumingCreditRef = useRef(false);
 
   // Capture ?ref= on first load
   useEffect(() => {
@@ -55,15 +66,23 @@ export function useAuditFlow() {
         setStatus("results");
         completedCountRef.current += 1;
 
-        // Persist audit count so refreshes can't reset the cap
         if (typeof window !== "undefined") {
           const prev = parseInt(localStorage.getItem(AUDITS_RUN_KEY) || "0", 10) || 0;
           localStorage.setItem(AUDITS_RUN_KEY, String(prev + 1));
+          // First successful audit consumes the free allowance for this browser.
+          // From here on, audit 2+ requires a credit on the email.
+          localStorage.setItem(FREE_AUDIT_USED_KEY, "1");
         }
 
-        // Log this audit to the Sheet only if we already have an email.
-        // Without one, ResultsScreen fires setNeedsEmail when the user
-        // scrolls past the summary, and submitEmail captures the lead then.
+        // If this audit consumed a paid credit, decrement the ledger now that
+        // we know the audit succeeded.
+        if (consumingCreditRef.current && withEmail) {
+          consumingCreditRef.current = false;
+          useCredit({ email: withEmail }).catch(() => {});
+        }
+
+        // Log to Sheet only if we already have an email. Without one,
+        // ResultsScreen renders the GatePanel which calls submitEmail.
         if (withEmail) {
           captureLead({
             email: withEmail,
@@ -88,6 +107,9 @@ export function useAuditFlow() {
           }
         }
       } catch (err) {
+        // Reset the consuming flag so a failed audit doesn't burn the credit
+        // on retry — useCredit was never called.
+        consumingCreditRef.current = false;
         const msg =
           err instanceof AuditError
             ? err.message
@@ -111,9 +133,30 @@ export function useAuditFlow() {
 
       const storedEmail =
         typeof window !== "undefined" ? localStorage.getItem(EMAIL_KEY) : "";
+      const freeUsed =
+        typeof window !== "undefined" &&
+        localStorage.getItem(FREE_AUDIT_USED_KEY) === "1";
 
-      // Credit gate disabled until Stripe is wired. Counter still increments
-      // (line ~60) so the gate can be re-enabled later.
+      // Audit 2+: must have an email and a positive credit balance.
+      // Audit 1 (no free used yet) is always allowed; email is captured
+      // post-audit via the GatePanel.
+      if (freeUsed && storedEmail) {
+        // Pre-load the peek so the paywall can show the listing context
+        peekListing(auditUrl).then(d => { if (d) setPeekData(d); });
+        const credits = await checkCredits({ email: storedEmail });
+        if (credits < 1) {
+          setStatus("paywall");
+          return;
+        }
+        consumingCreditRef.current = true;
+      } else if (freeUsed && !storedEmail) {
+        // Free already used on this browser but we have no email to charge
+        // against. This only happens if the user cleared their email but not
+        // freeAuditUsed. Send them to the paywall too — they can email Rory.
+        setStatus("paywall");
+        return;
+      }
+
       await performAudit(auditUrl, storedEmail || "");
     },
     [performAudit],
@@ -129,7 +172,7 @@ export function useAuditFlow() {
           : { email: value.email, marketingOptIn: !!value.marketingOptIn };
       setEmail(payload.email);
       setNeedsEmail(false);
-      // Email collected post-audit — log to Sheet + send report email to the tester
+      // Email collected post-audit. Log to Sheet + trigger report email.
       const target = pendingUrlRef.current || url;
       if (data && target) {
         captureLead({
@@ -156,6 +199,8 @@ export function useAuditFlow() {
     setError("");
     setErrorDetail("");
     setUrl("");
+    setPeekData(null);
+    consumingCreditRef.current = false;
     pendingUrlRef.current = "";
   }, []);
 
