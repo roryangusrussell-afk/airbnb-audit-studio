@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListingCard } from "./ListingCard";
 import { BottomTenRiskBanner } from "./BottomTenRiskBanner";
-import { FeedbackButton } from "./FeedbackModal";
 import { SummaryTab } from "./SummaryTab";
 import { DiagnosticTab } from "./DiagnosticTab";
 import { NextStepTab } from "./NextStepTab";
@@ -48,11 +47,11 @@ export function ResultsScreen({
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-print-hide>
         <div className="eyebrow">Your audit report</div>
         <div className="flex flex-wrap items-center gap-2">
-          <FeedbackButton
-            listingId={data.listingId}
-            email={email}
-            url={`https://www.airbnb.com/rooms/${data.listingId}`}
-          />
+          <Button variant="outline" size="sm" onClick={onAuditAnother} className="gap-1.5">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Audit another listing</span>
+            <span className="sm:hidden">Another listing</span>
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -61,11 +60,6 @@ export function ResultsScreen({
           >
             <Download className="h-3.5 w-3.5" />
             Download PDF
-          </Button>
-          <Button variant="outline" size="sm" onClick={onAuditAnother} className="gap-1.5">
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Audit another listing</span>
-            <span className="sm:hidden">Another listing</span>
           </Button>
         </div>
       </div>
@@ -126,16 +120,6 @@ export function ResultsScreen({
         </Tabs>
       )}
 
-      {!isGated && (
-        <div className="mt-8" data-print-hide>
-          <FeedbackButton
-            listingId={data.listingId}
-            email={email}
-            url={`https://www.airbnb.com/rooms/${data.listingId}`}
-            variant="panel"
-          />
-        </div>
-      )}
     </div>
   );
 }

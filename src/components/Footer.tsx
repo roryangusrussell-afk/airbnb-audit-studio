@@ -9,8 +9,8 @@ export function Footer() {
       <div className="container max-w-[1180px] px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 text-[12.5px] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p className="leading-relaxed">
-            Auditable is a free listing diagnostic built by Rory Russell, an Airbnb operator in Lisbon.
-            Audits are automated and don't constitute financial or legal advice.
+            Built by Rory Russell, a Lisbon Airbnb operator. Auditable uses public listing data
+            to give directional recommendations. It does not provide financial or legal advice.
           </p>
           <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px]">
             <Link to="/privacy" className="hover:text-foreground">
