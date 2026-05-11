@@ -5,11 +5,10 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import type { AuditResponse } from "@/lib/types";
 import { isPortugalListing, trackEvent } from "@/lib/nextStep";
 
-// CTA destinations. Replace placeholders with the real links before going live.
-// Empty strings cause the corresponding CTA to render as disabled "coming soon".
-const STRATEGY_CALL_URL = "https://cal.com/rory-russell"; // TODO: confirm real booking URL
-const SCC_MANAGEMENT_URL =
-  "mailto:roryangusrussell@gmail.com?subject=Property%20management%20enquiry%20(via%20Auditable)";
+// CTA destinations. Empty STRIPE_5_PACK_URL renders the 5-pack row as
+// "Coming soon" — paste a Stripe Payment Link there to go live.
+const STRATEGY_CALL_URL = "https://calendly.com/roryangusrussell/30min";
+const SCC_MANAGEMENT_URL = "https://santacatarinacollection.com/en";
 const STRIPE_5_PACK_URL = ""; // TODO: paste Stripe Payment Link for 5-pack
 
 export function NextStepTab({ email, data }: { email: string; data: AuditResponse }) {
