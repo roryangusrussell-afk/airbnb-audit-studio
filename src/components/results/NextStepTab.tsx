@@ -5,11 +5,10 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import type { AuditResponse } from "@/lib/types";
 import { isPortugalListing, trackEvent } from "@/lib/nextStep";
 
-// CTA destinations. Empty STRIPE_5_PACK_URL renders the 5-pack row as
-// "Coming soon" — paste a Stripe Payment Link there to go live.
 const STRATEGY_CALL_URL = "https://calendly.com/roryangusrussell/30min";
 const SCC_MANAGEMENT_URL = "https://santacatarinacollection.com/en";
-const STRIPE_5_PACK_URL = ""; // TODO: paste Stripe Payment Link for 5-pack
+const STRIPE_SINGLE_AUDIT_URL = "https://buy.stripe.com/14AeVfamFg2KbVQgGVaMU00";
+const STRIPE_FIVE_PACK_URL = "https://buy.stripe.com/bJe3cx1Q94k22lgbmBaMU01";
 
 export function NextStepTab({ email, data }: { email: string; data: AuditResponse }) {
   const isPT = isPortugalListing(data);
@@ -44,7 +43,7 @@ export function NextStepTab({ email, data }: { email: string; data: AuditRespons
         </h3>
         <div className="mt-3 space-y-2.5">
           <ReferralRow email={email} />
-          <FivePackRow />
+          <BuyAuditsRow />
         </div>
       </section>
     </div>
@@ -161,44 +160,43 @@ function ReferralRow({ email }: { email: string }) {
   );
 }
 
-function FivePackRow() {
-  const enabled = !!STRIPE_5_PACK_URL;
-  const content = (
-    <>
-      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-brand-soft">
-        <Tag className="h-4 w-4 text-brand" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-[13.5px] font-semibold text-foreground">
-          Need more audits now? Buy a 5-pack
-        </span>
-        <span className="mt-0.5 block truncate text-[12.5px] text-muted-foreground">
-          {enabled
-            ? "Five audits, use any time. Skip the wait."
-            : "Coming soon — not yet available."}
-        </span>
-      </span>
-      {enabled && <ArrowRight className="h-4 w-4 flex-none text-muted-foreground" />}
-    </>
-  );
-
-  if (!enabled) {
-    return (
-      <div className="flex w-full items-center gap-3.5 rounded-[12px] border bg-card px-4 py-3.5 opacity-60">
-        {content}
-      </div>
-    );
-  }
-
+function BuyAuditsRow() {
   return (
-    <a
-      href={STRIPE_5_PACK_URL}
-      target="_blank"
-      rel="noreferrer"
-      onClick={() => trackEvent("clicked_buy_five_audits")}
-      className="group flex w-full items-center gap-3.5 rounded-[12px] border bg-card px-4 py-3.5 text-left transition-colors hover:border-brand-border hover:bg-brand-soft/30"
-    >
-      {content}
-    </a>
+    <div className="rounded-[12px] border bg-card px-4 py-3.5">
+      <div className="flex items-center gap-3.5">
+        <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-brand-soft">
+          <Tag className="h-4 w-4 text-brand" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-[13.5px] font-semibold text-foreground">
+            Need another audit now? Buy one
+          </div>
+          <div className="mt-0.5 text-[12.5px] text-muted-foreground">
+            Skip the wait. 5-pack saves nearly half per audit.
+          </div>
+        </div>
+      </div>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <a
+          href={STRIPE_SINGLE_AUDIT_URL}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => trackEvent("clicked_buy_one_audit")}
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[10px] border bg-card px-4 text-[12.5px] font-semibold text-foreground transition-colors hover:bg-muted/40"
+        >
+          Buy 1 — €15
+        </a>
+        <a
+          href={STRIPE_FIVE_PACK_URL}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => trackEvent("clicked_buy_five_audits")}
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[10px] bg-brand px-4 text-[12.5px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90"
+        >
+          Buy 5 — €39
+          <ArrowRight className="h-3.5 w-3.5" />
+        </a>
+      </div>
+    </div>
   );
 }

@@ -44,6 +44,7 @@ export type AnalyticsEvent =
   | "clicked_strategy_call"
   | "clicked_management_fit"
   | "clicked_referral_copy"
+  | "clicked_buy_one_audit"
   | "clicked_buy_five_audits";
 
 type AllowedPropertyValue = string | number | boolean | null;
