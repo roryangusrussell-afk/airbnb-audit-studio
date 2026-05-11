@@ -1,4 +1,4 @@
-# CLAUDE.md — airbnb-audit-studio (frontend)
+# CLAUDE.md, airbnb-audit-studio (frontend)
 
 Guide for AI assistants working in this repo. Keep it accurate; update
 it when reality drifts.
@@ -14,13 +14,13 @@ three-tab report (Summary, Diagnostic, Next step). Production:
 - Backend repo: `airbnb-audit` (sibling)
 
 The audit is positioned as a free lead magnet for Rory Russell's parent
-brand — not a SaaS product. Read `airbnb-audit/PRODUCT.md` (in the
+brand, not a SaaS product. Read `airbnb-audit/PRODUCT.md` (in the
 sibling repo) for the strategic frame and the credibility rails.
 
 This project was bootstrapped on Lovable; `lovable-tagger` is wired into
 `vite.config.ts` for development-mode component tagging, and
 `.lovable/plan.md` exists for historical reasons. You can edit code
-locally — Lovable is no longer the source of truth.
+locally, Lovable is no longer the source of truth.
 
 ## Commands
 
@@ -35,7 +35,7 @@ npm run test         # vitest run, jsdom env, single pass
 npm run test:watch   # vitest in watch mode
 ```
 
-There is exactly one example test in `src/test/example.test.ts` —
+There is exactly one example test in `src/test/example.test.ts`, 
 testing has not been a priority. Add tests when the unit is worth
 testing in isolation; do not add ceremony.
 
@@ -49,7 +49,7 @@ agreement; do tighten per-module by adding explicit types.
 - Tailwind CSS + shadcn/ui (`src/components/ui/*`, `components.json`)
 - Routing: `react-router-dom` v6 with two routes (`/`, `/sample`)
 - Data fetching: `@tanstack/react-query` (provider in `App.tsx`; the app
-  doesn't actually use queries heavily — the audit flow is imperative)
+  doesn't actually use queries heavily, the audit flow is imperative)
 - Forms: `react-hook-form` + `zod` (only used in modals so far)
 - Icons: `lucide-react`
 - Charts: `recharts`
@@ -105,13 +105,13 @@ Statuses: `landing` → `loading` → `results` | `error`.
 3. `runAudit` calls `POST /api/audit` with a 240s client abort and one
    transparent retry on 5xx / network. The backend is a streaming JSON
    response that always returns HTTP 200 and encodes errors in the body
-   as `{ ok: false, status, error }` — `runAudit` parses both shapes.
+   as `{ ok: false, status, error }`, `runAudit` parses both shapes.
 4. On success, the results page renders three tabs:
-   - **Summary** (`SummaryTab.tsx`) — verdict, score, summary prose,
+   - **Summary** (`SummaryTab.tsx`), verdict, score, summary prose,
      positioning diagnosis, performance pattern.
-   - **Diagnostic** (`DiagnosticTab.tsx`, ~865 LOC) — category breakdown,
+   - **Diagnostic** (`DiagnosticTab.tsx`, ~865 LOC), category breakdown,
      issues, sub-rating gaps, host signals, photo analysis.
-   - **Next step** (`NextStepTab.tsx`, ~586 LOC) — paste-ready rewrites,
+   - **Next step** (`NextStepTab.tsx`, ~586 LOC), paste-ready rewrites,
      newsletter / strategy call CTAs, Email-this-report option.
 5. Email gate modal fires AFTER the audit completes (post-Rafael
    feedback) if no email is in `localStorage`. On submit, calls
@@ -123,7 +123,7 @@ Statuses: `landing` → `loading` → `results` | `error`.
 
 `localStorage` keys: `auditEmail`, `pendingRef`, `auditsRun`. Cap is
 `FREE_AUDIT_LIMIT = 5` but the credit gate is currently disabled
-("until Stripe is wired" — see `submitUrl` in `useAuditFlow.ts`).
+("until Stripe is wired", see `submitUrl` in `useAuditFlow.ts`).
 
 `AuditError` (in `api.ts`) carries `status` + `detail`. Errors with
 `status` 422 surface as "listing not found"; 403 as "service
@@ -137,16 +137,16 @@ else is generic. `ErrorScreen` shows the message and an optional retry.
 - `GET /api/peek?id=<listingId>` cheap preview; returns nulls on
   failure rather than 4xx.
 - `POST /api/capture-lead` `{ email, url, listingId, title, score,
-  rating, reviewCount, result }` — best-effort, never throws to caller.
-- `POST /api/redeem-ref` `{ refereeEmail, refCode }` — note the field
+  rating, reviewCount, result }`, best-effort, never throws to caller.
+- `POST /api/redeem-ref` `{ refereeEmail, refCode }`, note the field
   is `refereeEmail` (the backend uses it for the self-referral guard).
-- `POST /api/use-credit` / `GET /api/check-credits` — credit ledger
+- `POST /api/use-credit` / `GET /api/check-credits`, credit ledger
   endpoints, currently dormant in the UI.
 - `POST /api/feedback` `{ listingId, rating, comment, email, url }`.
 
 All requests send `X-Audit-Token: <VITE_AUDIT_TOKEN>` when the env var
 is set at build time. The token is in the JS bundle so it isn't real
-auth — it's a rotatable speed bump matching the backend's
+auth, it's a rotatable speed bump matching the backend's
 `AUDIT_FRONTEND_TOKEN`. Leave unset for local dev unless you want to
 hit production.
 
@@ -157,7 +157,7 @@ Defined in `src/index.css` as HSL CSS variables, exposed in
 
 - Background: warm ivory (`hsl(40 33% 98%)`)
 - Brand: pink `#e8185c` (`--brand`, also `brand-soft`/`brand-border`)
-- Score bands as `success` (≥75), `warning` (55–74), `danger` (<55) —
+- Score bands as `success` (≥75), `warning` (55–74), `danger` (<55), 
   see `scoring.ts:scoreBand` and `bandTextClass`/`bandBgClass`
 - Two shadow tokens: `shadow-card`, `shadow-elevated`
 - Font: Inter (loaded via the system or web font; not bundled)
@@ -178,6 +178,16 @@ Branding rules baked in (don't break):
 
 ## Conventions
 
+- **NEVER use em dashes (Unicode U+2014) ANYWHERE in this repo.** Not in
+  user-visible copy, not in error messages, not in aria-labels, not in
+  code comments, not in commit messages, not in this CLAUDE.md, not in
+  any .md file. Hard rule, no exceptions. Use commas, colons, periods, or
+  restructure the sentence. Same rule lives in the backend (the
+  `api/audit.js` prompt tells Claude not to emit em dashes) so LLM output
+  is already gated. Before any commit, sweep `src/` for U+2014; the result
+  must be empty. Reason: Rory's durable preference, set 2026-05-11. Em
+  dashes were proliferating across comments and copy and he wants the
+  codebase clean.
 - Imports use the `@` alias for `src/` (configured in `vite.config.ts`,
   `tsconfig.app.json`, `vitest.config.ts`, and `components.json`).
 - `*.test.ts(x)` files live next to the unit; they are picked up by
@@ -185,10 +195,10 @@ Branding rules baked in (don't break):
 - ESLint: react-hooks rules enforced; `@typescript-eslint/no-unused-vars`
   is OFF (TS itself is loose). Don't sprinkle `// eslint-disable-next-line`.
 - React Query is mounted as a provider but barely used. The audit
-  request is a `fetch` in a `useCallback` — no need to migrate it.
+  request is a `fetch` in a `useCallback`, no need to migrate it.
 - Lovable's `componentTagger` only runs in dev mode. Don't fight it.
 - Keep tab components pure-presentational. State lives in
-  `useAuditFlow`. Data shape is `AuditResponse` from `lib/types.ts` —
+  `useAuditFlow`. Data shape is `AuditResponse` from `lib/types.ts`, 
   update both types and consumers when adding a backend field.
 
 ## Branch and commit conventions
@@ -204,13 +214,13 @@ Branding rules baked in (don't break):
 
 1. `npm run dev` and exercise the full flow with a real Airbnb URL.
    The default `BASE` is the production backend, so audits cost real
-   money — use sparingly. Or temporarily point `BASE` at a Vercel
+   money, use sparingly. Or temporarily point `BASE` at a Vercel
    preview of the backend.
 2. `/sample` route renders `sampleData.ts` through `ResultsScreen`.
    Use this for fast UI iteration without burning audits.
 3. `npm run lint` and `npm run test` before committing.
 4. Mobile: the results screen had a recent responsiveness pass
-   (`100bd440`). Test on a narrow viewport — many components have
+   (`100bd440`). Test on a narrow viewport, many components have
    explicit `sm:` breakpoints.
 5. Print/PDF: `ResultsScreen` has a print mode that expands all tabs
    for `window.print()`. Don't regress `data-print-hide` markers when

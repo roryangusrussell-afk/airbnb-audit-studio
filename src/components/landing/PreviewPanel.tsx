@@ -70,7 +70,7 @@ function ScoreRingMini() {
 export function PreviewPanel() {
   return (
     <div className="relative">
-      {/* Hero image — shorter on mobile so the score card sits closer */}
+      {/* Hero image: shorter on mobile so the score card sits closer */}
       <div className="relative overflow-hidden rounded-[2rem] shadow-elevated">
         <img
           src={heroApartment}
@@ -80,7 +80,7 @@ export function PreviewPanel() {
         />
       </div>
 
-      {/* Floating pills (desktop only — clutter mobile) */}
+      {/* Floating pills (desktop only: clutter mobile) */}
       <FloatingPill
         icon={<Camera className="h-4 w-4" />}
         label="Photo Quality"
@@ -110,7 +110,7 @@ export function PreviewPanel() {
         className="bottom-6 right-6 sm:right-16"
       />
 
-      {/* Score card — stacks below image on mobile (relative + negative margin to overlap slightly), absolute-positioned on desktop */}
+      {/* Score card: stacks below image on mobile (relative + negative margin to overlap slightly), absolute-positioned on desktop */}
       <div className="relative z-20 mx-auto -mt-12 w-[88%] max-w-[300px] rounded-2xl border border-border/70 bg-card p-5 shadow-elevated sm:absolute sm:-right-8 sm:top-16 sm:mt-0 sm:w-[260px] sm:max-w-none">
         <div className="text-center">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">

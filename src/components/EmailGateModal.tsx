@@ -56,7 +56,7 @@ export function EmailGateModal({
             onClick={() => onOpenChange(false)}
             className="block w-full text-center text-[12px] text-muted-foreground hover:text-foreground transition-colors"
           >
-            Skip — I'll just read it here
+            Skip, I'll just read it here
           </button>
         </form>
       </DialogContent>

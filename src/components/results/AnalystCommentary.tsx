@@ -6,7 +6,7 @@ function firstNSentences(text: string, n: number): string {
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
     if (ch !== "." && ch !== "!" && ch !== "?") continue;
-    // Skip decimals like "4.5" — a period flanked by digits isn't a sentence end.
+    // Skip decimals like "4.5": a period flanked by digits isn't a sentence end.
     if (ch === "." && /\d/.test(text[i - 1] ?? "") && /\d/.test(text[i + 1] ?? "")) continue;
     count++;
     if (count === n) return text.slice(0, i + 1).trim();

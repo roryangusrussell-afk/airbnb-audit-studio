@@ -37,7 +37,7 @@ export function UrlForm({
     }
     if (!/\/rooms\/\d+/.test(u.pathname)) {
       setErr(
-        "Open the listing on airbnb.com, then copy the URL — we need the one with /rooms/ in it.",
+        "Open the listing on airbnb.com, then copy the URL. We need the one with /rooms/ in it.",
       );
       return;
     }

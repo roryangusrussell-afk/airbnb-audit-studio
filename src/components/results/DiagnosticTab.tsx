@@ -98,8 +98,8 @@ export function DiagnosticTab({ data, printMode = false }: { data: AuditResponse
     return m;
   }, [data.cats]);
 
-  // Hide rewrite sections when both the source data and the rewrite are absent —
-  // means we couldn't extract it AND Claude didn't return one.
+  // Hide rewrite sections when both the source data and the rewrite are absent.
+  // Means we couldn't extract it AND Claude didn't return one.
   const availableCards = CARDS.filter((c) => {
     if (c.rewriteKind === "none") {
       return catByName[c.area] !== undefined;
@@ -210,7 +210,7 @@ function AuditAreasRail({
           {kind === "diagnostic" && (
             <span
               className="hidden flex-none rounded-full border bg-muted/40 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground lg:inline-block"
-              title="Diagnostic only — feeds your overall description score, not graded separately"
+              title="Diagnostic only: feeds your overall description score, not graded separately"
             >
               Diag
             </span>
@@ -415,7 +415,7 @@ function RewriteSection({
   if (!rewrite) {
     return (
       <div className="mt-5 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
-        Rewrite not available for this section yet — try re-running the audit.
+        Rewrite not available for this section yet. Try re-running the audit.
       </div>
     );
   }
@@ -496,7 +496,7 @@ function DiagnosticSection({
         </div>
       ) : (
         <div className="mt-5 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
-          No recommended fixes in this category — this area is performing well.
+          No recommended fixes in this category. This area is performing well.
         </div>
       )}
     </>
@@ -812,7 +812,7 @@ function buildFound(area: string, data: AuditResponse): Found[] {
         Icon: XCircle,
         iconText: "text-danger",
         title: "No captions on any photo",
-        detail: `None of the ${total} photos carry captions, which is a free conversion lever you're leaving unused — captions add room context, amenity proof, and search depth.`,
+        detail: `None of the ${total} photos carry captions, which is a free conversion lever you're leaving unused. Captions add room context, amenity proof, and search depth.`,
       });
     } else if (captioned > 0 && captioned < total / 2) {
       out.push({

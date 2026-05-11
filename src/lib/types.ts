@@ -137,7 +137,7 @@ export interface AuditResponse {
   archetypeAlignment?: ArchetypeAlignment;
   neighbourhood?: string | null;
   petPolicy?: string | null;
-  // New Summary tab shape (session 7) — replaces listingSignals + positioningDiagnosis
+  // New Summary tab shape (session 7): replaces listingSignals + positioningDiagnosis
   summary?: string;
   start?: SummaryAction[];
   stop?: SummaryAction[];

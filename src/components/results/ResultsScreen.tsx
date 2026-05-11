@@ -40,6 +40,19 @@ export function ResultsScreen({
     return () => window.removeEventListener("afterprint", after);
   }, []);
 
+  if (isGated && !printMode) {
+    return (
+      <div className="min-h-full">
+        {topSlot}
+        <GatePanel
+          data={data}
+          onSubmit={onSubmitEmail!}
+          onAuditAnother={onAuditAnother}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="container max-w-[1180px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       {topSlot}
@@ -69,9 +82,7 @@ export function ResultsScreen({
         {data.bottomTenRisk && <BottomTenRiskBanner />}
       </div>
 
-      {isGated && !printMode ? (
-        <GatePanel data={data} onSubmit={onSubmitEmail!} />
-      ) : printMode ? (
+      {printMode ? (
         <div className="mt-6 space-y-8">
           <PrintSection title="Summary">
             <SummaryTab data={data} />

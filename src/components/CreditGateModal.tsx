@@ -22,7 +22,7 @@ export function CreditGateModal({
       style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 16px" }}
       role="dialog"
       aria-modal="true"
-      aria-label="Credit gate — audit another listing"
+      aria-label="Credit gate: audit another listing"
     >
       {/* Overlay */}
       <div
@@ -113,7 +113,7 @@ export function CreditGateModal({
         }}
           className="credit-modal-grid"
         >
-          {/* Left — Free path */}
+          {/* Left: Free path */}
           <div style={{
             background: "#faf9f7",
             border: "1px solid #e5e7eb",
@@ -211,7 +211,7 @@ export function CreditGateModal({
             </button>
           </div>
 
-          {/* Right — Buy path */}
+          {/* Right: Buy path */}
           <div style={{
             background: "#fdf2f5",
             border: "1px solid rgba(232,24,92,0.14)",
@@ -251,7 +251,7 @@ export function CreditGateModal({
               color: "#4b5563",
               margin: "0 0 20px",
             }}>
-              Most hosts manage multiple listings. One missed issue can cost you bookings for months. Credits don't expire — buy once, audit whenever.
+              Most hosts manage multiple listings. One missed issue can cost you bookings for months. Credits don't expire: buy once, audit whenever.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

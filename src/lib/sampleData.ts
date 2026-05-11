@@ -52,7 +52,7 @@ export const sampleAudit: AuditResponse = {
       impact: "medium",
       title: "Photo metadata is missing",
       problem:
-        "28 photos have no captions — a missed semantic signal for Airbnb search",
+        "28 photos have no captions, a missed semantic signal for Airbnb search",
       action:
         "Write one descriptive sentence per photo referencing the room and a feature",
     },
@@ -203,7 +203,7 @@ export const sampleAudit: AuditResponse = {
     promise:
       "A bright, well-equipped flat in the heart of Cais do Sodré with the rare luxury of a private parking space and a south-facing balcony.",
     reviewAlignment:
-      "Reviews repeatedly validate the parking, the location and the cleanliness — all pillars of the implied promise.",
+      "Reviews repeatedly validate the parking, the location and the cleanliness, all pillars of the implied promise.",
     adjustment:
       "Private parking is already validated by reviews, but the listing under-displays it in the title and gallery. The shift is treating parking as the headline differentiator, not a footnote.",
   },
@@ -327,7 +327,7 @@ export const sampleAudit: AuditResponse = {
         category: "Description",
         title: "Description structure flattens the story",
         detail:
-          "A single block of copy treats the balcony, parking and neighbourhood as equal — and undersells each individual signal.",
+          "A single block of copy treats the balcony, parking and neighbourhood as equal, and undersells each individual signal.",
       },
     ],
     leverage: [

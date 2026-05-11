@@ -250,7 +250,7 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
               color: MUTED,
               margin: "10px 0 0",
             }}>
-              We evaluate your listing data, copy clarity, photo quality, amenity visibility and guest review patterns — then turn those signals into a prioritised list of fixes.
+              We evaluate your listing data, copy clarity, photo quality, amenity visibility and guest review patterns, then turn those signals into a prioritised list of fixes.
             </p>
           </div>
 

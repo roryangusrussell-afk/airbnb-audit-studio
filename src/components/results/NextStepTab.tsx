@@ -208,7 +208,7 @@ function BuyAuditsCard() {
             onClick={() => trackEvent("clicked_buy_one_audit")}
             className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-[10px] border bg-card px-4 text-[12.5px] font-semibold text-foreground transition-colors hover:bg-muted/40 sm:w-auto"
           >
-            Buy 1 — €15
+            Buy 1 for €15
           </a>
           <div className="relative">
             <a
@@ -218,7 +218,7 @@ function BuyAuditsCard() {
               onClick={() => trackEvent("clicked_buy_five_audits")}
               className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-[10px] bg-brand px-4 text-[12.5px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90 sm:w-auto"
             >
-              Buy 5 — €39
+              Buy 5 for €39
               <ArrowRight className="h-3.5 w-3.5" />
             </a>
             <span className="pointer-events-none absolute -top-2 right-2 rounded-full bg-foreground px-2 py-[2px] text-[9px] font-bold uppercase tracking-[0.1em] text-background">

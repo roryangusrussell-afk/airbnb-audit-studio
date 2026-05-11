@@ -99,7 +99,7 @@ export function ListingCard({ data }: { data: AuditResponse }) {
             )}
             {data.guests != null && (
               <span className="rounded-full border border-brand-border bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand">
-                Hosts up to {data.guests} guests
+                Up to {data.guests} guests
               </span>
             )}
             <span className="ml-auto text-[11px] text-muted-foreground">

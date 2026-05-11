@@ -12,9 +12,9 @@ const Cookies = () => (
     <h3>Strictly necessary</h3>
     <p>These keep the audit working. They cannot be disabled because the service depends on them.</p>
     <ul>
-      <li><strong>auditEmail</strong> (local storage) — remembers the email you gave so you don't have to re-enter it on subsequent audits.</li>
-      <li><strong>auditsRun</strong> (local storage) — counts how many audits you've run from this browser, so we can enforce the free-tier cap.</li>
-      <li><strong>pendingRef</strong> (local storage) — temporary store for a referral code if you arrived via someone's invite link.</li>
+      <li><strong>auditEmail</strong> (local storage): remembers the email you gave so you don't have to re-enter it on subsequent audits.</li>
+      <li><strong>auditsRun</strong> (local storage): counts how many audits you've run from this browser, so we can enforce the free-tier cap.</li>
+      <li><strong>pendingRef</strong> (local storage): temporary store for a referral code if you arrived via someone's invite link.</li>
     </ul>
 
     <h3>Analytics</h3>

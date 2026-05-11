@@ -53,11 +53,11 @@ const Privacy = () => (
       We use a small set of trusted processors to run Auditable:
     </p>
     <ul>
-      <li><strong>Vercel</strong> — hosting and analytics.</li>
-      <li><strong>Anthropic</strong> — Claude API for content analysis. Listing text and a small sample of public photo URLs are sent for scoring; data is not used to train models per Anthropic's API terms.</li>
-      <li><strong>Resend</strong> — to deliver the audit report email.</li>
-      <li><strong>Apify</strong> — to fetch the public listing data.</li>
-      <li><strong>Google Sheets</strong> — to log leads and audits for our internal records.</li>
+      <li><strong>Vercel</strong>: hosting and analytics.</li>
+      <li><strong>Anthropic</strong>: Claude API for content analysis. Listing text and a small sample of public photo URLs are sent for scoring; data is not used to train models per Anthropic's API terms.</li>
+      <li><strong>Resend</strong>: to deliver the audit report email.</li>
+      <li><strong>Apify</strong>: to fetch the public listing data.</li>
+      <li><strong>Google Sheets</strong>: to log leads and audits for our internal records.</li>
     </ul>
     <p>
       We do not sell your data. We do not share it with advertisers or data brokers.

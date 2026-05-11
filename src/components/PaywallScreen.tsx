@@ -124,7 +124,7 @@ export function PaywallScreen({
             <span className="min-w-0 flex-1 text-left">
               <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                 <span className="text-[15px] font-bold text-foreground">
-                  Buy 5 audits — €39
+                  Buy 5 audits for €39
                 </span>
                 <span className="inline-flex items-center rounded-full bg-brand-soft px-2 py-[2px] text-[10px] font-bold uppercase tracking-[0.1em] text-brand">
                   Best value
@@ -149,7 +149,7 @@ export function PaywallScreen({
             </span>
             <span className="min-w-0 flex-1 text-left">
               <span className="block text-[15px] font-semibold text-foreground">
-                Buy 1 audit — €15
+                Buy 1 audit for €15
               </span>
               <span className="mt-1 block text-[12.5px] leading-relaxed text-muted-foreground">
                 One-off credit for checking one more listing.

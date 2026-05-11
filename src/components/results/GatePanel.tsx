@@ -1,10 +1,15 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Lock, Mail, ArrowRight, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScoreRing } from "./ScoreRing";
-import { bandTextClass, scoreBand, verdictLabel } from "@/lib/scoring";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  Home,
+  Mail,
+  MapPin,
+  Star,
+} from "lucide-react";
 import type { AuditResponse } from "@/lib/types";
 
 export interface GateSubmitPayload {
@@ -12,19 +17,51 @@ export interface GateSubmitPayload {
   marketingOptIn: boolean;
 }
 
+const UNLOCK_ITEMS = [
+  "Paste-ready rewrites for your title, overview and description",
+  "Breakdown of your rating, reviews and host response signals",
+  "Photo feedback, including missing rooms or weak first impressions",
+  "Prioritised fixes ranked by likely impact",
+];
+
+const FALLBACK_HEADLINE =
+  "Your audit is ready. Enter your email to see the rewrites and prioritised fixes.";
+
+function deriveHeadline(data: AuditResponse): string {
+  const summary = data.summary?.trim();
+  if (summary) {
+    const firstSentence = summary.split(/(?<=[.!?])\s+/)[0]?.trim();
+    if (firstSentence && firstSentence.length >= 30 && firstSentence.length <= 200) {
+      return firstSentence;
+    }
+  }
+  return FALLBACK_HEADLINE;
+}
+
+function formatAuditedDate(): string {
+  return new Date().toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export function GatePanel({
   data,
   onSubmit,
+  onAuditAnother,
 }: {
   data: AuditResponse;
   onSubmit: (payload: GateSubmitPayload) => void;
+  onAuditAnother?: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [marketing, setMarketing] = useState(false);
   const [err, setErr] = useState("");
 
-  const band = scoreBand(data.score);
-  const verdict = data.verdict || verdictLabel(data.score);
+  const headline = deriveHeadline(data);
+  const guestLabel =
+    data.guests != null ? `Up to ${data.guests} guests` : null;
 
   const handle = (e: FormEvent) => {
     e.preventDefault();
@@ -37,110 +74,295 @@ export function GatePanel({
     onSubmit({ email: trimmed, marketingOptIn: marketing });
   };
 
-  const unlocks = [
-    "Paste-ready rewrites for every section",
-    "Sub-rating breakdown and host signals",
-    "Photo intelligence and missing-room flags",
-    "Prioritised fixes ranked by impact",
-  ];
-
   return (
-    <section className="mt-4 overflow-hidden rounded-2xl border bg-card shadow-card">
-      {/* Top: score teaser so the user sees a result exists */}
-      <div className="flex flex-col items-center gap-5 border-b bg-muted/30 px-6 py-7 sm:flex-row sm:items-center sm:gap-7 sm:px-8">
-        <ScoreRing score={data.score} size={120} />
-        <div className="min-w-0 text-center sm:text-left">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            Your audit is ready
-          </div>
-          <h2 className={`mt-1 text-2xl font-bold tracking-tight ${bandTextClass(band)}`}>
-            {verdict}
-          </h2>
-          <p className="mt-2 max-w-md text-[13.5px] leading-6 text-muted-foreground">
-            We scored your listing and prepared the rewrites. Enter your email to read through the full report.
-          </p>
-        </div>
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Top header row */}
+      <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+        <p className="text-xs font-bold uppercase tracking-[0.28em] text-brand">
+          Your audit report
+        </p>
+        {onAuditAnother && (
+          <button
+            type="button"
+            onClick={onAuditAnother}
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-card transition hover:border-slate-300 hover:bg-muted/50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Audit another listing
+          </button>
+        )}
       </div>
 
-      {/* Bottom: email form + what unlocks */}
-      <div className="grid gap-6 px-6 py-7 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10">
-        <form onSubmit={handle} className="space-y-4">
+      {/* Listing summary card */}
+      <ListingSummary data={data} guestLabel={guestLabel} />
+
+      {/* Main audit preview card */}
+      <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-card">
+        <div className="grid gap-8 px-6 py-10 sm:px-8 lg:grid-cols-[150px_1fr] lg:items-center lg:px-10">
+          <div className="flex justify-center lg:justify-start">
+            <PreviewScoreRing score={data.score} />
+          </div>
           <div>
-            <label htmlFor="gate-email" className="text-[13px] font-semibold text-foreground">
-              Email address
-            </label>
-            <div className="relative mt-1.5">
-              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="gate-email"
-                type="email"
-                autoFocus
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (err) setErr("");
-                }}
-                placeholder="you@example.com"
-                className="h-11 pl-9"
-                aria-invalid={!!err}
-                aria-describedby={err ? "gate-email-error" : undefined}
-              />
-            </div>
-            {err && (
-              <p id="gate-email-error" className="mt-1.5 text-sm text-danger">
-                {err}
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-muted-foreground">
+              Your audit is ready
+            </p>
+            <h2 className="mt-3 max-w-4xl text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl">
+              {headline}
+            </h2>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
+              We've scored your listing and prepared practical rewrites.
+              <br />
+              Enter your email to unlock the full report and keep a copy for later.
+            </p>
+          </div>
+        </div>
+
+        <div className="mx-6 border-t border-border sm:mx-8 lg:mx-10" />
+
+        <div className="grid items-stretch gap-5 px-6 py-8 sm:px-8 lg:grid-cols-2 lg:px-10">
+          {/* Unlock form */}
+          <div className="h-full rounded-2xl border border-border bg-card p-6">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+              Unlock your full report
+            </p>
+
+            <form onSubmit={handle} noValidate>
+              <label
+                htmlFor="gate-email"
+                className="mb-2 block text-sm font-semibold text-foreground"
+              >
+                Email address
+              </label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="gate-email"
+                  type="email"
+                  autoFocus
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (err) setErr("");
+                  }}
+                  placeholder="you@example.com"
+                  aria-invalid={!!err}
+                  aria-describedby={err ? "gate-email-error" : undefined}
+                  className="h-12 w-full rounded-xl border border-border bg-card pl-11 pr-4 text-base text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-brand focus:ring-4 focus:ring-brand-soft"
+                />
+              </div>
+              {err && (
+                <p id="gate-email-error" className="mt-2 text-sm text-danger">
+                  {err}
+                </p>
+              )}
+
+              <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={marketing}
+                  onChange={(e) => setMarketing(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 flex-none rounded border-border accent-brand"
+                />
+                <span>
+                  Send me occasional listing-improvement tips. I can unsubscribe at any time.
+                  <span className="mt-1 block text-xs text-muted-foreground/80">
+                    Optional. Your audit will be emailed either way.
+                  </span>
+                </span>
+              </label>
+
+              <button
+                type="submit"
+                className="mt-5 inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-base font-semibold text-background shadow-card transition hover:-translate-y-0.5 hover:bg-foreground/90 hover:shadow-elevated disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Unlock my full audit
+                <ArrowRight className="h-5 w-5" />
+              </button>
+
+              <p className="mt-4 text-xs leading-5 text-muted-foreground">
+                By continuing you agree to our{" "}
+                <Link
+                  to="/terms"
+                  className="font-medium text-foreground/80 underline underline-offset-2 hover:text-brand"
+                >
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link
+                  to="/privacy"
+                  className="font-medium text-foreground/80 underline underline-offset-2 hover:text-brand"
+                >
+                  Privacy Policy
+                </Link>
+                . No spam.
               </p>
+            </form>
+          </div>
+
+          {/* What you'll unlock */}
+          <div className="h-full rounded-2xl border border-border bg-card p-6">
+            <p className="mb-5 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+              What you'll unlock
+            </p>
+            <ul className="divide-y divide-border/60">
+              {UNLOCK_ITEMS.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-4 py-4 first:pt-0 last:pb-0"
+                >
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-300 text-emerald-600">
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                  </span>
+                  <span className="text-sm leading-6 text-foreground sm:text-base">
+                    {item}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ListingSummary({
+  data,
+  guestLabel,
+}: {
+  data: AuditResponse;
+  guestLabel: string | null;
+}) {
+  const auditedDate = formatAuditedDate();
+
+  return (
+    <section className="mb-5 rounded-3xl border border-border bg-card p-4 shadow-card">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+        {data.thumbnail ? (
+          <div className="relative h-32 w-full overflow-hidden rounded-2xl bg-muted sm:h-28 sm:w-52 sm:flex-none">
+            <img
+              src={data.thumbnail}
+              alt={data.title}
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute left-3 top-3">
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-xs font-medium text-white">
+                <CheckCircle2 className="h-3 w-3" />
+                Analysed
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex h-32 w-full items-center justify-center rounded-2xl bg-muted text-muted-foreground sm:h-28 sm:w-52 sm:flex-none">
+            <Home className="h-8 w-8 opacity-50" />
+          </div>
+        )}
+
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-2xl font-bold tracking-tight text-foreground">
+            {data.title}
+          </h1>
+
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-base text-muted-foreground">
+            {data.location && (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="h-4 w-4" />
+                {data.location}
+              </span>
+            )}
+            {data.rating != null && data.rating > 0 && (
+              <>
+                <Star className="ml-2 h-4 w-4 fill-foreground text-foreground" />
+                <span className="font-medium text-foreground">
+                  {data.rating.toFixed(2)}
+                </span>
+                {data.reviewCount != null && data.reviewCount > 0 && (
+                  <>
+                    <span>·</span>
+                    <span>{data.reviewCount} reviews</span>
+                  </>
+                )}
+              </>
             )}
           </div>
 
-          <label className="flex cursor-pointer items-start gap-2.5 text-[12.5px] leading-5 text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={marketing}
-              onChange={(e) => setMarketing(e.target.checked)}
-              className="mt-0.5 h-4 w-4 flex-none rounded border-border accent-brand"
-            />
-            <span>
-              Send me occasional listing-improvement tips. I can unsubscribe at any time.
-              <span className="mt-0.5 block text-[11.5px] text-muted-foreground/80">
-                Optional. Your audit will be emailed either way as part of this request.
+          <div className="mt-3 flex flex-wrap gap-2">
+            {data.propertyType && (
+              <span className="rounded-full border border-brand-border bg-brand-soft px-3 py-1 text-sm font-semibold text-brand">
+                {data.propertyType}
               </span>
-            </span>
-          </label>
-
-          <Button type="submit" className="h-11 w-full gap-1.5">
-            View my audit
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-
-          <p className="text-[11.5px] leading-5 text-muted-foreground">
-            By continuing you agree to our{" "}
-            <Link to="/terms" className="underline hover:text-foreground">
-              Terms
-            </Link>{" "}
-            and{" "}
-            <Link to="/privacy" className="underline hover:text-foreground">
-              Privacy Policy
-            </Link>
-            . No spam.
-          </p>
-        </form>
-
-        <div className="rounded-xl border bg-muted/20 p-5">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-            <Lock className="h-3.5 w-3.5" />
-            What's behind the gate
+            )}
+            {guestLabel && (
+              <span className="rounded-full border border-brand-border bg-brand-soft px-3 py-1 text-sm font-semibold text-brand">
+                {guestLabel}
+              </span>
+            )}
           </div>
-          <ul className="mt-3 space-y-2.5">
-            {unlocks.map((u) => (
-              <li key={u} className="flex items-start gap-2.5 text-[13px] leading-5 text-foreground">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-success" />
-                <span>{u}</span>
-              </li>
-            ))}
-          </ul>
         </div>
+
+        <p className="shrink-0 text-sm text-muted-foreground sm:self-start">
+          Audited {auditedDate}
+        </p>
       </div>
     </section>
+  );
+}
+
+function PreviewScoreRing({ score }: { score: number }) {
+  const size = 140;
+  const stroke = 10;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const [displayed, setDisplayed] = useState(0);
+
+  useEffect(() => {
+    const start = performance.now();
+    const dur = 900;
+    let raf = 0;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setDisplayed(Math.round(score * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [score]);
+
+  const offset = c - (displayed / 100) * c;
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="#E5E7EB"
+          strokeWidth={stroke}
+          fill="none"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="#F59E0B"
+          strokeWidth={stroke}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={offset}
+          style={{ transition: "stroke-dashoffset 0.2s linear" }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="text-4xl font-bold tabular-nums text-amber-500">
+          {displayed}
+        </div>
+        <div className="mt-1 text-sm font-semibold text-muted-foreground">
+          / 100
+        </div>
+      </div>
+    </div>
   );
 }

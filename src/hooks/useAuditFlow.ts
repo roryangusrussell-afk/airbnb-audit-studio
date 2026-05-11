@@ -108,7 +108,7 @@ export function useAuditFlow() {
         }
       } catch (err) {
         // Reset the consuming flag so a failed audit doesn't burn the credit
-        // on retry — useCredit was never called.
+        // on retry, since useCredit was never called.
         consumingCreditRef.current = false;
         const msg =
           err instanceof AuditError
@@ -152,7 +152,7 @@ export function useAuditFlow() {
       } else if (freeUsed && !storedEmail) {
         // Free already used on this browser but we have no email to charge
         // against. This only happens if the user cleared their email but not
-        // freeAuditUsed. Send them to the paywall too — they can email Rory.
+        // freeAuditUsed. Send them to the paywall too, they can email Rory.
         setStatus("paywall");
         return;
       }

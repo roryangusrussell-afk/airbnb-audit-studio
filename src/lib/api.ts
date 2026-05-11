@@ -132,7 +132,7 @@ export async function runAudit(url: string): Promise<AuditResponse> {
         console.error("[runAudit] timeout", { url, attempt });
         throw e;
       } else {
-        // Network error — retryable
+        // Network error, retryable
         const message = (err as Error)?.message || String(err);
         lastError = new AuditError("Could not reach the audit service. Please try again.", undefined, message);
         console.error("[runAudit] network", { url, attempt, message });
@@ -170,7 +170,7 @@ export async function peekListing(url: string): Promise<PeekData | null> {
 }
 
 // Best-effort POST. Logs failures to the console rather than swallowing
-// silently, but never throws — these are non-blocking side effects from the
+// silently, but never throws. These are non-blocking side effects from the
 // caller's perspective.
 async function postBestEffort(path: string, body: unknown, label: string): Promise<void> {
   try {
