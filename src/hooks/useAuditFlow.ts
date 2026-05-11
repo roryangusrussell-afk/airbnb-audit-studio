@@ -120,14 +120,20 @@ export function useAuditFlow() {
   );
 
   const submitEmail = useCallback(
-    async (value: string) => {
-      setEmail(value);
+    async (
+      value: string | { email: string; marketingOptIn?: boolean },
+    ) => {
+      const payload =
+        typeof value === "string"
+          ? { email: value, marketingOptIn: false }
+          : { email: value.email, marketingOptIn: !!value.marketingOptIn };
+      setEmail(payload.email);
       setNeedsEmail(false);
       // Email collected post-audit — log to Sheet + send report email to the tester
       const target = pendingUrlRef.current || url;
       if (data && target) {
         captureLead({
-          email: value,
+          email: payload.email,
           url: target,
           listingId: data.listingId,
           title: data.title,
@@ -135,6 +141,9 @@ export function useAuditFlow() {
           rating: data.rating ?? null,
           reviewCount: data.reviewCount ?? null,
           result: data,
+          marketingOptIn: payload.marketingOptIn,
+          consentTimestamp: new Date().toISOString(),
+          source: "gate_panel",
         });
       }
     },

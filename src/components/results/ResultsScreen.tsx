@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, FileText, Activity, Rocket, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,46 +8,24 @@ import { FeedbackButton } from "./FeedbackModal";
 import { SummaryTab } from "./SummaryTab";
 import { DiagnosticTab } from "./DiagnosticTab";
 import { NextStepTab } from "./NextStepTab";
+import { GatePanel, GateSubmitPayload } from "./GatePanel";
 import type { AuditResponse } from "@/lib/types";
 
 export function ResultsScreen({
   data,
   email,
   onAuditAnother,
-  onRequestEmailGate,
+  onSubmitEmail,
   topSlot,
 }: {
   data: AuditResponse;
   email: string;
   onAuditAnother: () => void;
-  onRequestEmailGate?: () => void;
+  onSubmitEmail?: (payload: GateSubmitPayload) => void;
   topSlot?: React.ReactNode;
 }) {
   const [printMode, setPrintMode] = useState(false);
-  const summarySentinelRef = useRef<HTMLDivElement>(null);
-  const emailGateFiredRef = useRef(false);
-
-  useEffect(() => {
-    if (email || !onRequestEmailGate || emailGateFiredRef.current) return;
-    const el = summarySentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (
-          !entry.isIntersecting &&
-          entry.boundingClientRect.top < 0 &&
-          !emailGateFiredRef.current
-        ) {
-          emailGateFiredRef.current = true;
-          onRequestEmailGate();
-          observer.disconnect();
-        }
-      },
-      { threshold: 0 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [email, onRequestEmailGate]);
+  const isGated = !email && !!onSubmitEmail;
 
   // When entering print mode, give React a tick to render the expanded view
   // before opening the print dialog. afterprint flips back to the tabbed view.
@@ -96,9 +74,10 @@ export function ResultsScreen({
         <ListingCard data={data} />
         {data.bottomTenRisk && <BottomTenRiskBanner />}
       </div>
-      <div ref={summarySentinelRef} aria-hidden className="h-px" data-print-hide />
 
-      {printMode ? (
+      {isGated && !printMode ? (
+        <GatePanel data={data} onSubmit={onSubmitEmail!} />
+      ) : printMode ? (
         <div className="mt-6 space-y-8">
           <PrintSection title="Summary">
             <SummaryTab data={data} />
@@ -147,14 +126,16 @@ export function ResultsScreen({
         </Tabs>
       )}
 
-      <div className="mt-8" data-print-hide>
-        <FeedbackButton
-          listingId={data.listingId}
-          email={email}
-          url={`https://www.airbnb.com/rooms/${data.listingId}`}
-          variant="panel"
-        />
-      </div>
+      {!isGated && (
+        <div className="mt-8" data-print-hide>
+          <FeedbackButton
+            listingId={data.listingId}
+            email={email}
+            url={`https://www.airbnb.com/rooms/${data.listingId}`}
+            variant="panel"
+          />
+        </div>
+      )}
     </div>
   );
 }

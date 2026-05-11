@@ -68,11 +68,17 @@ export function ListingCard({ data }: { data: AuditResponse }) {
                 <MapPin className="h-3.5 w-3.5" /> {data.location}
               </span>
             )}
-            {data.rating != null && (
+            {data.rating != null && data.rating > 0 ? (
               <span className="inline-flex items-center gap-1">
                 <Star className="h-3.5 w-3.5 fill-current text-foreground" />
                 <span className="font-medium text-foreground">{data.rating.toFixed(2)}</span>
-                {data.reviewCount != null && <span>· {data.reviewCount} reviews</span>}
+                {data.reviewCount != null && data.reviewCount > 0 && (
+                  <span>· {data.reviewCount} reviews</span>
+                )}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border bg-muted/40 px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                New listing
               </span>
             )}
             {data.amenities.length > 0 && (

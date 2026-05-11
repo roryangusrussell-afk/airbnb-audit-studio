@@ -145,10 +145,14 @@ export function DiagnosticTab({ data, printMode = false }: { data: AuditResponse
   const activeIndex = availableCards.findIndex((c) => c.id === active.id);
   const next = availableCards[activeIndex + 1] ?? null;
 
+  const scoredCards = availableCards.filter((c) => catByName[c.area] !== undefined);
+  const diagnosticCards = availableCards.filter((c) => catByName[c.area] === undefined);
+
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[232px_minmax(0,1fr)]">
       <AuditAreasRail
-        cards={availableCards}
+        scoredCards={scoredCards}
+        diagnosticCards={diagnosticCards}
         activeId={active.id}
         onSelect={(id) => setActiveId(id)}
       />
@@ -166,64 +170,108 @@ export function DiagnosticTab({ data, printMode = false }: { data: AuditResponse
 }
 
 function AuditAreasRail({
-  cards,
+  scoredCards,
+  diagnosticCards,
   activeId,
   onSelect,
 }: {
-  cards: CardDef[];
+  scoredCards: CardDef[];
+  diagnosticCards: CardDef[];
   activeId: string;
   onSelect: (id: string) => void;
 }) {
+  const renderItem = (c: CardDef, kind: "scored" | "diagnostic") => {
+    const meta = getCategoryMeta(c.area);
+    const Icon = meta.icon;
+    const isActive = c.id === activeId;
+    return (
+      <li key={c.id} className="flex-none lg:flex-1">
+        <button
+          type="button"
+          onClick={() => onSelect(c.id)}
+          className={`group flex w-full items-center gap-2 whitespace-nowrap rounded-xl px-2 py-2 text-left transition-colors lg:gap-2.5 ${
+            isActive ? "bg-brand-soft" : "hover:bg-muted/60"
+          }`}
+          aria-current={isActive ? "true" : undefined}
+        >
+          <span
+            className={`flex h-7 w-7 flex-none items-center justify-center rounded-[10px] lg:h-8 lg:w-8 ${meta.iconBg}`}
+          >
+            <Icon className={`h-3.5 w-3.5 lg:h-4 lg:w-4 ${meta.iconText}`} />
+          </span>
+          <span
+            className={`min-w-0 flex-1 text-[13px] font-semibold leading-tight tracking-tight lg:whitespace-normal ${
+              isActive ? "text-brand" : "text-foreground"
+            }`}
+            title={c.label}
+          >
+            {c.label}
+          </span>
+          {kind === "diagnostic" && (
+            <span
+              className="hidden flex-none rounded-full border bg-muted/40 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground lg:inline-block"
+              title="Diagnostic only — feeds your overall description score, not graded separately"
+            >
+              Diag
+            </span>
+          )}
+          <ChevronRight
+            className={`hidden h-3.5 w-3.5 flex-none lg:block ${
+              isActive ? "text-brand" : "text-muted-foreground/70"
+            }`}
+          />
+        </button>
+      </li>
+    );
+  };
+
+  const groupHeading = (text: string) => (
+    <div className="hidden px-2 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground lg:block">
+      {text}
+    </div>
+  );
+
   return (
-    <aside className="rounded-2xl border bg-card shadow-card lg:p-3">
-      <div className="hidden px-2 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground lg:block">
+    <aside className="rounded-2xl border bg-card shadow-card lg:p-2.5">
+      <div className="hidden px-2 pt-1 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground lg:block">
         Audit areas
       </div>
-      {/* Horizontal scrolling pills on mobile/tablet, vertical list on lg+ */}
-      <ul
-        className="flex gap-1.5 overflow-x-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-col lg:gap-0 lg:space-y-1 lg:overflow-visible lg:p-0"
-      >
-        {cards.map((c) => {
-          const meta = getCategoryMeta(c.area);
-          const Icon = meta.icon;
-          const isActive = c.id === activeId;
-          return (
-            <li key={c.id} className="flex-none lg:flex-1">
-              <button
-                type="button"
-                onClick={() => onSelect(c.id)}
-                className={`group flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-left transition-colors lg:w-full lg:gap-2.5 lg:px-2 ${
-                  isActive
-                    ? "bg-brand-soft"
-                    : "hover:bg-muted/60"
-                }`}
-                aria-current={isActive ? "true" : undefined}
-              >
-                <span
-                  className={`flex h-7 w-7 flex-none items-center justify-center rounded-[10px] lg:h-8 lg:w-8 ${meta.iconBg}`}
-                >
-                  <Icon className={`h-3.5 w-3.5 lg:h-4 lg:w-4 ${meta.iconText}`} />
-                </span>
-                <span
-                  className={`min-w-0 flex-1 text-[13px] font-semibold leading-tight tracking-tight lg:whitespace-normal ${
-                    isActive ? "text-brand" : "text-foreground"
-                  }`}
-                  title={c.label}
-                >
-                  {c.label}
-                </span>
-                <ChevronRight
-                  className={`hidden h-3.5 w-3.5 flex-none lg:block ${
-                    isActive ? "text-brand" : "text-muted-foreground/70"
-                  }`}
-                />
-              </button>
-            </li>
-          );
-        })}
+
+      {/* Mobile/tablet: a single horizontal scrolling row, no group headings (space-constrained). */}
+      <ul className="flex gap-1.5 overflow-x-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
+        {[...scoredCards, ...diagnosticCards].map((c) =>
+          renderItem(c, catByNameFromCards(scoredCards, c) ? "scored" : "diagnostic"),
+        )}
       </ul>
+
+      {/* Desktop: grouped sections with headings + per-item badge. */}
+      <div className="hidden lg:block">
+        {scoredCards.length > 0 && (
+          <>
+            {groupHeading("Scored sections")}
+            <ul className="space-y-0.5">
+              {scoredCards.map((c) => renderItem(c, "scored"))}
+            </ul>
+          </>
+        )}
+        {diagnosticCards.length > 0 && (
+          <>
+            {groupHeading("Description diagnostics")}
+            <ul className="space-y-0.5">
+              {diagnosticCards.map((c) => renderItem(c, "diagnostic"))}
+            </ul>
+            <p className="px-2 pt-2 pb-1 text-[11px] leading-snug text-muted-foreground">
+              Diagnostic sections feed your overall description quality. They aren't scored separately.
+            </p>
+          </>
+        )}
+      </div>
     </aside>
   );
+}
+
+function catByNameFromCards(scoredCards: CardDef[], card: CardDef): boolean {
+  return scoredCards.some((s) => s.id === card.id);
 }
 
 function DetailPanel({
@@ -412,8 +460,20 @@ function DiagnosticSection({
   fixes: Fix[];
   catFb?: string;
 }) {
+  const isReviewsArea = card.area === "Reviews & rating";
+  const hasReviewData =
+    (typeof data.rating === "number" && data.rating > 0) ||
+    (typeof data.reviewCount === "number" && data.reviewCount > 0);
+
   return (
     <>
+      {isReviewsArea && !hasReviewData && (
+        <div className="mt-5 rounded-xl border bg-muted/40 px-4 py-3 text-[13px] text-muted-foreground">
+          <span className="font-semibold text-foreground">New listing.</span>{" "}
+          Review trust cannot be assessed yet. This section will fill in as guests stay and leave reviews.
+        </div>
+      )}
+
       <div className="mt-5">
         <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
           <Eye className="h-3.5 w-3.5" />
@@ -557,7 +617,7 @@ function buildMetrics(area: string, data: AuditResponse): Metric[] {
   }
   if (area === "Reviews & rating") {
     const out: Metric[] = [];
-    if (typeof data.rating === "number") {
+    if (typeof data.rating === "number" && data.rating > 0) {
       out.push({
         Icon: StarIcon,
         iconBg: "bg-success-soft",
@@ -568,7 +628,7 @@ function buildMetrics(area: string, data: AuditResponse): Metric[] {
         noteTone: data.rating >= 4.8 ? "good" : "warn",
       });
     }
-    if (typeof data.reviewCount === "number") {
+    if (typeof data.reviewCount === "number" && data.reviewCount > 0) {
       out.push({
         Icon: MessageCircle,
         iconBg: "bg-brand-soft",

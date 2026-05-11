@@ -178,28 +178,57 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
             </h2>
           )}
 
-          {/* Rating row */}
-          {(peek?.rating || peek?.reviewCount) && (
-            <div style={{
-              marginTop: 14,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-            }}>
-              {peek.rating && (
-                <>
-                  <span style={{ color: "#F59E0B", fontSize: 16, lineHeight: 1 }}>★</span>
-                  <span style={{ fontSize: 15, fontWeight: 600, color: DARK }}>{peek.rating}</span>
-                </>
-              )}
-              {peek.rating && peek.reviewCount && (
-                <span style={{ width: 1, height: 14, background: "rgba(15,23,42,0.15)", display: "inline-block" }} />
-              )}
-              {peek.reviewCount && (
-                <span style={{ fontSize: 14, color: MUTED }}>{peek.reviewCount} reviews</span>
-              )}
-            </div>
-          )}
+          {/* Rating row: only render when we actually have a non-zero rating or review count.
+              peek.rating is a string ("0" is truthy), so check the parsed numeric value. */}
+          {(() => {
+            const ratingNum = peek?.rating ? parseFloat(peek.rating) : NaN;
+            const hasRating = Number.isFinite(ratingNum) && ratingNum > 0;
+            const hasReviews = typeof peek?.reviewCount === "number" && peek.reviewCount > 0;
+            if (hasRating || hasReviews) {
+              return (
+                <div style={{
+                  marginTop: 14,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}>
+                  {hasRating && (
+                    <>
+                      <span style={{ color: "#F59E0B", fontSize: 16, lineHeight: 1 }}>★</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: DARK }}>{peek!.rating}</span>
+                    </>
+                  )}
+                  {hasRating && hasReviews && (
+                    <span style={{ width: 1, height: 14, background: "rgba(15,23,42,0.15)", display: "inline-block" }} />
+                  )}
+                  {hasReviews && (
+                    <span style={{ fontSize: 14, color: MUTED }}>{peek!.reviewCount} reviews</span>
+                  )}
+                </div>
+              );
+            }
+            if (peek?.title) {
+              return (
+                <div style={{
+                  marginTop: 14,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  borderRadius: 999,
+                  padding: "4px 10px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: MUTED,
+                  background: "rgba(15,23,42,0.05)",
+                  border: `1px solid ${BORDER}`,
+                  width: "fit-content",
+                }}>
+                  New listing
+                </div>
+              );
+            }
+            return null;
+          })()}
 
           {/* Divider */}
           <div style={{
