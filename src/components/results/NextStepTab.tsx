@@ -126,13 +126,13 @@ function PrimaryCard({
         </p>
       )}
 
-      <div className="mt-6 flex justify-start sm:justify-end">
+      <div className="mt-6 flex justify-start">
         <a
           href={href}
           target={href.startsWith("mailto:") ? undefined : "_blank"}
           rel={href.startsWith("mailto:") ? undefined : "noreferrer"}
           onClick={onClick}
-          className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-[10px] bg-brand px-5 text-[13px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90 sm:w-auto"
+          className="inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-[10px] bg-brand px-5 text-[13px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90 sm:w-auto"
         >
           {ctaLabel}
           <ArrowRight className="h-3.5 w-3.5" />

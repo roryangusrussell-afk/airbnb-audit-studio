@@ -8,21 +8,22 @@ interface Props {
   cats: Cat[];
   score: number;
   priorityFix?: string;
+  instant?: boolean;
 }
 
-export function ScoreBreakdownCard({ cats, score, priorityFix }: Props) {
+export function ScoreBreakdownCard({ cats, score, priorityFix, instant }: Props) {
   const ordered = [...cats].sort((a, b) => a.score - b.score);
   const band = scoreBand(score);
 
   return (
-    <div className="flex h-full flex-col rounded-[20px] border border-[#EDE8E6] bg-white p-4 shadow-[0_8px_30px_rgba(15,23,42,0.04)] sm:p-6">
-      <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6D6E78]">
+    <div className="flex h-full flex-col rounded-[20px] border border-border bg-card p-4 shadow-card sm:p-6">
+      <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
         Score breakdown
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[140px_1fr]">
         <div className="flex flex-col items-center justify-center">
-          <ScoreRing score={score} size={112} />
+          <ScoreRing score={score} size={112} instant={instant} />
           <div className="mt-3">
             <span
               className={`inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] ${bandSoftClasses(band)}`}
@@ -40,17 +41,19 @@ export function ScoreBreakdownCard({ cats, score, priorityFix }: Props) {
       </div>
 
       {priorityFix && (
-        <div className="mt-auto pt-6 flex items-start gap-3"><div className="flex w-full items-start gap-3 rounded-2xl border border-[#FFD9E4] bg-[#FFF7FA] p-4">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-white text-brand shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-            <Wand2 className="h-4 w-4" aria-hidden="true" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
-              Priority fix
+        <div className="mt-auto pt-6">
+          <div className="flex w-full items-start gap-3 rounded-2xl border border-brand-border bg-brand-soft p-4">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-card text-brand shadow-card">
+              <Wand2 className="h-4 w-4" aria-hidden="true" />
             </div>
-            <div className="mt-1 text-[13px] leading-[1.5] text-[#1F1F24]">{priorityFix}</div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
+                Priority fix
+              </div>
+              <div className="mt-1 text-[13px] leading-[1.5] text-foreground">{priorityFix}</div>
+            </div>
           </div>
-        </div></div>
+        </div>
       )}
     </div>
   );
@@ -76,16 +79,16 @@ function ScoreCategoryRow({ cat }: { cat: Cat }) {
             />
           </span>
           <div>
-            <div className="text-sm font-semibold text-[#1F1F24]">{cat.name}</div>
-            <div className="text-xs text-[#6D6E78]">{cat.fb}</div>
+            <div className="text-sm font-semibold text-foreground">{cat.name}</div>
+            <div className="text-xs text-muted-foreground">{cat.fb}</div>
           </div>
         </div>
         <div className={`shrink-0 text-sm font-bold tabular-nums ${textCls}`}>
           {cat.score}
-          <span className="font-normal text-[#6D6E78]">/100</span>
+          <span className="font-normal text-muted-foreground">/100</span>
         </div>
       </div>
-      <div className="h-1.5 rounded-full bg-[#F1EFED]">
+      <div className="h-1.5 rounded-full bg-muted">
         <div
           className={`h-full rounded-full ${fillCls}`}
           style={{

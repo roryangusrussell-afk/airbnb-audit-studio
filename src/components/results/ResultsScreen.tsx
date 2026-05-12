@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, FileText, Activity, Rocket, Download } from "lucide-react";
+import { ArrowLeft, FileText, Search, Wrench, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListingCard } from "./ListingCard";
@@ -24,7 +24,8 @@ export function ResultsScreen({
   topSlot?: React.ReactNode;
 }) {
   const [printMode, setPrintMode] = useState(false);
-  const isGated = !email && !!onSubmitEmail;
+  const [skipped, setSkipped] = useState(false);
+  const isGated = !email && !!onSubmitEmail && !skipped;
 
   // When entering print mode, give React a tick to render the expanded view
   // before opening the print dialog. afterprint flips back to the tabbed view.
@@ -48,6 +49,7 @@ export function ResultsScreen({
           data={data}
           onSubmit={onSubmitEmail!}
           onAuditAnother={onAuditAnother}
+          onSkip={() => setSkipped(true)}
         />
       </div>
     );
@@ -85,12 +87,12 @@ export function ResultsScreen({
       {printMode ? (
         <div className="mt-6 space-y-8">
           <PrintSection title="Summary">
-            <SummaryTab data={data} />
+            <SummaryTab data={data} instant />
           </PrintSection>
-          <PrintSection title="Diagnostic">
+          <PrintSection title="Breakdown">
             <DiagnosticTab data={data} printMode />
           </PrintSection>
-          <PrintSection title="Next step">
+          <PrintSection title="Get fixes">
             <NextStepTab email={email} data={data} />
           </PrintSection>
         </div>
@@ -108,15 +110,15 @@ export function ResultsScreen({
               value="diagnostic"
               className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
             >
-              <Activity className="h-3.5 w-3.5" />
-              Diagnostic
+              <Search className="h-3.5 w-3.5" />
+              Breakdown
             </TabsTrigger>
             <TabsTrigger
               value="next"
               className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
             >
-              <Rocket className="h-3.5 w-3.5" />
-              Next step
+              <Wrench className="h-3.5 w-3.5" />
+              Get fixes
             </TabsTrigger>
           </TabsList>
           <TabsContent value="summary" className="mt-3">

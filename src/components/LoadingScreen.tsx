@@ -45,6 +45,7 @@ const STEPS: Array<{ title: string; desc: string; dwellMs: number }> = [
 
 export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | null }) {
   const [step, setStep] = useState(0);
+  const [step5Secs, setStep5Secs] = useState(0);
 
   useEffect(() => {
     if (step >= STEPS.length - 1) return;
@@ -53,6 +54,12 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
   }, [step]);
 
   const activeStep = Math.min(step, STEPS.length - 1);
+
+  useEffect(() => {
+    if (activeStep !== STEPS.length - 1) { setStep5Secs(0); return; }
+    const t = setInterval(() => setStep5Secs((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [activeStep]);
 
   return (
     <div style={{
@@ -202,7 +209,7 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
                     <span style={{ width: 1, height: 14, background: "rgba(15,23,42,0.15)", display: "inline-block" }} />
                   )}
                   {hasReviews && (
-                    <span style={{ fontSize: 14, color: MUTED }}>{peek!.reviewCount} reviews</span>
+                    <span style={{ fontSize: 14, color: MUTED }}>{peek!.reviewCount} {peek!.reviewCount === 1 ? "review" : "reviews"}</span>
                   )}
                 </div>
               );
@@ -440,6 +447,22 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
             })}
           </div>
 
+          {/* Step-5 long-wait message */}
+          {step5Secs >= 30 && (
+            <div style={{
+              marginTop: 16,
+              padding: "12px 16px",
+              borderRadius: 10,
+              background: "rgba(232,24,92,0.06)",
+              border: "1px solid rgba(232,24,92,0.16)",
+              fontSize: 14,
+              lineHeight: 1.5,
+              color: MUTED,
+            }}>
+              Still working. Complex listings take a little longer. Hang tight.
+            </div>
+          )}
+
           {/* Divider */}
           <div style={{ margin: "24px 0", height: 1, background: BORDER }} />
 
@@ -467,7 +490,7 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
               margin: 0,
               paddingTop: 2,
             }}>
-              This audit usually takes 30–60 seconds.<br />
+              This audit usually takes 30 to 60 seconds.<br />
               We'll prioritise the fixes most likely to improve your visibility, conversion and guest trust.
             </p>
           </div>

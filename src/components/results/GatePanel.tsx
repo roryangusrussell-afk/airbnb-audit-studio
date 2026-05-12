@@ -11,6 +11,7 @@ import {
   Star,
 } from "lucide-react";
 import type { AuditResponse } from "@/lib/types";
+import { scoreBand, bandTextClass } from "@/lib/scoring";
 
 export interface GateSubmitPayload {
   email: string;
@@ -50,14 +51,17 @@ export function GatePanel({
   data,
   onSubmit,
   onAuditAnother,
+  onSkip,
 }: {
   data: AuditResponse;
   onSubmit: (payload: GateSubmitPayload) => void;
   onAuditAnother?: () => void;
+  onSkip?: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [marketing, setMarketing] = useState(false);
   const [err, setErr] = useState("");
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const headline = deriveHeadline(data);
   const guestLabel =
@@ -78,18 +82,37 @@ export function GatePanel({
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Top header row */}
       <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-        <p className="text-xs font-bold uppercase tracking-[0.28em] text-brand">
+        <p className="text-xs font-bold uppercase tracking-[0.28em] text-muted-foreground">
           Your audit report
         </p>
-        {onAuditAnother && (
+        {onAuditAnother && !confirmReset && (
           <button
             type="button"
-            onClick={onAuditAnother}
-            className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-card transition hover:border-slate-300 hover:bg-muted/50"
+            onClick={() => setConfirmReset(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-card transition hover:border-muted-foreground/30 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
           >
             <ArrowLeft className="h-4 w-4" />
             Audit another listing
           </button>
+        )}
+        {onAuditAnother && confirmReset && (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-border bg-card px-4 py-2.5 shadow-card">
+            <span className="text-sm text-muted-foreground">This will close your current report.</span>
+            <button
+              type="button"
+              onClick={onAuditAnother}
+              className="min-h-[36px] px-1 text-sm font-semibold text-danger hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-1"
+            >
+              Yes, close it
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmReset(false)}
+              className="min-h-[36px] px-1 text-sm font-semibold text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+            >
+              Cancel
+            </button>
+          </div>
         )}
       </div>
 
@@ -109,7 +132,7 @@ export function GatePanel({
             <h2 className="mt-3 max-w-4xl text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl">
               {headline}
             </h2>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
+            <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground">
               We've scored your listing and prepared practical rewrites.
               <br />
               Enter your email to unlock the full report and keep a copy for later.
@@ -196,6 +219,18 @@ export function GatePanel({
                 </Link>
                 . No spam.
               </p>
+
+              {onSkip && (
+                <div className="mt-3 flex min-h-[44px] items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={onSkip}
+                    className="px-2 py-1 text-xs text-muted-foreground/70 underline underline-offset-2 hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+                  >
+                    No thanks, just show me the report
+                  </button>
+                </div>
+              )}
             </form>
           </div>
 
@@ -210,7 +245,7 @@ export function GatePanel({
                   key={item}
                   className="flex items-start gap-4 py-4 first:pt-0 last:pb-0"
                 >
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-300 text-emerald-600">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-success-border text-success">
                     <Check className="h-3.5 w-3.5" strokeWidth={3} />
                   </span>
                   <span className="text-sm leading-6 text-foreground sm:text-base">
@@ -279,7 +314,7 @@ function ListingSummary({
                 {data.reviewCount != null && data.reviewCount > 0 && (
                   <>
                     <span>·</span>
-                    <span>{data.reviewCount} reviews</span>
+                    <span>{data.reviewCount} {data.reviewCount === 1 ? "review" : "reviews"}</span>
                   </>
                 )}
               </>
@@ -288,12 +323,12 @@ function ListingSummary({
 
           <div className="mt-3 flex flex-wrap gap-2">
             {data.propertyType && (
-              <span className="rounded-full border border-brand-border bg-brand-soft px-3 py-1 text-sm font-semibold text-brand">
+              <span className="rounded-full border border-border bg-muted px-3 py-1 text-sm font-semibold text-muted-foreground">
                 {data.propertyType}
               </span>
             )}
             {guestLabel && (
-              <span className="rounded-full border border-brand-border bg-brand-soft px-3 py-1 text-sm font-semibold text-brand">
+              <span className="rounded-full border border-border bg-muted px-3 py-1 text-sm font-semibold text-muted-foreground">
                 {guestLabel}
               </span>
             )}
@@ -346,17 +381,16 @@ function PreviewScoreRing({ score }: { score: number }) {
           cx={size / 2}
           cy={size / 2}
           r={r}
-          stroke="#F59E0B"
           strokeWidth={stroke}
           fill="none"
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 0.2s linear" }}
+          style={{ stroke: `hsl(var(--${scoreBand(score) === "strong" ? "success" : scoreBand(score) === "average" ? "warning" : "danger"}))`, transition: "stroke-dashoffset 0.2s linear" }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="text-4xl font-bold tabular-nums text-amber-500">
+        <div className={`text-4xl font-bold tabular-nums ${bandTextClass(scoreBand(score))}`}>
           {displayed}
         </div>
         <div className="mt-1 text-sm font-semibold text-muted-foreground">

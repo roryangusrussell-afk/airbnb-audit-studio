@@ -47,8 +47,12 @@ export function UrlForm({
 
   return (
     <form onSubmit={handle} className={cn("w-full", className)} noValidate>
+      <label htmlFor="listing-url" className="sr-only">
+        Airbnb listing URL
+      </label>
       <div className="flex flex-col gap-3 sm:flex-row">
         <Input
+          id="listing-url"
           type="url"
           value={value}
           onChange={(e) => {

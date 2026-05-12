@@ -73,7 +73,7 @@ export function ListingCard({ data }: { data: AuditResponse }) {
                 <Star className="h-3.5 w-3.5 fill-current text-foreground" />
                 <span className="font-medium text-foreground">{data.rating.toFixed(2)}</span>
                 {data.reviewCount != null && data.reviewCount > 0 && (
-                  <span>· {data.reviewCount} reviews</span>
+                  <span>· {data.reviewCount} {data.reviewCount === 1 ? "review" : "reviews"}</span>
                 )}
               </span>
             ) : (
@@ -93,12 +93,12 @@ export function ListingCard({ data }: { data: AuditResponse }) {
 
           <div className="mt-2 flex flex-wrap items-center gap-2">
             {data.propertyType && (
-              <span className="rounded-full border border-brand-border bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand">
+              <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
                 {data.propertyType}
               </span>
             )}
             {data.guests != null && (
-              <span className="rounded-full border border-brand-border bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand">
+              <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
                 Up to {data.guests} guests
               </span>
             )}

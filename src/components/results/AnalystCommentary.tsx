@@ -1,4 +1,3 @@
-import { Star } from "lucide-react";
 import type { AuditResponse } from "@/lib/types";
 
 function firstNSentences(text: string, n: number): string {
@@ -6,7 +5,6 @@ function firstNSentences(text: string, n: number): string {
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
     if (ch !== "." && ch !== "!" && ch !== "?") continue;
-    // Skip decimals like "4.5": a period flanked by digits isn't a sentence end.
     if (ch === "." && /\d/.test(text[i - 1] ?? "") && /\d/.test(text[i + 1] ?? "")) continue;
     count++;
     if (count === n) return text.slice(0, i + 1).trim();
@@ -24,31 +22,17 @@ export function AnalystCommentary({ data }: { data: AuditResponse }) {
     .map((p) => firstNSentences(p, 2));
 
   return (
-    <div className="flex h-full flex-col rounded-[20px] border border-[#EDE8E6] bg-white p-4 shadow-[0_8px_30px_rgba(15,23,42,0.04)] sm:p-6">
-      <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-brand">
-        Analyst commentary
+    <div className="rounded-[20px] border border-border bg-card p-4 shadow-card sm:p-6">
+      <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+        Analysis
       </div>
-      <h2 className="text-xl font-semibold tracking-[-0.02em] text-[#1F1F24]">
+      <h2 className="text-xl font-semibold tracking-[-0.02em] text-foreground">
         What we found
       </h2>
-      <div className="mt-3 space-y-3 text-[13.5px] leading-6 text-[#3F4048]">
+      <div className="mt-3 space-y-3 text-sm leading-6 text-foreground/80">
         {paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
-      </div>
-
-      <div className="mt-auto pt-6">
-        <div className="flex items-start gap-3 rounded-2xl border border-[#F9D99B] bg-[#FFF7E8] p-4">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-white text-[#F59E0B]">
-            <Star className="h-4 w-4 fill-current" aria-hidden />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-[#B4730A]">Bottom line takeaway</div>
-            <div className="mt-1 text-[13px] leading-[1.5] text-[#1F1F24]">
-              {firstNSentences(data.verdict, 1)}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

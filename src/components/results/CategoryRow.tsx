@@ -22,9 +22,7 @@ export function CategoryRow({ cat }: { cat: Cat }) {
   const band = scoreBand(cat.score);
   const Icon = ICONS[cat.name] ?? Type;
   return (
-    <div className="flex items-start gap-3 border-l-2 pl-4 py-2"
-      style={{ borderColor: `hsl(var(--${band === "strong" ? "success" : band === "average" ? "warning" : "danger"}))` }}
-    >
+    <div className="flex items-start gap-3 py-2 pl-1">
       <div className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full ${bandBgClass(band)}/10`}>
         <Icon className={`h-4 w-4 ${bandTextClass(band)}`} />
       </div>

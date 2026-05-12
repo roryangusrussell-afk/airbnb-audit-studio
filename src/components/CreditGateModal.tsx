@@ -12,7 +12,7 @@ export function CreditGateModal({
 }) {
   const refCode = email ? btoa(email).slice(0, 10) : "";
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const link = `${origin}/audit?ref=${refCode}`;
+  const link = `${origin}/?ref=${refCode}`;
   const { copied, copy } = useCopyToClipboard(2000);
 
   if (!open) return null;
@@ -138,7 +138,7 @@ export function CreditGateModal({
 
             <h3 style={{
               fontSize: 22,
-              fontWeight: 750,
+              fontWeight: 700,
               lineHeight: 1.2,
               color: "#111827",
               margin: "0 0 10px",
@@ -237,7 +237,7 @@ export function CreditGateModal({
 
             <h3 style={{
               fontSize: 22,
-              fontWeight: 750,
+              fontWeight: 700,
               lineHeight: 1.2,
               color: "#111827",
               margin: "0 0 10px",
@@ -365,7 +365,7 @@ function BuyRow({
               {originalPrice}
             </span>
           )}
-          <span style={{ fontSize: 16, fontWeight: 750, color: "#111827" }}>{price}</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: "#111827" }}>{price}</span>
           <span style={{ fontSize: 16, color: "#9ca3af", lineHeight: 1 }}>→</span>
         </span>
       )}

@@ -8,9 +8,13 @@ function bandStrokeVar(score: number): string {
   return "hsl(var(--danger))";
 }
 
-export function ScoreRing({ score, size = 172 }: { score: number; size?: number }) {
-  const [displayed, setDisplayed] = useState(0);
+export function ScoreRing({ score, size = 172, instant = false }: { score: number; size?: number; instant?: boolean }) {
+  const [displayed, setDisplayed] = useState(instant ? score : 0);
   useEffect(() => {
+    if (instant) {
+      setDisplayed(score);
+      return;
+    }
     const start = performance.now();
     const dur = 900;
     let raf = 0;
@@ -22,7 +26,7 @@ export function ScoreRing({ score, size = 172 }: { score: number; size?: number 
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [score]);
+  }, [score, instant]);
 
   const stroke = size >= 170 ? 12 : 10;
   const r = (size - stroke) / 2;
