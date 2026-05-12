@@ -24,8 +24,7 @@ export function ResultsScreen({
   topSlot?: React.ReactNode;
 }) {
   const [printMode, setPrintMode] = useState(false);
-  const [skipped, setSkipped] = useState(false);
-  const isGated = !email && !!onSubmitEmail && !skipped;
+  const isGated = !email && !!onSubmitEmail;
 
   // When entering print mode, give React a tick to render the expanded view
   // before opening the print dialog. afterprint flips back to the tabbed view.
@@ -49,7 +48,6 @@ export function ResultsScreen({
           data={data}
           onSubmit={onSubmitEmail!}
           onAuditAnother={onAuditAnother}
-          onSkip={() => setSkipped(true)}
         />
       </div>
     );

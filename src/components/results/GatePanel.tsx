@@ -51,12 +51,10 @@ export function GatePanel({
   data,
   onSubmit,
   onAuditAnother,
-  onSkip,
 }: {
   data: AuditResponse;
   onSubmit: (payload: GateSubmitPayload) => void;
   onAuditAnother?: () => void;
-  onSkip?: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [marketing, setMarketing] = useState(false);
@@ -133,9 +131,7 @@ export function GatePanel({
               {headline}
             </h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground">
-              We've scored your listing and prepared practical rewrites.
-              <br />
-              Enter your email to unlock the full report and keep a copy for later.
+              We've scored your listing and prepared practical rewrites. Enter your email and we'll send you the full report so you can refer back to it.
             </p>
           </div>
         </div>
@@ -198,7 +194,7 @@ export function GatePanel({
                 type="submit"
                 className="mt-5 inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-base font-semibold text-background shadow-card transition hover:-translate-y-0.5 hover:bg-foreground/90 hover:shadow-elevated disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Unlock my full audit
+                Send me my report
                 <ArrowRight className="h-5 w-5" />
               </button>
 
@@ -220,17 +216,6 @@ export function GatePanel({
                 . No spam.
               </p>
 
-              {onSkip && (
-                <div className="mt-3 flex min-h-[44px] items-center justify-center">
-                  <button
-                    type="button"
-                    onClick={onSkip}
-                    className="px-2 py-1 text-xs text-muted-foreground/70 underline underline-offset-2 hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-                  >
-                    No thanks, just show me the report
-                  </button>
-                </div>
-              )}
             </form>
           </div>
 
