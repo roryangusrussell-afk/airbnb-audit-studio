@@ -685,7 +685,7 @@ function buildMetrics(area: string, data: AuditResponse): Metric[] {
         iconBg: r >= 90 ? "bg-success-soft" : "bg-warning-soft",
         iconText: r >= 90 ? "text-success" : "text-warning",
         value: `${r}%`,
-        label: "Response rate",
+        label: "Guest message response",
         note: r >= 90 ? "Above benchmark" : "Below benchmark",
         noteTone: r >= 90 ? "good" : "warn",
       });
@@ -995,12 +995,12 @@ function FixCard({ fix }: { fix: Fix }) {
               </div>
             </div>
 
-            <div className="rounded-xl border border-brand-border bg-brand-soft p-3.5">
+            <div className={`rounded-xl border p-3.5 ${COPY_AREAS.has(fix.area) ? "border-brand-border bg-brand-soft" : "border-border bg-card"}`}>
               <div className="flex items-center justify-between gap-2">
                 <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
                   {fixLabel}
                 </div>
-                <CopyButton value={fix.fix} />
+                {COPY_AREAS.has(fix.area) && <CopyButton value={fix.fix} />}
               </div>
               <p className="mt-2 text-[13px] leading-5 text-foreground">{fix.fix}</p>
             </div>
