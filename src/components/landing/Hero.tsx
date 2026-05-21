@@ -38,7 +38,7 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
           </div>
           <div className="leading-tight">
             <div className="text-base font-extrabold tracking-tight text-foreground">
-              AUDITABLE
+              Auditable
             </div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand">
               For Airbnb hosts

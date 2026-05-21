@@ -23,7 +23,7 @@ export function Footer() {
               Cookies
             </Link>
             <a
-              href="mailto:roryangusrussell@gmail.com"
+              href="mailto:rory@santacatarinacollection.com"
               className="hover:text-foreground"
             >
               Contact

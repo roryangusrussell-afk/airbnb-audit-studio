@@ -28,8 +28,8 @@ export function NextStepTab({ email, data }: { email: string; data: AuditRespons
           Your next best step
         </h2>
         <p className="mt-1.5 max-w-[58ch] text-sm leading-relaxed text-muted-foreground">
-          Use this audit to improve the listing, compare another property, or check whether
-          hands-on management would make sense.
+          Use this audit to improve the listing, compare another property, or explore
+          whether a hands-on operator is the right next move.
         </p>
       </header>
 
@@ -78,7 +78,7 @@ function ManagementPrimary() {
       icon={Home}
       title="Want a Lisbon operator to review the upside?"
       body="Your audit gives us a head start. We can review the listing, pricing, guest experience and operations to see where the biggest upside is."
-      supporting="Best for Lisbon hosts or owners who want a more hands-on operator."
+      supporting="Best for Lisbon hosts or owners ready to hand off to a specialist operator."
       ctaLabel="Check management fit"
       href={SCC_MANAGEMENT_URL}
       onClick={() => trackEvent("clicked_management_fit")}

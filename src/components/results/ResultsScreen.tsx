@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, FileText, Search, Wrench, Download, Stethoscope } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, FileText, Search, Wrench, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListingCard } from "./ListingCard";
@@ -26,23 +26,10 @@ export function ResultsScreen({
   onSubmitEmail?: (payload: GateSubmitPayload) => void;
   topSlot?: React.ReactNode;
 }) {
-  const [printMode, setPrintMode] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>("summary");
   const isGated = !email && !!onSubmitEmail;
 
-  useEffect(() => {
-    if (!printMode) return;
-    const t = setTimeout(() => window.print(), 120);
-    return () => clearTimeout(t);
-  }, [printMode]);
-
-  useEffect(() => {
-    const after = () => setPrintMode(false);
-    window.addEventListener("afterprint", after);
-    return () => window.removeEventListener("afterprint", after);
-  }, []);
-
-  if (isGated && !printMode) {
+  if (isGated) {
     return (
       <div className="min-h-full">
         {topSlot}
@@ -67,15 +54,6 @@ export function ResultsScreen({
             <span className="hidden sm:inline">Audit another listing</span>
             <span className="sm:hidden">Another listing</span>
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPrintMode(true)}
-            className="hidden gap-1.5 sm:inline-flex"
-          >
-            <Download className="h-3.5 w-3.5" />
-            Download PDF
-          </Button>
         </div>
       </div>
 
@@ -84,81 +62,55 @@ export function ResultsScreen({
         {data.bottomTenRisk && <BottomTenRiskBanner />}
       </div>
 
-      {printMode ? (
-        <div className="mt-6 space-y-8">
-          <PrintSection title="Summary">
-            <SummaryTab data={data} instant />
-          </PrintSection>
-          <PrintSection title="Diagnostics">
-            <DiagnosticsTab data={data} />
-          </PrintSection>
-          <PrintSection title="Breakdown">
-            <DiagnosticTab data={data} printMode />
-          </PrintSection>
-          <PrintSection title="Get fixes">
-            <NextStepTab email={email} data={data} />
-          </PrintSection>
-        </div>
-      ) : (
-        <Tabs
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as TabKey)}
-          className="mt-4"
-        >
-          <TabsList className="h-auto w-full justify-center gap-1 rounded-[16px] border bg-card p-1 shadow-card sm:w-auto" data-print-hide>
-            <TabsTrigger
-              value="summary"
-              className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              Summary
-            </TabsTrigger>
-            <TabsTrigger
-              value="diagnostics"
-              className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
-            >
-              <Stethoscope className="h-3.5 w-3.5" />
-              Diagnostics
-            </TabsTrigger>
-            <TabsTrigger
-              value="breakdown"
-              className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
-            >
-              <Search className="h-3.5 w-3.5" />
-              Breakdown
-            </TabsTrigger>
-            <TabsTrigger
-              value="next"
-              className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
-            >
-              <Wrench className="h-3.5 w-3.5" />
-              Get fixes
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="summary" className="mt-3">
-            <SummaryTab data={data} onGoToDiagnostics={() => setActiveTab("diagnostics")} />
-          </TabsContent>
-          <TabsContent value="diagnostics" className="mt-3">
-            <DiagnosticsTab data={data} />
-          </TabsContent>
-          <TabsContent value="breakdown" className="mt-3">
-            <DiagnosticTab data={data} />
-          </TabsContent>
-          <TabsContent value="next" className="mt-3">
-            <NextStepTab email={email} data={data} />
-          </TabsContent>
-        </Tabs>
-      )}
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as TabKey)}
+        className="mt-4"
+      >
+        <TabsList className="h-auto w-full justify-center gap-1 rounded-[16px] border bg-card p-1 shadow-card sm:w-auto" data-print-hide>
+          <TabsTrigger
+            value="summary"
+            className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
+          >
+            <FileText className="h-3.5 w-3.5" />
+            Summary
+          </TabsTrigger>
+          <TabsTrigger
+            value="diagnostics"
+            className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
+          >
+            <Stethoscope className="h-3.5 w-3.5" />
+            Diagnostics
+          </TabsTrigger>
+          <TabsTrigger
+            value="breakdown"
+            className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
+          >
+            <Search className="h-3.5 w-3.5" />
+            Breakdown
+          </TabsTrigger>
+          <TabsTrigger
+            value="next"
+            className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
+          >
+            <Wrench className="h-3.5 w-3.5" />
+            Get fixes
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="summary" className="mt-3">
+          <SummaryTab data={data} onGoToDiagnostics={() => setActiveTab("diagnostics")} />
+        </TabsContent>
+        <TabsContent value="diagnostics" className="mt-3">
+          <DiagnosticsTab data={data} />
+        </TabsContent>
+        <TabsContent value="breakdown" className="mt-3">
+          <DiagnosticTab data={data} />
+        </TabsContent>
+        <TabsContent value="next" className="mt-3">
+          <NextStepTab email={email} data={data} />
+        </TabsContent>
+      </Tabs>
 
     </div>
-  );
-}
-
-function PrintSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="print-section">
-      <h2 className="mb-3 text-[22px] font-bold tracking-tight text-foreground">{title}</h2>
-      {children}
-    </section>
   );
 }
