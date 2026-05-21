@@ -28,10 +28,18 @@ const UNLOCK_ITEMS = [
 
 function deriveHeadline(data: AuditResponse): string {
   const score = data.score;
-  const city = (data.location?.trim() ?? "").split(",")[0].trim() || "your listing";
+  const city = (data.location?.trim() ?? "").split(",")[0].trim();
 
-  if (score >= 80) return `A strong ${city} stay, with a few details worth tightening.`;
-  if (score >= 60) return `A solid ${city} stay, but important details need to be clearer.`;
+  if (score >= 80) {
+    return city
+      ? `A strong ${city} stay, with a few details worth tightening.`
+      : "A strong listing, with a few details worth tightening.";
+  }
+  if (score >= 60) {
+    return city
+      ? `A solid ${city} stay, but important details need to be clearer.`
+      : "A solid listing, but important details need to be clearer.";
+  }
   if (score >= 40) return "There's a good stay here, but the listing is making guests work too hard.";
   return "The listing has potential, but too many key details are hard to find.";
 }
