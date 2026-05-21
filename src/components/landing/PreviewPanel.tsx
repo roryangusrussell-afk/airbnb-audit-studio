@@ -1,4 +1,4 @@
-import { Camera, Smile, Type, Home, ChevronRight } from "lucide-react";
+import { Camera, Star, Type, Home, MessageSquareText, FileText, TrendingUp } from "lucide-react";
 import heroApartment from "@/assets/hero-apartment.jpeg";
 
 type PillProps = {
@@ -31,12 +31,13 @@ function FloatingPill({ icon, label, status, tone, className = "" }: PillProps) 
 }
 
 const categories = [
-  { label: "Photo Quality", icon: Camera, score: 78, tone: "good" as const },
-  { label: "Guest Experience", icon: Smile, score: 62, tone: "warn" as const },
-  { label: "Title & SEO", icon: Type, score: 58, tone: "warn" as const },
-  { label: "Amenities", icon: Home, score: 71, tone: "good" as const },
-  { label: "Pricing", icon: ChevronRight, score: 76, tone: "good" as const },
-  { label: "Description", icon: ChevronRight, score: 70, tone: "good" as const },
+  { label: "Photos", icon: Camera, score: 78, tone: "good" as const },
+  { label: "Reviews & Rating", icon: Star, score: 62, tone: "warn" as const },
+  { label: "Title", icon: Type, score: 58, tone: "warn" as const },
+  { label: "Amenities", icon: Home, score: 71, tone: "warn" as const },
+  { label: "Overview", icon: MessageSquareText, score: 65, tone: "warn" as const },
+  { label: "Description", icon: FileText, score: 70, tone: "warn" as const },
+  { label: "Conversion Signals", icon: TrendingUp, score: 55, tone: "warn" as const },
 ];
 
 function ScoreRingMini() {
@@ -53,7 +54,7 @@ function ScoreRingMini() {
           cy="50"
           r={r}
           fill="none"
-          stroke="hsl(var(--brand))"
+          stroke="hsl(var(--warning))"
           strokeWidth="7"
           strokeLinecap="round"
           strokeDasharray={`${dash} ${c}`}
@@ -83,30 +84,30 @@ export function PreviewPanel() {
       {/* Floating pills (desktop only: clutter mobile) */}
       <FloatingPill
         icon={<Camera className="h-4 w-4" />}
-        label="Photo Quality"
+        label="Photos"
         status="Good"
         tone="good"
         className="left-2 top-8 sm:-left-6"
       />
       <FloatingPill
-        icon={<Smile className="h-4 w-4" />}
-        label="Guest Experience"
+        icon={<Star className="h-4 w-4" />}
+        label="Reviews & Rating"
         status="Needs Work"
         tone="warn"
         className="left-2 top-1/2 -translate-y-1/2 sm:-left-8"
       />
       <FloatingPill
         icon={<Type className="h-4 w-4" />}
-        label="Title & SEO"
+        label="Title"
         status="Needs Work"
         tone="warn"
         className="bottom-12 left-6 sm:left-12"
       />
       <FloatingPill
-        icon={<Home className="h-4 w-4" />}
-        label="Amenities"
-        status="Good"
-        tone="good"
+        icon={<TrendingUp className="h-4 w-4" />}
+        label="Conversion Signals"
+        status="Needs Work"
+        tone="warn"
         className="bottom-6 right-6 sm:right-16"
       />
 
@@ -119,7 +120,7 @@ export function PreviewPanel() {
           <div className="mt-3 flex justify-center">
             <ScoreRingMini />
           </div>
-          <div className="mt-2 text-[11px] font-semibold uppercase tracking-wider text-success">
+          <div className="mt-2 text-[11px] font-semibold uppercase tracking-wider text-warning">
             Good, room to grow
           </div>
         </div>
