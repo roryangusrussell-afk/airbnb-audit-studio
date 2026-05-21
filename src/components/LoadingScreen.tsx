@@ -18,12 +18,12 @@ const BORDER = "rgba(15,23,42,0.08)";
 const STEPS: Array<{ title: string; desc: string; dwellMs: number }> = [
   {
     title: "Listing data",
-    desc: "Fetching title, description, amenities, photos and reviews",
+    desc: "Fetching title, overview, amenities, photos and reviews",
     dwellMs: 5000,
   },
   {
-    title: "Copy clarity",
-    desc: "Reading the title, overview and description for conversion strength",
+    title: "AI-readable details",
+    desc: "Checking whether key guest questions are clearly answered in your listing",
     dwellMs: 7000,
   },
   {
@@ -32,13 +32,13 @@ const STEPS: Array<{ title: string; desc: string; dwellMs: number }> = [
     dwellMs: 9000,
   },
   {
-    title: "Guest trust signals",
-    desc: "Checking ratings, review patterns, amenities and friction points",
+    title: "Review signals",
+    desc: "Finding recurring themes Airbnb may surface in review highlights",
     dwellMs: 9000,
   },
   {
     title: "Priority fix list",
-    desc: "Compiling the highest-impact actions for your listing",
+    desc: "Ranking the changes most likely to improve visibility and conversion",
     dwellMs: 0,
   },
 ];
@@ -257,7 +257,7 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
               color: MUTED,
               margin: "10px 0 0",
             }}>
-              We evaluate your listing data, copy clarity, photo quality, amenity visibility and guest review patterns, then turn those signals into a prioritised list of fixes.
+              We're checking whether Airbnb's AI can clearly understand your amenities, positioning, photos, review signals and guest-facing details - then turning the gaps into a prioritised fix list.
             </p>
           </div>
 
@@ -287,7 +287,7 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
             color: PINK,
             margin: "0 0 22px",
           }}>
-            Auditing · Almost ready
+            AI Readability Audit · In Progress
           </p>
 
           {/* Main heading */}
@@ -299,12 +299,23 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
               color: DARK,
-              margin: "0 0 32px",
+              margin: "0 0 16px",
               maxWidth: 640,
             }}
           >
-            Reading your listing the way Airbnb does.
+            Checking what Airbnb's AI can actually understand.
           </h1>
+
+          {/* Support line */}
+          <p style={{
+            fontSize: 15,
+            lineHeight: 1.6,
+            color: MUTED,
+            margin: "0 0 28px",
+            maxWidth: 580,
+          }}>
+            Airbnb's new AI features rely on the details your listing makes explicit. We're checking what gets surfaced, what gets missed, and what needs rewriting.
+          </p>
 
           {/* Progress steps */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -490,8 +501,8 @@ export function LoadingScreen({ url, peek }: { url: string; peek: PeekData | nul
               margin: 0,
               paddingTop: 2,
             }}>
-              This audit usually takes 30 to 60 seconds.<br />
-              We'll prioritise the fixes most likely to improve your visibility, conversion and guest trust.
+              This usually takes 30 to 60 seconds.<br />
+              We'll prioritise the fixes most likely to help Airbnb's AI understand your listing - and help guests choose it.
             </p>
           </div>
         </div>
