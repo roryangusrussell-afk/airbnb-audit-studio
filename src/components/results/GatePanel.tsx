@@ -16,7 +16,12 @@ import { scoreBand, bandTextClass } from "@/lib/scoring";
 export interface GateSubmitPayload {
   email: string;
   marketingOptIn: boolean;
+  consentText: string;
+  consentSource: string;
 }
+
+const CONSENT_TEXT =
+  "By submitting, you agree to receive your audit report and occasional Airbnb optimisation emails from Auditable / Santa Catarina Collection. You can unsubscribe at any time.";
 
 const UNLOCK_ITEMS = [
   "Paste-ready rewrites for your title, overview and description",
@@ -62,7 +67,6 @@ export function GatePanel({
   onAuditAnother?: () => void;
 }) {
   const [email, setEmail] = useState("");
-  const [marketing, setMarketing] = useState(false);
   const [err, setErr] = useState("");
   const [confirmReset, setConfirmReset] = useState(false);
 
@@ -78,7 +82,12 @@ export function GatePanel({
       return;
     }
     setErr("");
-    onSubmit({ email: trimmed, marketingOptIn: marketing });
+    onSubmit({
+      email: trimmed,
+      marketingOptIn: true,
+      consentText: CONSENT_TEXT,
+      consentSource: "audit_report_email_capture",
+    });
   };
 
   return (
@@ -180,20 +189,9 @@ export function GatePanel({
                 </p>
               )}
 
-              <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm text-muted-foreground">
-                <input
-                  type="checkbox"
-                  checked={marketing}
-                  onChange={(e) => setMarketing(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 flex-none rounded border-border accent-brand"
-                />
-                <span>
-                  Send me occasional Airbnb optimisation tips. Optional.
-                  <span className="mt-1 block text-xs text-muted-foreground/80">
-                    Your audit will be emailed either way.
-                  </span>
-                </span>
-              </label>
+              <p className="mt-3 text-sm leading-5 text-muted-foreground">
+                We'll email your audit report and send occasional Airbnb optimisation notes. No spam. Unsubscribe anytime.
+              </p>
 
               <button
                 type="submit"
@@ -204,7 +202,7 @@ export function GatePanel({
               </button>
 
               <p className="mt-4 text-xs leading-5 text-muted-foreground">
-                By continuing you agree to our{" "}
+                By submitting, you agree to receive your audit report and occasional Airbnb optimisation emails from Auditable / Santa Catarina Collection. You can unsubscribe at any time. See{" "}
                 <Link
                   to="/terms"
                   className="font-medium text-foreground/80 underline underline-offset-2 hover:text-brand"
@@ -218,7 +216,7 @@ export function GatePanel({
                 >
                   Privacy Policy
                 </Link>
-                . No spam.
+                .
               </p>
 
             </form>

@@ -208,6 +208,7 @@ export async function captureLead(payload: {
   result?: AuditResponse;
   marketingOptIn?: boolean;
   consentTimestamp?: string;
+  consentText?: string;
   source?: string;
 }): Promise<void> {
   await postBestEffort("/api/capture-lead", payload, "captureLead");

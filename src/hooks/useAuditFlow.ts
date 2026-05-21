@@ -164,12 +164,12 @@ export function useAuditFlow() {
 
   const submitEmail = useCallback(
     async (
-      value: string | { email: string; marketingOptIn?: boolean },
+      value: string | { email: string; marketingOptIn?: boolean; consentText?: string; consentSource?: string },
     ) => {
       const payload =
         typeof value === "string"
-          ? { email: value, marketingOptIn: false }
-          : { email: value.email, marketingOptIn: !!value.marketingOptIn };
+          ? { email: value, marketingOptIn: false, consentText: undefined, consentSource: undefined }
+          : { email: value.email, marketingOptIn: !!value.marketingOptIn, consentText: value.consentText, consentSource: value.consentSource };
       setEmail(payload.email);
       setNeedsEmail(false);
       // Email collected post-audit. Log to Sheet + trigger report email.
@@ -186,7 +186,8 @@ export function useAuditFlow() {
           result: data,
           marketingOptIn: payload.marketingOptIn,
           consentTimestamp: new Date().toISOString(),
-          source: "gate_panel",
+          consentText: payload.consentText,
+          source: payload.consentSource ?? "gate_panel",
         });
       }
     },
