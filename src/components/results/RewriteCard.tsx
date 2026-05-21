@@ -10,12 +10,6 @@ import type {
 
 const TONE_ORDER: RewriteTone[] = ["Concise", "Premium", "Warm"];
 
-type Intent =
-  | "Adding section"
-  | "Added specifics"
-  | "Tightened"
-  | "Restructured";
-
 type SafetyState = "ready" | "confirm";
 
 const PLACEHOLDER_RX = /\[[^\]]+\]/;
@@ -41,18 +35,28 @@ function SafetyPill({ state }: { state: SafetyState }) {
   );
 }
 
-function deriveIntent(current: string, recommended: string): Intent {
-  const cur = current.trim().length;
-  const rec = recommended.trim().length;
-  if (cur === 0 || (cur > 0 && rec >= cur * 2.5)) return "Adding section";
-  const ratio = rec / cur;
-  if (ratio < 0.75) return "Tightened";
-  if (ratio > 1.4) return "Added specifics";
-  return "Restructured";
-}
-
 function isEffectivelyEmpty(current: string): boolean {
   return current.trim().length < 60;
+}
+
+function RewriteParagraphs({ text }: { text: string }) {
+  const paragraphs = text.split(/\n\n+/).filter(Boolean);
+  if (paragraphs.length <= 1) {
+    return (
+      <p className="whitespace-pre-line text-[15px] leading-[1.8] text-foreground">
+        {text}
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {paragraphs.map((para, i) => (
+        <p key={i} className="whitespace-pre-line text-[15px] leading-[1.8] text-foreground">
+          {para}
+        </p>
+      ))}
+    </div>
+  );
 }
 
 function CurrentBlock({ current }: { current: string }) {
@@ -61,11 +65,11 @@ function CurrentBlock({ current }: { current: string }) {
   return (
     <div
       className={`rounded-xl border p-4 ${
-        empty || sparse ? "border-dashed bg-muted/30" : "bg-muted/40"
+        empty || sparse ? "border-dashed bg-muted/20" : "border-border/60 bg-muted/20"
       }`}
     >
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/60">
           Current
         </span>
         {sparse && (
@@ -80,11 +84,11 @@ function CurrentBlock({ current }: { current: string }) {
         )}
       </div>
       {empty ? (
-        <p className="mt-2 text-[13.5px] italic text-muted-foreground">
+        <p className="mt-2 text-[13px] italic text-muted-foreground/70">
           This section isn't filled in on your listing.
         </p>
       ) : (
-        <p className="mt-2 whitespace-pre-line text-[13.5px] leading-7 text-foreground">
+        <p className="mt-2 whitespace-pre-line text-[13px] leading-[1.65] text-muted-foreground">
           {current}
         </p>
       )}
@@ -123,67 +127,50 @@ function KeepAsIsBlock({ why, sectionMissing }: { why?: string; sectionMissing?:
   );
 }
 
-function DiagnosisBlock({
-  why,
-  isAdd,
-}: {
-  why: string;
-  isAdd: boolean;
-}) {
+function WhatChangedNote({ why, isAdd }: { why: string; isAdd: boolean }) {
   return (
-    <div className="rounded-xl border bg-card p-4">
-      <div className="flex items-center gap-2">
-        <Lightbulb className="h-3.5 w-3.5 text-muted-foreground" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-          {isAdd ? "What this draft adds" : "Changes in this rewrite"}
+    <div className="flex items-start gap-2 pt-1">
+      <Lightbulb className="mt-0.5 h-3.5 w-3.5 flex-none text-muted-foreground/50" />
+      <div>
+        <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/55">
+          {isAdd ? "What this adds" : "What changed"}
         </span>
+        <p className="mt-0.5 text-[12.5px] leading-[1.6] text-muted-foreground">
+          {why}
+        </p>
       </div>
-      <p className="mt-2 whitespace-pre-line text-[13.5px] leading-7 text-foreground">
-        {why}
-      </p>
     </div>
-  );
-}
-
-function IntentBadge({ intent }: { intent: Intent }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-      {intent}
-    </span>
   );
 }
 
 function RecommendedBlock({
   text,
   toneLabel,
-  intent,
   isAdd,
   toneWhy,
 }: {
   text: string;
   toneLabel?: string;
-  intent: Intent;
   isAdd: boolean;
   toneWhy?: string;
 }) {
   const safety = detectSafety(text);
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-card">
+    <div className="rounded-xl border border-brand/20 bg-card p-5 shadow-card">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Sparkles className="h-3.5 w-3.5 text-brand" />
-          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
+          <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-brand">
             {isAdd ? "Suggested" : "Recommended"}
             {toneLabel ? ` · ${toneLabel}` : ""}
           </span>
-          <IntentBadge intent={intent} />
           <SafetyPill state={safety} />
         </div>
         <CopyButton value={text} />
       </div>
-      <p className="mt-2 whitespace-pre-line text-[14px] leading-7 text-foreground">
-        {text}
-      </p>
+      <div className="mt-3">
+        <RewriteParagraphs text={text} />
+      </div>
       {safety === "confirm" && (
         <p className="mt-3 text-[12px] leading-5 text-warning">
           Items in [brackets] are placeholders. Confirm or remove each one before publishing.
@@ -278,23 +265,23 @@ export function MultiToneRewriteCard({
   }
 
   const isAdd = !current || current.trim().length === 0;
-  const intent = deriveIntent(current, active.text);
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_3fr]">
       <CurrentBlock current={current} />
-      <ToneSwitcher
-        options={opts}
-        activeTone={activeTone}
-        onSelect={setActiveTone}
-      />
-      <RecommendedBlock
-        text={active.text}
-        toneLabel={active.tone}
-        intent={intent}
-        isAdd={isAdd}
-        toneWhy={active.why}
-      />
+      <div className="space-y-3">
+        <ToneSwitcher
+          options={opts}
+          activeTone={activeTone}
+          onSelect={setActiveTone}
+        />
+        <RecommendedBlock
+          text={active.text}
+          toneLabel={active.tone}
+          isAdd={isAdd}
+          toneWhy={active.why}
+        />
+      </div>
     </div>
   );
 }
@@ -320,13 +307,14 @@ export function SingleRewriteCard({
   }
 
   const isAdd = !current || current.trim().length === 0;
-  const intent = deriveIntent(current, rewrite.text);
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_3fr]">
       <CurrentBlock current={current} />
-      {rewrite.why && <DiagnosisBlock why={rewrite.why} isAdd={isAdd} />}
-      <RecommendedBlock text={rewrite.text} intent={intent} isAdd={isAdd} />
+      <div className="space-y-3">
+        <RecommendedBlock text={rewrite.text} isAdd={isAdd} />
+        {rewrite.why && <WhatChangedNote why={rewrite.why} isAdd={isAdd} />}
+      </div>
     </div>
   );
 }
