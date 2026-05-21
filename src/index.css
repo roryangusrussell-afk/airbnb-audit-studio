@@ -121,9 +121,31 @@
   }
   /* Keep audit cards intact across page breaks where possible. */
   .rounded-2xl,
-  .rounded-xl {
+  .rounded-xl,
+  .rounded-\[20px\],
+  .rounded-\[24px\] {
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+  /* Protect rows (score breakdown, fix-in-order, lists) from splitting and duplicating. */
+  ol li,
+  ul li,
+  li.break-inside-avoid,
+  .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Keep section headings with their first item. */
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  /* Avoid orphan group headings (Primary drag / Supporting signals etc). */
+  .text-\[10\.5px\].uppercase {
+    break-after: avoid;
+    page-break-after: avoid;
   }
   /* Each top-level print section starts on a fresh page. */
   .print-section {

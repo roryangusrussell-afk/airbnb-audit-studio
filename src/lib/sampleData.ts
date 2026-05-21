@@ -66,7 +66,7 @@ export const sampleAudit: AuditResponse = {
       title: "Lead with parking in the title",
       fix: "Light-filled 1BR in Cais do Sodré with private parking",
       whyItMatters:
-        "Guests filtering on parking see your title before they open the listing",
+        "Guests filtering for parking see your title before they open the listing.",
       where: "Listing editor > Title",
     },
     {
@@ -74,32 +74,43 @@ export const sampleAudit: AuditResponse = {
       area: "Photos",
       difficulty: "Easy",
       tier: "quick_win",
-      title: "Add captions to all 28 photos",
-      fix: "Write one sentence per photo naming the room and one feature, e.g. Living room with south-facing balcony and city views",
+      title: "Add a parking proof photo",
+      fix: "Add one clear shot of the private parking space within the first 5-8 images. Caption: 'Private parking space included, rare for Cais do Sodré.'",
       whyItMatters:
-        "None of your 28 photos have captions. Airbnb indexes them for search matching",
+        "Private parking is the listing's rarest differentiator and appears repeatedly in reviews, but guests cannot see it in the gallery.",
       where: "Listing editor > Photos",
     },
     {
       rank: "03",
+      area: "Photos",
+      difficulty: "Easy",
+      tier: "quick_win",
+      title: "Add captions to all 28 photos",
+      fix: "Write one sentence per photo naming the room and one visible feature, e.g. 'Living room with south-facing balcony and city views.'",
+      whyItMatters:
+        "Captions help Airbnb and guests understand what each photo proves.",
+      where: "Listing editor > Photos",
+    },
+    {
+      rank: "04",
       area: "Description",
       difficulty: "Medium",
       tier: "quick_win",
       title: "Break description into subsections",
       fix: "Restructure into four paragraphs: The space / The balcony and parking / The neighbourhood / Good to know",
       whyItMatters:
-        "Flat structure is hard to scan on mobile and undersells the balcony and parking",
+        "A flat block is harder to scan on mobile and undersells balcony, parking and location.",
       where: "Listing editor > About this space",
     },
     {
-      rank: "04",
+      rank: "05",
       area: "Overview",
       difficulty: "Easy",
       tier: "refinement",
-      title: "Move parking to opening line",
-      fix: "Start with: A light-filled apartment with a private parking space and south-facing balcony in Cais do Sodré",
+      title: "Move parking to the opening line",
+      fix: "Start with: A light-filled apartment with a private parking space and south-facing balcony in Cais do Sodré.",
       whyItMatters:
-        "Parking currently appears in paragraph three. Most guests read only the first two lines",
+        "Parking currently appears too late. Put the rarest differentiator in the first visible lines.",
       where: "Listing editor > About this space",
     },
   ],
@@ -145,7 +156,7 @@ export const sampleAudit: AuditResponse = {
   isGuestFavorite: true,
   guestFavoriteTier: "Top 5%",
   summary:
-    "This listing reads as a base for travellers who want to be in the heart of Lisbon's nightlife and food scene with the rare luxury of a private parking space. The promise is delivering: 4.87 across 94 reviews, Guest Favourite status, 5.0 communication, and 4.9 location and cleanliness. Recent reviews mention the parking by name.\n\nThe fundamental tension is that the rarest signal on this listing, private parking in Cais do Sodré, is invisible above the fold. The title doesn't mention it, and the first photo doesn't show it. The shift worth making is treating parking as the primary differentiator, not a footnote in paragraph three.",
+    "A strong Lisbon base with rare private parking. Reviews prove the stay delivers, but the listing does not make parking visible enough before guests click.\n\nThe fundamental tension is that the rarest signal on this listing, private parking in Cais do Sodré, is invisible above the fold. The title doesn't mention it, and the first photo doesn't show it. The shift worth making is treating parking as the primary differentiator, not a footnote in paragraph three.",
   start: [
     {
       title: "Add parking to the title",
@@ -265,8 +276,8 @@ export const sampleAudit: AuditResponse = {
     },
     theSpace: {
       keepAsIs: false,
-      text: "Two bedrooms with double beds, hotel-quality linens, and a sofa bed in the living room for a fourth guest. Open-plan living and dining area with a glass dining table for 4. Fully fitted kitchen with oven, induction hob, microwave, coffee machine, kettle, and toaster. All cookware and cutlery provided. Bathroom with walk-in shower, marble-effect tiles, and fresh towels. Air conditioning throughout. Flat-screen TV and console table workspace. Professionally cleaned and sanitized before each stay. Fresh toiletries, shower gel, shampoo, and basic supplies provided on arrival.",
-      why: "Removes 'Welcome to our home', 'peaceful retreat', and generic adjectives. Leads with room count and sleeping arrangements (key for families). Adds specific kitchen appliances and workspace detail visible in photos. Factual and scannable.",
+      text: "One bedroom with [confirm bed size] and hotel-quality linens. [Confirm whether the sofa in the living room is a sofa bed.] Open-plan living and dining area. Fully fitted kitchen with [confirm specific appliances visible in photos]. Bathroom with walk-in shower and fresh towels. Air conditioning throughout. [Confirm whether a dedicated desk/workspace is set up.] Professionally cleaned before each stay.",
+      why: "Removes 'Welcome to our home' and generic adjectives. Bracketed placeholders mark every detail the audit cannot verify from the scrape: bed size, sofa-bed status, specific appliances and workspace. Confirm or remove each before publishing.",
     },
     guestAccess: {
       keepAsIs: false,

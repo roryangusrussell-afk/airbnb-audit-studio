@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { CheckCircle2, Lightbulb, Sparkles } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Lightbulb, Sparkles } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
 import type {
   MultiToneRewrite,
@@ -15,6 +15,31 @@ type Intent =
   | "Added specifics"
   | "Tightened"
   | "Restructured";
+
+type SafetyState = "ready" | "confirm";
+
+const PLACEHOLDER_RX = /\[[^\]]+\]/;
+
+function detectSafety(text: string): SafetyState {
+  return PLACEHOLDER_RX.test(text) ? "confirm" : "ready";
+}
+
+function SafetyPill({ state }: { state: SafetyState }) {
+  if (state === "ready") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-success-border bg-success-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-success">
+        <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+        Ready to copy
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-warning-border bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-warning">
+      <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+      Confirm first
+    </span>
+  );
+}
 
 function deriveIntent(current: string, recommended: string): Intent {
   const cur = current.trim().length;
@@ -126,6 +151,7 @@ function RecommendedBlock({
   isAdd: boolean;
   toneWhy?: string;
 }) {
+  const safety = detectSafety(text);
   return (
     <div className="rounded-xl border bg-card p-4 shadow-card">
       <div className="flex items-center justify-between gap-2">
@@ -136,12 +162,18 @@ function RecommendedBlock({
             {toneLabel ? ` · ${toneLabel}` : ""}
           </span>
           <IntentBadge intent={intent} />
+          <SafetyPill state={safety} />
         </div>
         <CopyButton value={text} />
       </div>
       <p className="mt-2 whitespace-pre-line text-[14px] leading-7 text-foreground">
         {text}
       </p>
+      {safety === "confirm" && (
+        <p className="mt-3 text-[12px] leading-5 text-warning">
+          Items in [brackets] are placeholders. Confirm or remove each one before publishing.
+        </p>
+      )}
       {toneWhy && toneLabel && (
         <p className="mt-3 border-t pt-3 text-[12.5px] leading-6 text-muted-foreground">
           <span className="font-semibold text-foreground">

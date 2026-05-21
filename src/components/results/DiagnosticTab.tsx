@@ -15,6 +15,8 @@ import {
   Type as TypeIcon,
   FileText,
   ListChecks,
+  Zap,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
@@ -49,6 +51,7 @@ const CARDS: CardDef[] = [
   { id: "houseRules", label: "House rules", area: "HouseRules", rewriteKey: "houseRules", rewriteKind: "single" },
   { id: "photos", label: "Photos", area: "Photos", rewriteKind: "none" },
   { id: "reviews", label: "Reviews & rating", area: "Reviews & rating", rewriteKind: "none" },
+  { id: "conversion", label: "Conversion signals", area: "Conversion Signals", rewriteKind: "none" },
 ];
 
 function getCurrentText(area: string, data: AuditResponse): string {
@@ -494,12 +497,47 @@ function DiagnosticSection({
             <FixCard key={f.rank + f.title} fix={f} />
           ))}
         </div>
+      ) : isReviewsArea && hasReviewData ? (
+        <div className="mt-5 space-y-3">
+          <div className="rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
+            No critical fixes in this category. Reviews are performing well.
+          </div>
+          <OptionalReplyCard />
+        </div>
       ) : (
         <div className="mt-5 rounded-xl border bg-muted/40 p-4 text-sm text-muted-foreground">
           No recommended fixes in this category. This area is performing well.
         </div>
       )}
     </>
+  );
+}
+
+function OptionalReplyCard() {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[10.5px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            Optional
+          </div>
+          <h4 className="mt-1 text-[14.5px] font-semibold leading-snug text-foreground">
+            Reply to recent reviews that mention parking
+          </h4>
+        </div>
+        <span className="inline-flex shrink-0 items-center rounded-full border border-border bg-muted px-2.5 py-1 text-[10.5px] font-semibold text-muted-foreground">
+          Low effort
+        </span>
+      </div>
+      <p className="mt-2 text-[12.5px] leading-[1.5] text-muted-foreground">
+        Guests already validate the parking and location. Short public replies can reinforce those
+        signals for future guests scanning reviews.
+      </p>
+      <div className="mt-3 rounded-xl border bg-muted/40 px-3.5 py-3 text-[12.5px] leading-[1.5] text-foreground">
+        "Thanks for staying with us, glad the private parking and Cais do Sodré location made the
+        trip easier."
+      </div>
+    </div>
   );
 }
 
@@ -648,6 +686,46 @@ function buildMetrics(area: string, data: AuditResponse): Metric[] {
         value: `${r}%`,
         label: "Response rate",
         note: r >= 90 ? "Above benchmark" : "Below benchmark",
+        noteTone: r >= 90 ? "good" : "warn",
+      });
+    }
+    return out;
+  }
+  if (area === "Conversion Signals") {
+    const ibCheck = data.checks?.find((c) => c.label === "Instant Book enabled");
+    const ibOn = ibCheck?.ok === true;
+    const ibUnknown = ibCheck?.ok === "unknown" || ibCheck == null;
+    const gfCheck = data.checks?.find((c) => c.label === "Guest Favourite status");
+    const gfOn = gfCheck?.ok === true;
+    const out: Metric[] = [
+      {
+        Icon: Zap,
+        iconBg: ibOn ? "bg-success-soft" : ibUnknown ? "bg-muted" : "bg-warning-soft",
+        iconText: ibOn ? "text-success" : ibUnknown ? "text-muted-foreground" : "text-warning",
+        value: ibOn ? "On" : ibUnknown ? "Unknown" : "Off",
+        label: "Instant Book",
+        note: ibOn ? "15-25% ranking boost active" : ibUnknown ? "Could not detect" : "Missing 15-25% ranking boost",
+        noteTone: ibOn ? "good" : "warn",
+      },
+      {
+        Icon: TrendingUp,
+        iconBg: gfOn ? "bg-success-soft" : "bg-muted",
+        iconText: gfOn ? "text-success" : "text-muted-foreground",
+        value: gfOn ? (data.guestFavoriteTier ?? "Yes") : "No",
+        label: "Guest Favourite",
+        note: gfOn ? "Primary quality signal in 2026 algorithm" : "Not yet achieved",
+        noteTone: gfOn ? "good" : "warn",
+      },
+    ];
+    if (typeof data.hostMessageResponseRate === "number") {
+      const r = data.hostMessageResponseRate;
+      out.push({
+        Icon: Clock,
+        iconBg: r >= 90 ? "bg-success-soft" : "bg-warning-soft",
+        iconText: r >= 90 ? "text-success" : "text-warning",
+        value: `${r}%`,
+        label: "Response rate",
+        note: r >= 90 ? "Above Airbnb benchmark" : "Below Airbnb benchmark",
         noteTone: r >= 90 ? "good" : "warn",
       });
     }

@@ -51,9 +51,9 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
             <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
-              See exactly what your Airbnb listing should{" "}
+              Make your listing readable to{" "}
               <span className="relative inline-block whitespace-nowrap">
-                fix first
+                Airbnb's AI
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 100 10"
@@ -72,8 +72,7 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
               <span className="text-brand">.</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Paste your listing URL. We score 6 categories, flag the highest-impact gaps,
-              and write the rewrites for you. Free, in under a minute.
+              Paste your Airbnb URL. We check what the new AI features can see, what they miss, and what you should rewrite first.
             </p>
 
             <div className="mt-8 max-w-xl space-y-3">

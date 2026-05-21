@@ -17,7 +17,7 @@ interface ColumnConfig {
 
 const CONFIG: Record<Variant, ColumnConfig> = {
   strengths: {
-    label: "Strengths",
+    label: "What's working",
     Icon: Award,
     cardBg: "bg-[#F4FCF8]",
     cardBorder: "border-[#CFEFDC]",
@@ -27,17 +27,17 @@ const CONFIG: Record<Variant, ColumnConfig> = {
     itemIconFallbackText: "text-success",
   },
   gaps: {
-    label: "Gaps & Risks",
+    label: "What's holding it back",
     Icon: AlertTriangle,
-    cardBg: "bg-[#FFF9EE]",
-    cardBorder: "border-[#F7DDA8]",
-    headerText: "text-warning",
+    cardBg: "bg-[#FFF4F4]",
+    cardBorder: "border-danger-border",
+    headerText: "text-danger",
     headerIconBg: "bg-white",
-    itemIconFallbackBg: "bg-warning-soft",
-    itemIconFallbackText: "text-warning",
+    itemIconFallbackBg: "bg-danger-soft",
+    itemIconFallbackText: "text-danger",
   },
   leverage: {
-    label: "Untapped Leverage",
+    label: "Hidden upside",
     Icon: TrendingUp,
     cardBg: "bg-[#F4F8FF]",
     cardBorder: "border-[#D6E4FF]",
@@ -114,19 +114,29 @@ function deriveFallback(data: AuditResponse): {
   return { strengths, gaps, leverage };
 }
 
-export function PerformancePattern({ data }: { data: AuditResponse }) {
+export function PerformancePattern({
+  data,
+  withHeader = false,
+}: {
+  data: AuditResponse;
+  withHeader?: boolean;
+}) {
   const pattern = data.performancePattern ?? deriveFallback(data);
 
   return (
     <section>
-      <h3 className="text-[18px] font-semibold tracking-[-0.01em] text-[#1F1F24]">
-        Performance pattern
-      </h3>
-      <p className="mt-1 text-[13.5px] text-[#6D6E78]">
-        A synthesis of the main signals helping and holding back this listing.
-      </p>
+      {withHeader && (
+        <>
+          <h3 className="text-[18px] font-semibold tracking-[-0.01em] text-[#1F1F24]">
+            Performance pattern
+          </h3>
+          <p className="mt-1 text-[13.5px] text-[#6D6E78]">
+            A synthesis of the main signals helping and holding back this listing.
+          </p>
+        </>
+      )}
 
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className={`grid grid-cols-1 gap-4 lg:grid-cols-3 ${withHeader ? "mt-4" : ""}`}>
         <PatternColumn variant="strengths" items={pattern.strengths} />
         <PatternColumn variant="gaps" items={pattern.gaps} />
         <PatternColumn variant="leverage" items={pattern.leverage} />

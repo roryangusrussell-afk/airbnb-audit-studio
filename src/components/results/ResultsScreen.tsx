@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, FileText, Search, Wrench, Download } from "lucide-react";
+import { ArrowLeft, FileText, Search, Wrench, Download, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListingCard } from "./ListingCard";
 import { BottomTenRiskBanner } from "./BottomTenRiskBanner";
 import { SummaryTab } from "./SummaryTab";
+import { DiagnosticsTab } from "./DiagnosticsTab";
 import { DiagnosticTab } from "./DiagnosticTab";
 import { NextStepTab } from "./NextStepTab";
 import { GatePanel, GateSubmitPayload } from "./GatePanel";
 import type { AuditResponse } from "@/lib/types";
+
+type TabKey = "summary" | "diagnostics" | "breakdown" | "next";
 
 export function ResultsScreen({
   data,
@@ -24,10 +27,9 @@ export function ResultsScreen({
   topSlot?: React.ReactNode;
 }) {
   const [printMode, setPrintMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabKey>("summary");
   const isGated = !email && !!onSubmitEmail;
 
-  // When entering print mode, give React a tick to render the expanded view
-  // before opening the print dialog. afterprint flips back to the tabbed view.
   useEffect(() => {
     if (!printMode) return;
     const t = setTimeout(() => window.print(), 120);
@@ -87,6 +89,9 @@ export function ResultsScreen({
           <PrintSection title="Summary">
             <SummaryTab data={data} instant />
           </PrintSection>
+          <PrintSection title="Diagnostics">
+            <DiagnosticsTab data={data} />
+          </PrintSection>
           <PrintSection title="Breakdown">
             <DiagnosticTab data={data} printMode />
           </PrintSection>
@@ -95,7 +100,11 @@ export function ResultsScreen({
           </PrintSection>
         </div>
       ) : (
-        <Tabs defaultValue="summary" className="mt-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as TabKey)}
+          className="mt-4"
+        >
           <TabsList className="h-auto w-full justify-center gap-1 rounded-[16px] border bg-card p-1 shadow-card sm:w-auto" data-print-hide>
             <TabsTrigger
               value="summary"
@@ -105,7 +114,14 @@ export function ResultsScreen({
               Summary
             </TabsTrigger>
             <TabsTrigger
-              value="diagnostic"
+              value="diagnostics"
+              className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
+            >
+              <Stethoscope className="h-3.5 w-3.5" />
+              Diagnostics
+            </TabsTrigger>
+            <TabsTrigger
+              value="breakdown"
               className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
             >
               <Search className="h-3.5 w-3.5" />
@@ -120,9 +136,12 @@ export function ResultsScreen({
             </TabsTrigger>
           </TabsList>
           <TabsContent value="summary" className="mt-3">
-            <SummaryTab data={data} />
+            <SummaryTab data={data} onGoToDiagnostics={() => setActiveTab("diagnostics")} />
           </TabsContent>
-          <TabsContent value="diagnostic" className="mt-3">
+          <TabsContent value="diagnostics" className="mt-3">
+            <DiagnosticsTab data={data} />
+          </TabsContent>
+          <TabsContent value="breakdown" className="mt-3">
             <DiagnosticTab data={data} />
           </TabsContent>
           <TabsContent value="next" className="mt-3">

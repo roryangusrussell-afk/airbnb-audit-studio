@@ -10,6 +10,7 @@ import {
   AlertCircle,
   MapPin,
   ShieldCheck,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 
@@ -19,7 +20,8 @@ export type CategoryKey =
   | "Description"
   | "Amenities"
   | "Photos"
-  | "Reviews & rating";
+  | "Reviews & rating"
+  | "Conversion Signals";
 
 export interface CategoryMeta {
   icon: LucideIcon;
@@ -97,6 +99,12 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     iconText: "text-success",
     iconBg: "bg-success-soft",
     subtext: "Social proof, sentiment, and trust",
+  },
+  "Conversion Signals": {
+    icon: TrendingUp,
+    iconText: "text-brand",
+    iconBg: "bg-brand-soft",
+    subtext: "Instant Book, Guest Favourite, and response metrics",
   },
 };
 

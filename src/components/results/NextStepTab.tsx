@@ -76,8 +76,8 @@ function ManagementPrimary() {
     <PrimaryCard
       eyebrow="Portugal property management"
       icon={Home}
-      title="Want help improving or managing this listing?"
-      body="Your audit gives us a head start. We can review the listing, pricing, guest experience, and operations to see where the biggest upside is."
+      title="Want a Lisbon operator to review the upside?"
+      body="Your audit gives us a head start. We can review the listing, pricing, guest experience and operations to see where the biggest upside is."
       supporting="Best for Lisbon hosts or owners who want a more hands-on operator."
       ctaLabel="Check management fit"
       href={SCC_MANAGEMENT_URL}

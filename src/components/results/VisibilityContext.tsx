@@ -11,7 +11,7 @@ const FACTORS = [
   },
   {
     label: "Pricing vs. your market",
-    detail: "Airbnb ranks lower-priced comparable listings higher. Tools like PriceLabs or Beyond give you the market context we can't.",
+    detail: "Pricing relative to comparable listings can influence visibility and conversion. Tools like PriceLabs or Beyond give you the market context we can't.",
   },
   {
     label: "Response rate and declines",
