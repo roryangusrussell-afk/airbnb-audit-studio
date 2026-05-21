@@ -183,7 +183,7 @@ function AuditAreasRail({
   activeId: string;
   onSelect: (id: string) => void;
 }) {
-  const renderItem = (c: CardDef, kind: "scored" | "diagnostic") => {
+  const renderItem = (c: CardDef) => {
     const meta = getCategoryMeta(c.area);
     const Icon = meta.icon;
     const isActive = c.id === activeId;
@@ -216,14 +216,7 @@ function AuditAreasRail({
           >
             {c.label}
           </span>
-          {kind === "diagnostic" && (
-            <span
-              className="hidden flex-none px-1 text-[9px] font-medium text-muted-foreground/40 lg:inline-block"
-              title="Diagnostic only: feeds your overall description score, not graded separately"
-            >
-              diag
-            </span>
-          )}
+
           <ChevronRight
             className={`hidden h-3.5 w-3.5 flex-none lg:block ${
               isActive ? "text-brand" : "text-muted-foreground/25"
@@ -249,7 +242,7 @@ function AuditAreasRail({
       {/* Mobile/tablet: a single horizontal scrolling row, no group headings (space-constrained). */}
       <ul className="flex gap-1.5 overflow-x-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden">
         {[...scoredCards, ...diagnosticCards].map((c) =>
-          renderItem(c, catByNameFromCards(scoredCards, c) ? "scored" : "diagnostic"),
+          renderItem(c),
         )}
       </ul>
 
@@ -259,7 +252,7 @@ function AuditAreasRail({
           <>
             {groupHeading("Scored sections")}
             <ul className="space-y-0.5">
-              {scoredCards.map((c) => renderItem(c, "scored"))}
+              {scoredCards.map((c) => renderItem(c))}
             </ul>
           </>
         )}
@@ -267,7 +260,7 @@ function AuditAreasRail({
           <>
             {groupHeading("Description diagnostics")}
             <ul className="space-y-0.5">
-              {diagnosticCards.map((c) => renderItem(c, "diagnostic"))}
+              {diagnosticCards.map((c) => renderItem(c))}
             </ul>
           </>
         )}
@@ -276,9 +269,6 @@ function AuditAreasRail({
   );
 }
 
-function catByNameFromCards(scoredCards: CardDef[], card: CardDef): boolean {
-  return scoredCards.some((s) => s.id === card.id);
-}
 
 function DetailPanel({
   card,
