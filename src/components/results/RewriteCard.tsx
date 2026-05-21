@@ -92,7 +92,22 @@ function CurrentBlock({ current }: { current: string }) {
   );
 }
 
-function KeepAsIsBlock({ why }: { why?: string }) {
+function KeepAsIsBlock({ why, sectionMissing }: { why?: string; sectionMissing?: boolean }) {
+  if (sectionMissing) {
+    return (
+      <div className="rounded-xl border border-warning-border bg-warning-soft p-4">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 text-warning" />
+          <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-warning">
+            Section not filled in
+          </div>
+        </div>
+        {why && (
+          <p className="mt-2 text-[13px] leading-5 text-foreground">{why}</p>
+        )}
+      </div>
+    );
+  }
   return (
     <div className="rounded-xl border border-success-border bg-success-soft p-4">
       <div className="flex items-center gap-2">
@@ -253,7 +268,7 @@ export function MultiToneRewriteCard({
     return (
       <div className="space-y-3">
         <CurrentBlock current={current} />
-        <KeepAsIsBlock why={rewrite.why} />
+        <KeepAsIsBlock why={rewrite.why} sectionMissing={!current || current.trim().length === 0} />
       </div>
     );
   }
@@ -295,7 +310,7 @@ export function SingleRewriteCard({
     return (
       <div className="space-y-3">
         <CurrentBlock current={current} />
-        <KeepAsIsBlock why={rewrite.why} />
+        <KeepAsIsBlock why={rewrite.why} sectionMissing={!current || current.trim().length === 0} />
       </div>
     );
   }

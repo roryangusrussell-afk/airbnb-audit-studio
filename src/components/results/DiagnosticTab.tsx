@@ -379,15 +379,23 @@ function HeaderStatus({
   }
   if (!hasRewrite) return null;
   const isAdd = !rewriteKeepAsIs && currentEmpty;
+  const missingButKept = rewriteKeepAsIs && currentEmpty;
   return (
     <span
       className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
-        rewriteKeepAsIs
+        missingButKept
+          ? "border-warning-border bg-warning-soft text-warning"
+          : rewriteKeepAsIs
           ? "border-success-border bg-success-soft text-success"
           : "border-border bg-card text-foreground"
       }`}
     >
-      {rewriteKeepAsIs ? (
+      {missingButKept ? (
+        <>
+          <AlertTriangle className="h-3.5 w-3.5" />
+          Section missing
+        </>
+      ) : rewriteKeepAsIs ? (
         <>
           <CheckCircle2 className="h-3.5 w-3.5" />
           Keep as is
@@ -954,10 +962,13 @@ const EFFORT_PILL: Record<string, string> = {
   Hard: "bg-danger-soft text-danger border-danger-border",
 };
 
+const COPY_AREAS = new Set(["Title", "Overview", "Description"]);
+
 function FixCard({ fix }: { fix: Fix }) {
   const meta = getCategoryMeta(fix.area);
   const Icon = meta.icon;
   const pill = EFFORT_PILL[fix.difficulty] ?? "bg-muted text-muted-foreground border-border";
+  const fixLabel = COPY_AREAS.has(fix.area) ? "Recommended copy" : "Recommended action";
 
   return (
     <div className="rounded-xl border bg-card p-4 shadow-card">
@@ -994,7 +1005,7 @@ function FixCard({ fix }: { fix: Fix }) {
             <div className="rounded-xl border border-brand-border bg-brand-soft p-3.5">
               <div className="flex items-center justify-between gap-2">
                 <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
-                  Recommended copy
+                  {fixLabel}
                 </div>
                 <CopyButton value={fix.fix} />
               </div>
