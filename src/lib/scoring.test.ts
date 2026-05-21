@@ -29,28 +29,24 @@ describe("scoreBand", () => {
 });
 
 describe("verdictLabel", () => {
-  it("ladders down through every threshold", () => {
-    expect(verdictLabel(80)).toBe("Excellent");
-    expect(verdictLabel(79)).toBe("Strong");
-    expect(verdictLabel(72)).toBe("Strong");
-    expect(verdictLabel(71)).toBe("Solid");
-    expect(verdictLabel(60)).toBe("Solid");
-    expect(verdictLabel(59)).toBe("Needs work");
-    expect(verdictLabel(48)).toBe("Needs work");
-    expect(verdictLabel(47)).toBe("Critical");
-    expect(verdictLabel(0)).toBe("Critical");
+  it("uses three tiers: AI-ready / Room to grow / Leaking visibility", () => {
+    expect(verdictLabel(100)).toBe("AI-ready");
+    expect(verdictLabel(75)).toBe("AI-ready");
+    expect(verdictLabel(74)).toBe("Room to grow");
+    expect(verdictLabel(55)).toBe("Room to grow");
+    expect(verdictLabel(54)).toBe("Leaking visibility");
+    expect(verdictLabel(0)).toBe("Leaking visibility");
   });
 });
 
 describe("diagnosticLabel", () => {
-  it("uses 'Strong listing' at 80+ but otherwise mirrors verdictLabel", () => {
-    expect(diagnosticLabel(95)).toBe("Strong listing");
-    expect(diagnosticLabel(80)).toBe("Strong listing");
-    expect(diagnosticLabel(79)).toBe("Strong");
-    expect(diagnosticLabel(72)).toBe("Strong");
-    expect(diagnosticLabel(60)).toBe("Solid");
-    expect(diagnosticLabel(48)).toBe("Needs work");
-    expect(diagnosticLabel(47)).toBe("Critical");
+  it("mirrors verdictLabel tiers", () => {
+    expect(diagnosticLabel(100)).toBe("AI-ready");
+    expect(diagnosticLabel(75)).toBe("AI-ready");
+    expect(diagnosticLabel(74)).toBe("Room to grow");
+    expect(diagnosticLabel(55)).toBe("Room to grow");
+    expect(diagnosticLabel(54)).toBe("Leaking visibility");
+    expect(diagnosticLabel(0)).toBe("Leaking visibility");
   });
 });
 

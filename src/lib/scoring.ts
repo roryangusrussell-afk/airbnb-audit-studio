@@ -7,20 +7,16 @@ export function scoreBand(n: number): Band {
 }
 
 export function verdictLabel(n: number): string {
-  if (n >= 80) return "Excellent";
-  if (n >= 72) return "Strong";
-  if (n >= 60) return "Solid";
-  if (n >= 48) return "Needs work";
-  return "Critical";
+  if (n >= 75) return "AI-ready";
+  if (n >= 55) return "Room to grow";
+  return "Leaking visibility";
 }
 
 // More diagnostic label used in the score breakdown card.
 export function diagnosticLabel(n: number): string {
-  if (n >= 80) return "Strong listing";
-  if (n >= 72) return "Strong";
-  if (n >= 60) return "Solid";
-  if (n >= 48) return "Needs work";
-  return "Critical";
+  if (n >= 75) return "AI-ready";
+  if (n >= 55) return "Room to grow";
+  return "Leaking visibility";
 }
 
 export function categoryRatingBand(rating: string | number): Band {

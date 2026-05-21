@@ -1,11 +1,11 @@
 import { LegalLayout } from "@/components/LegalLayout";
 
 const Privacy = () => (
-  <LegalLayout title="Privacy Policy" lastUpdated="11 May 2026">
+  <LegalLayout title="Privacy Policy" lastUpdated="21 May 2026">
     <p>
       This policy explains what data Auditable collects, why, and what you can do about it.
       Auditable is operated by Rory Russell, based in Lisbon, Portugal. If you have any questions
-      about anything below, email <a href="mailto:roryangusrussell@gmail.com">roryangusrussell@gmail.com</a>.
+      about anything below, email <a href="mailto:rory@santacatarinacollection.com">rory@santacatarinacollection.com</a>.
     </p>
 
     <h2>What we collect</h2>
@@ -19,8 +19,7 @@ const Privacy = () => (
         report and contact you about issues with this service.
       </li>
       <li>
-        <strong>Audit results</strong> linked to your email so we can answer support questions
-        and improve the tool.
+        <strong>Audit results</strong> linked to your email so we can answer support questions.
       </li>
       <li>
         <strong>Basic usage data</strong> such as page views and referrer, via Vercel Analytics.
@@ -38,7 +37,6 @@ const Privacy = () => (
       <li>To email the audit report to you (transactional, required to deliver the service).</li>
       <li>To reply if you contact us with questions or feedback.</li>
       <li>To send occasional listing-improvement tips, only if you opted in. You can unsubscribe at any time.</li>
-      <li>To improve Auditable's accuracy and fix bugs.</li>
     </ul>
 
     <h2>Legal basis (GDPR)</h2>
@@ -53,11 +51,11 @@ const Privacy = () => (
       We use a small set of trusted processors to run Auditable:
     </p>
     <ul>
-      <li><strong>Vercel</strong>: hosting and analytics.</li>
-      <li><strong>Anthropic</strong>: Claude API for content analysis. Listing text and a small sample of public photo URLs are sent for scoring; data is not used to train models per Anthropic's API terms.</li>
-      <li><strong>Resend</strong>: to deliver the audit report email.</li>
-      <li><strong>Apify</strong>: to fetch the public listing data.</li>
-      <li><strong>Google Sheets</strong>: to log leads and audits for our internal records.</li>
+      <li><strong>Vercel</strong>: hosting and analytics (US; transferred under Standard Contractual Clauses).</li>
+      <li><strong>Anthropic</strong>: AI analysis of listing content. Listing text and a small sample of public photo URLs are sent for scoring; data is not used to train models per Anthropic's API terms (US; transferred under Standard Contractual Clauses).</li>
+      <li><strong>Resend</strong>: to deliver the audit report email (US; transferred under Standard Contractual Clauses).</li>
+      <li><strong>A data fetching service</strong>: to retrieve the public listing page. No personal data is shared beyond the listing URL.</li>
+      <li><strong>Internal records system</strong>: to log audits for support and service improvement.</li>
     </ul>
     <p>
       We do not sell your data. We do not share it with advertisers or data brokers.
@@ -65,7 +63,7 @@ const Privacy = () => (
 
     <h2>How long we keep data</h2>
     <ul>
-      <li>Audit results: indefinitely, unless you ask us to delete them.</li>
+      <li>Audit results: 24 months from your last audit, after which data is anonymised or deleted. You can request deletion at any time.</li>
       <li>Email address: until you ask us to delete it or unsubscribe (in which case the email is removed from marketing lists immediately).</li>
       <li>Server logs: 30 days.</li>
     </ul>
@@ -73,7 +71,7 @@ const Privacy = () => (
     <h2>Your rights</h2>
     <p>
       Under the GDPR you have the right to access, correct, export, and delete your personal data.
-      Email <a href="mailto:roryangusrussell@gmail.com">roryangusrussell@gmail.com</a> with the
+      Email <a href="mailto:rory@santacatarinacollection.com">rory@santacatarinacollection.com</a> with the
       subject line "Data request" and we'll respond within 30 days.
     </p>
     <p>
