@@ -20,24 +20,20 @@ export interface GateSubmitPayload {
 
 const UNLOCK_ITEMS = [
   "Paste-ready rewrites for your title, overview and description",
-  "AI-readability gaps Airbnb may not be able to confirm from your listing",
+  "AI-readability gaps where Airbnb may not be able to confirm key details",
   "Review themes Airbnb may surface before guests read the full reviews",
   "Photo feedback on weak first impressions and missing guest decision cues",
-  "A prioritised fix list ranked by visibility and conversion impact",
+  "A prioritised fix list ranked by visibility and booking impact",
 ];
 
-const FALLBACK_HEADLINE =
-  "Your listing has been checked for AI readability. Enter your email to see the full results.";
-
 function deriveHeadline(data: AuditResponse): string {
-  const summary = data.summary?.trim();
-  if (summary) {
-    const firstSentence = summary.split(/(?<=[.!?])\s+/)[0]?.trim();
-    if (firstSentence && firstSentence.length >= 30 && firstSentence.length <= 200) {
-      return firstSentence;
-    }
-  }
-  return FALLBACK_HEADLINE;
+  const score = data.score;
+  const city = (data.location?.trim() ?? "").split(",")[0].trim() || "your listing";
+
+  if (score >= 80) return `A strong ${city} stay, with a few details worth tightening.`;
+  if (score >= 60) return `A solid ${city} stay, but important details need to be clearer.`;
+  if (score >= 40) return "There's a good stay here, but the listing is making guests work too hard.";
+  return "The listing has potential, but too many key details are hard to find.";
 }
 
 function formatAuditedDate(): string {
@@ -82,7 +78,7 @@ export function GatePanel({
       {/* Top header row */}
       <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <p className="text-xs font-bold uppercase tracking-[0.28em] text-muted-foreground">
-          Your AI readability report
+          Your audit report
         </p>
         {onAuditAnother && !confirmReset && (
           <button
@@ -132,7 +128,7 @@ export function GatePanel({
               {headline}
             </h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground">
-              We've checked what Airbnb's AI can understand from your listing, where key details may be missed, and which rewrites are most likely to improve visibility and conversion.
+              We've checked what Airbnb's AI can understand from your listing, where key details may be missed, and which rewrites are most likely to improve visibility and bookings.
             </p>
           </div>
         </div>
