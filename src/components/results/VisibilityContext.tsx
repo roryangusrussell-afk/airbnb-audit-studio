@@ -7,7 +7,7 @@ const FACTORS = [
   },
   {
     label: "Instant Book and minimum nights",
-    detail: "Instant Book receives a direct ranking boost. High minimum nights cut filter eligibility for short trips.",
+    detail: "Instant Book gives a direct ranking boost, but its on/off state is not exposed to any external tool, so we can't read it from your listing. High minimum nights also cut filter eligibility for short trips.",
   },
   {
     label: "Pricing vs. your market",

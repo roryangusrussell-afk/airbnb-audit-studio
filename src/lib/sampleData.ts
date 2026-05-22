@@ -34,7 +34,6 @@ export const sampleAudit: AuditResponse = {
     { ok: false, label: "Workspace or desk declared" },
     { ok: false, label: "Photo captions look human-written" },
     { ok: true, label: "Review count 10 or above" },
-    { ok: "unknown", label: "Instant Book enabled" },
     { ok: true, label: "Guest Favourite status" },
     { ok: "unknown", label: "Flexible or moderate cancellation" },
   ],

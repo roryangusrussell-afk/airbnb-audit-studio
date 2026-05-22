@@ -15,7 +15,6 @@ import {
   Type as TypeIcon,
   FileText,
   ListChecks,
-  Zap,
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
@@ -693,21 +692,13 @@ function buildMetrics(area: string, data: AuditResponse): Metric[] {
     return out;
   }
   if (area === "Conversion Signals") {
-    const ibCheck = data.checks?.find((c) => c.label === "Instant Book enabled");
-    const ibOn = ibCheck?.ok === true;
-    const ibUnknown = ibCheck?.ok === "unknown" || ibCheck == null;
+    // Instant Book is intentionally not shown: its status cannot be detected
+    // for a public listing (gated behind a logged-in Airbnb session), so we
+    // never display it rather than show a permanent "Unknown". See the backend
+    // handler NOTE + instant-book-detection-research-brief.md.
     const gfCheck = data.checks?.find((c) => c.label === "Guest Favourite status");
     const gfOn = gfCheck?.ok === true;
     const out: Metric[] = [
-      {
-        Icon: Zap,
-        iconBg: ibOn ? "bg-success-soft" : ibUnknown ? "bg-muted" : "bg-warning-soft",
-        iconText: ibOn ? "text-success" : ibUnknown ? "text-muted-foreground" : "text-warning",
-        value: ibOn ? "On" : ibUnknown ? "Unknown" : "Off",
-        label: "Instant Book",
-        note: ibOn ? "15-25% ranking boost active" : ibUnknown ? "Could not detect" : "Missing 15-25% ranking boost",
-        noteTone: ibOn ? "good" : "warn",
-      },
       {
         Icon: TrendingUp,
         iconBg: gfOn ? "bg-success-soft" : "bg-muted",

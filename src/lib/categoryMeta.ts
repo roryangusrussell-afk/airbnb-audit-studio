@@ -104,7 +104,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     icon: TrendingUp,
     iconText: "text-brand",
     iconBg: "bg-brand-soft",
-    subtext: "Instant Book, Guest Favourite, and response metrics",
+    subtext: "Guest Favourite and response metrics",
   },
 };
 
