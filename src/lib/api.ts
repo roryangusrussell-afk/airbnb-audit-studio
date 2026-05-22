@@ -106,7 +106,12 @@ export async function runAudit(url: string): Promise<AuditResponse> {
           throw err;
         }
         if (status >= 500) {
-          lastError = new AuditError(`Audit failed (${status}). Please try again.`, status, errorText);
+          // 503 is the backend's "AI provider at capacity" signal: surface its
+          // friendly, specific message directly instead of the generic line, so
+          // the user sees "high demand, try again in a minute" rather than a raw
+          // provider error. Other 5xx keep the generic message.
+          const message = status === 503 ? errorText : `Audit failed (${status}). Please try again.`;
+          lastError = new AuditError(message, status, errorText);
           console.error("[runAudit] body-5xx", { url, attempt, status, errorText });
           if (attempt < MAX_ATTEMPTS) {
             await new Promise(r => setTimeout(r, 2000));
