@@ -73,6 +73,16 @@ export async function runAudit(url: string): Promise<AuditResponse> {
         console.error("[runAudit] 403", { url, attempt });
         throw err;
       }
+      if (res.status === 422) {
+        const detail = await readBodySnippet(res);
+        const err = new AuditError(
+          "This listing could not be found. Check the URL is public and try again.",
+          422,
+          detail,
+        );
+        console.error("[runAudit] 422", { url, attempt, detail });
+        throw err;
+      }
       if (res.status >= 400 && res.status < 500) {
         const detail = await readBodySnippet(res);
         const err = new AuditError(`Audit failed (${res.status}). Please try again.`, res.status, detail);
@@ -225,12 +235,17 @@ export async function redeemRef(email: string, refCode: string): Promise<void> {
   await postBestEffort("/api/redeem-ref", { refereeEmail: email, refCode }, "redeemRef");
 }
 
-export async function checkCredits(
-  identity: { refCode: string } | { email: string },
-): Promise<number> {
-  const param = "refCode" in identity
-    ? `refCode=${encodeURIComponent(identity.refCode)}`
-    : `email=${encodeURIComponent(identity.email)}`;
+type CreditIdentity = string | { refCode: string } | { email: string };
+
+function normalizeCreditIdentity(identity: CreditIdentity): { refCode: string } | { email: string } {
+  return typeof identity === "string" ? { email: identity } : identity;
+}
+
+export async function checkCredits(identity: CreditIdentity): Promise<number> {
+  const normalized = normalizeCreditIdentity(identity);
+  const param = "refCode" in normalized
+    ? `refCode=${encodeURIComponent(normalized.refCode)}`
+    : `email=${encodeURIComponent(normalized.email)}`;
   try {
     const res = await fetch(`${BASE}/api/check-credits?${param}`, {
       headers: authHeaders(),
@@ -243,14 +258,13 @@ export async function checkCredits(
   }
 }
 
-export async function useCredit(
-  identity: { refCode: string } | { email: string },
-): Promise<{ ok: boolean; remaining?: number }> {
+export async function useCredit(identity: CreditIdentity): Promise<{ ok: boolean; remaining?: number }> {
+  const normalized = normalizeCreditIdentity(identity);
   try {
     const res = await fetch(`${BASE}/api/use-credit`, {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify(identity),
+      body: JSON.stringify(normalized),
     });
     if (!res.ok) return { ok: false };
     const data = (await res.json()) as { ok?: boolean; remaining?: number };

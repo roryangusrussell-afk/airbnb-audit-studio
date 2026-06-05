@@ -233,7 +233,7 @@ describe("fire-and-forget endpoints", () => {
     await redeemRef("a@b.com", "REF1");
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toContain("/api/redeem-ref");
-    expect(JSON.parse(init.body)).toEqual({ email: "a@b.com", refCode: "REF1" });
+    expect(JSON.parse(init.body)).toEqual({ refereeEmail: "a@b.com", refCode: "REF1" });
   });
 
   it("useCredit posts to /api/use-credit", async () => {
@@ -251,7 +251,7 @@ describe("fire-and-forget endpoints", () => {
     await expect(sendReport({ email: "a@b.com", listingId: "1", score: 80, title: "T" })).resolves.toBeUndefined();
     await expect(captureLead({ email: "a@b.com", url: URL })).resolves.toBeUndefined();
     await expect(redeemRef("a@b.com", "REF1")).resolves.toBeUndefined();
-    await expect(useCredit("a@b.com")).resolves.toBeUndefined();
+    await expect(useCredit("a@b.com")).resolves.toEqual({ ok: false });
     await expect(submitFeedback({ listingId: "1", rating: "good" })).resolves.toBeUndefined();
   });
 });

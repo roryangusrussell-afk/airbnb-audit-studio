@@ -204,15 +204,17 @@ describe("useAuditFlow", () => {
     expect(redeemRef).toHaveBeenCalledTimes(1);
   });
 
-  it("opens the credit gate after 5 free audits and skips runAudit", async () => {
-    localStorage.setItem("auditsRun", "5");
+  it("opens the paywall after the free audit is used and no credits remain", async () => {
+    localStorage.setItem("freeAuditUsed", "1");
+    localStorage.setItem("auditEmail", "host@example.com");
+    checkCredits.mockResolvedValueOnce(0);
     const { result } = renderHook(() => useAuditFlow());
 
     await act(async () => {
       await result.current.submitUrl(URL);
     });
 
-    expect(result.current.creditGateOpen).toBe(true);
+    expect(result.current.status).toBe("paywall");
     expect(runAudit).not.toHaveBeenCalled();
   });
 
@@ -335,16 +337,18 @@ describe("useAuditFlow", () => {
     await waitFor(() => expect(result.current.peekData).toEqual(peek));
   });
 
-  it("closeCreditGate dismisses the gate", async () => {
-    localStorage.setItem("auditsRun", "5");
+  it("reset leaves the paywall and returns to landing", async () => {
+    localStorage.setItem("freeAuditUsed", "1");
+    localStorage.setItem("auditEmail", "host@example.com");
+    checkCredits.mockResolvedValueOnce(0);
     const { result } = renderHook(() => useAuditFlow());
 
     await act(async () => {
       await result.current.submitUrl(URL);
     });
-    expect(result.current.creditGateOpen).toBe(true);
+    expect(result.current.status).toBe("paywall");
 
-    act(() => result.current.closeCreditGate());
-    expect(result.current.creditGateOpen).toBe(false);
+    act(() => result.current.reset());
+    expect(result.current.status).toBe("landing");
   });
 });

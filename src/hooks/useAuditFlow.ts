@@ -6,7 +6,7 @@ import {
   peekListing,
   redeemRef,
   runAudit,
-  useCredit,
+  useCredit as consumeCredit,
 } from "@/lib/api";
 import type { PeekData } from "@/lib/api";
 import type { AuditResponse } from "@/lib/types";
@@ -78,7 +78,7 @@ export function useAuditFlow() {
         // we know the audit succeeded.
         if (consumingCreditRef.current && withEmail) {
           consumingCreditRef.current = false;
-          useCredit({ email: withEmail }).catch(() => {});
+          consumeCredit({ email: withEmail }).catch(() => {});
         }
 
         // Log to Sheet only if we already have an email. Without one,
