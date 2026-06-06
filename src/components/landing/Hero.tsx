@@ -7,23 +7,23 @@ import { PreviewPanel } from "./PreviewPanel";
 const trustItems = [
   {
     icon: BadgeCheck,
-    title: "Operator built",
-    body: "Built by hosts who run listings every day.",
+    title: "Built by an operator",
+    body: "Rory runs STR listings in Lisbon. The rubric is what he uses on his own properties.",
   },
   {
     icon: Sparkles,
-    title: "Impact first",
-    body: "We focus on what moves rankings and bookings.",
+    title: "Most listings score under 65",
+    body: "The average audit surfaces 3 high-priority gaps. Most hosts fix the top two in under an hour.",
   },
   {
     icon: Lock,
-    title: "Private & secure",
-    body: "Read-only audit. We never edit your listing.",
+    title: "Read-only. Nothing is changed.",
+    body: "We read your public listing. We never log in, never edit, never store your URL.",
   },
   {
     icon: Zap,
-    title: "Fast & actionable",
-    body: "Full report with copy-ready fixes in under a minute.",
+    title: "Free, then €15 per audit",
+    body: "First audit is free after email. Each additional audit is €15, or €39 for five.",
   },
 ];
 
@@ -51,9 +51,9 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
             <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
-              Make your listing readable to{" "}
+              Find out what's{" "}
               <span className="relative inline-block whitespace-nowrap">
-                Airbnb's AI
+                actually holding back
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 100 10"
@@ -68,11 +68,11 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
                     fill="none"
                   />
                 </svg>
-              </span>
-              <span className="text-brand">.</span>
+              </span>{" "}
+              your Airbnb listing<span className="text-brand">.</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Paste your Airbnb URL. We check what the new AI features can see, what they miss, and what you should rewrite first.
+              Paste your listing URL. We score your title, photos, description, amenities, and reviews — then send you paste-ready rewrites you can drop straight into Airbnb. First audit is free.
             </p>
 
             <div className="mt-8 max-w-xl space-y-3">

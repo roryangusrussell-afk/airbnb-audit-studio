@@ -43,15 +43,14 @@ export function PaywallScreen({
           </span>
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand">
-              No audits left
+              Free audit used
             </div>
             <h1 className="mt-2 text-[26px] font-bold tracking-tight text-foreground sm:text-[30px]">
-              You've used your free audit
+              Your report is saved. Ready for the next listing?
             </h1>
             <p className="mx-auto mt-2.5 max-w-[46ch] text-[14px] leading-6 text-muted-foreground">
-              Your first audit is saved. To check another listing, buy more
-              credits below, or book a free strategy call to talk through your
-              results.
+              Book a free call to go through your results together, or buy
+              credits to audit more listings at €15 each.
             </p>
           </div>
           <div className="mt-1 inline-flex items-center gap-3 rounded-[12px] bg-muted/40 px-4 py-2.5 text-left">
@@ -90,15 +89,15 @@ export function PaywallScreen({
             <span className="min-w-0 flex-1 text-left">
               <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                 <span className="text-[15.5px] font-bold text-foreground">
-                  Book a free 30-min strategy call
+                  Book a free 30-min call with Rory
                 </span>
                 <span className="inline-flex items-center rounded-full bg-brand px-2 py-[2px] text-[10px] font-bold uppercase tracking-[0.1em] text-brand-foreground">
                   Free
                 </span>
               </span>
               <span className="mt-1.5 block text-[12.5px] leading-relaxed text-muted-foreground">
-                Review your first audit, identify the highest-impact fixes, and
-                decide what to improve first.
+                Go through your audit together, find the two or three fixes that
+                will actually move the needle, and decide whether to go deeper.
               </span>
             </span>
             <ArrowRight className="h-4 w-4 flex-none text-brand transition-transform group-hover:translate-x-0.5" />
@@ -131,8 +130,7 @@ export function PaywallScreen({
                 </span>
               </span>
               <span className="mt-1 block text-[12.5px] leading-relaxed text-muted-foreground">
-                Best value for hosts with multiple listings or a small
-                portfolio.
+                €7.80 per audit. Best for anyone with two or more listings.
               </span>
             </span>
             <ArrowRight className="h-4 w-4 flex-none text-brand transition-transform group-hover:translate-x-0.5" />
@@ -152,7 +150,7 @@ export function PaywallScreen({
                 Buy 1 audit for €15
               </span>
               <span className="mt-1 block text-[12.5px] leading-relaxed text-muted-foreground">
-                One-off credit for checking one more listing.
+                One listing. Same full report, same paste-ready rewrites.
               </span>
             </span>
             <ArrowRight className="h-4 w-4 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5" />

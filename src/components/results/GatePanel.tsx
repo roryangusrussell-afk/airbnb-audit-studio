@@ -24,11 +24,11 @@ const CONSENT_TEXT =
   "By submitting, you agree to receive your audit report and occasional Airbnb optimisation emails from Auditable / Santa Catarina Collection. You can unsubscribe at any time.";
 
 const UNLOCK_ITEMS = [
-  "Paste-ready rewrites for your title, overview and description",
-  "AI-readability gaps where Airbnb may not be able to confirm key details",
-  "Review themes Airbnb may surface before guests read the full reviews",
-  "Photo feedback on weak first impressions and missing guest decision cues",
-  "A prioritised fix list ranked by visibility and booking impact",
+  "Paste-ready rewrites: title (3 options), overview, description, guest access, and house rules",
+  "Priority fix list: what to tackle first, rated by impact and difficulty",
+  "Photo assessment: cover image quality, missing room types, and what guests see before clicking",
+  "Review signal analysis: recurring themes Airbnb surfaces before guests read a single review",
+  "AI readability gaps: where Airbnb's search cannot confirm your listing's key claims",
 ];
 
 function deriveHeadline(data: AuditResponse): string {
@@ -139,13 +139,13 @@ export function GatePanel({
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-muted-foreground">
-              AI Readability Score
+              Listing Score
             </p>
             <h2 className="mt-3 max-w-4xl text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl">
               {headline}
             </h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground">
-              We've checked what Airbnb's AI can understand from your listing, where key details may be missed, and which rewrites are most likely to improve visibility and bookings.
+              We've scored your title, photos, description, amenities, and reviews. Enter your email below to unlock the full report — including paste-ready rewrites for every section and a prioritised fix list.
             </p>
           </div>
         </div>
@@ -156,7 +156,7 @@ export function GatePanel({
           {/* Unlock form */}
           <div className="h-full rounded-2xl border border-border bg-card p-6">
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
-              Get the full fix list
+              Unlock your free report
             </p>
 
             <form onSubmit={handle} noValidate>
