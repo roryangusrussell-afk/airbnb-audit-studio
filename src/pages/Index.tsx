@@ -1,4 +1,5 @@
 import { Hero } from "@/components/landing/Hero";
+import { DiagnosisPreview } from "@/components/landing/DiagnosisPreview";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { ResultsScreen } from "@/components/results/ResultsScreen";
@@ -16,7 +17,12 @@ const Index = () => {
     <main className="flex min-h-screen flex-col bg-background">
       {credits != null && <CreditBadge credits={credits} />}
       <div className="flex-1">
-        {flow.status === "landing" && <Hero onSubmit={flow.submitUrl} />}
+        {flow.status === "landing" && (
+          <>
+            <Hero onSubmit={flow.submitUrl} />
+            <DiagnosisPreview />
+          </>
+        )}
         {flow.status === "loading" && <LoadingScreen url={flow.url} peek={flow.peekData} />}
         {flow.status === "error" && (
           <ErrorScreen message={flow.error} detail={flow.errorDetail} onRetry={flow.retry} onReset={flow.reset} />
