@@ -93,7 +93,22 @@ export function LockedReport({
           {sentence && (
             <p className="text-[13.5px] leading-[1.55] text-muted-foreground">{sentence}</p>
           )}
-          <div className="mt-auto rounded-2xl border border-dashed border-border bg-muted/30 p-4">
+          {/* Desktop only: fills the gap left by the taller unlock column. On
+              mobile the layout stacks, so this would just duplicate the photo
+              in the listing card above. */}
+          {data.thumbnail ? (
+            <div className="hidden min-h-[180px] flex-1 overflow-hidden rounded-2xl border border-border bg-muted lg:block">
+              <img
+                src={data.thumbnail}
+                alt={data.title}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="hidden flex-1 lg:block" aria-hidden="true" />
+          )}
+          <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-4">
             <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
               <Lock className="h-3 w-3" strokeWidth={2.5} aria-hidden="true" />
               The diagnosis is free

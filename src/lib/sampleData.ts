@@ -1,10 +1,12 @@
 import type { AuditResponse } from "./types";
+import heroApartment from "@/assets/hero-apartment.jpeg";
 
 export const sampleAudit: AuditResponse = {
   score: 71,
   verdict: "Strong reviews held back by a buried parking USP.",
   title: "Light-filled 1BR flat with balcony & private parking in Cais do Sodré",
   location: "Lisbon, Portugal",
+  thumbnail: heroApartment,
   overview:
     "A beautifully designed one-bedroom apartment in the heart of Cais do Sodré, with a south-facing balcony and one of the few private parking spaces in the neighbourhood.",
   description:
