@@ -8,37 +8,66 @@ import { SummaryTab } from "./SummaryTab";
 import { DiagnosticsTab } from "./DiagnosticsTab";
 import { DiagnosticTab } from "./DiagnosticTab";
 import { NextStepTab } from "./NextStepTab";
-import { GatePanel, GateSubmitPayload } from "./GatePanel";
+import { GateSubmitPayload } from "./GatePanel";
+import { LockedReport } from "./LockedReport";
+import type { FixPlanTier } from "./FixPlanUnlock";
+import { EmailGateModal } from "@/components/EmailGateModal";
 import type { AuditResponse } from "@/lib/types";
 
 type TabKey = "summary" | "diagnostics" | "breakdown" | "next";
+
+const FREE_SUMMARY_CONSENT =
+  "By submitting, you agree to receive your free audit summary and occasional Airbnb optimisation emails from Auditable / Santa Catarina Collection. You can unsubscribe at any time.";
 
 export function ResultsScreen({
   data,
   email,
   onAuditAnother,
   onSubmitEmail,
+  onCheckout,
+  locked = false,
   topSlot,
 }: {
   data: AuditResponse;
   email: string;
   onAuditAnother: () => void;
   onSubmitEmail?: (payload: GateSubmitPayload) => void;
+  onCheckout?: (tier: FixPlanTier) => void;
+  locked?: boolean;
   topSlot?: React.ReactNode;
 }) {
   const [activeTab, setActiveTab] = useState<TabKey>("summary");
-  const isGated = !email && !!onSubmitEmail;
+  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
 
-  if (isGated) {
+  // Locked: free diagnosis shown, fixes gated behind the Fix Plan.
+  if (locked) {
     return (
-      <div className="min-h-full">
-        {topSlot}
-        <GatePanel
+      <>
+        <LockedReport
           data={data}
-          onSubmit={onSubmitEmail!}
+          topSlot={topSlot}
           onAuditAnother={onAuditAnother}
+          onCheckout={onCheckout ?? (() => {})}
+          onEmailSummary={onSubmitEmail ? () => setSummaryModalOpen(true) : undefined}
         />
-      </div>
+        <EmailGateModal
+          open={summaryModalOpen}
+          onOpenChange={setSummaryModalOpen}
+          title="Email me the free summary"
+          description="We'll send your score and headline diagnosis so you can pick this back up later. The full Fix Plan stays available to unlock whenever you're ready."
+          cta="Send my free summary"
+          dismissLabel="Cancel"
+          onSubmit={(em) => {
+            onSubmitEmail?.({
+              email: em,
+              marketingOptIn: true,
+              consentText: FREE_SUMMARY_CONSENT,
+              consentSource: "free_summary",
+            });
+            setSummaryModalOpen(false);
+          }}
+        />
+      </>
     );
   }
 

@@ -204,18 +204,26 @@ describe("useAuditFlow", () => {
     expect(redeemRef).toHaveBeenCalledTimes(1);
   });
 
-  it("opens the paywall after the free audit is used and no credits remain", async () => {
+  it("runs the audit even after a prior free audit (no repeat-audit paywall; fixes are gated instead)", async () => {
     localStorage.setItem("freeAuditUsed", "1");
     localStorage.setItem("auditEmail", "host@example.com");
-    checkCredits.mockResolvedValueOnce(0);
     const { result } = renderHook(() => useAuditFlow());
 
     await act(async () => {
       await result.current.submitUrl(URL);
     });
 
-    expect(result.current.status).toBe("paywall");
-    expect(runAudit).not.toHaveBeenCalled();
+    expect(result.current.status).toBe("results");
+    expect(runAudit).toHaveBeenCalledTimes(1);
+  });
+
+  it("defaults to locked (unlocked=false) and flips unlocked when ?unlock=1 is present", async () => {
+    const lockedHook = renderHook(() => useAuditFlow());
+    expect(lockedHook.result.current.unlocked).toBe(false);
+
+    setLocation({ hostname: "example.com", search: "?unlock=1" });
+    const unlockedHook = renderHook(() => useAuditFlow());
+    expect(unlockedHook.result.current.unlocked).toBe(true);
   });
 
   it("bypasses the cap on localhost", async () => {
@@ -337,16 +345,14 @@ describe("useAuditFlow", () => {
     await waitFor(() => expect(result.current.peekData).toEqual(peek));
   });
 
-  it("reset leaves the paywall and returns to landing", async () => {
-    localStorage.setItem("freeAuditUsed", "1");
+  it("reset returns to landing after a completed audit", async () => {
     localStorage.setItem("auditEmail", "host@example.com");
-    checkCredits.mockResolvedValueOnce(0);
     const { result } = renderHook(() => useAuditFlow());
 
     await act(async () => {
       await result.current.submitUrl(URL);
     });
-    expect(result.current.status).toBe("paywall");
+    expect(result.current.status).toBe("results");
 
     act(() => result.current.reset());
     expect(result.current.status).toBe("landing");

@@ -1,13 +1,17 @@
+import { Lock } from "lucide-react";
 import { getCategoryMeta } from "@/lib/categoryMeta";
+import { getCategoryUnlock } from "@/lib/categoryUnlocks";
 import { scoreBand, bandTextClass, bandBgClass } from "@/lib/scoring";
 import type { Cat } from "@/lib/types";
 
 interface Props {
   cats: Cat[];
   score: number;
+  /** Locked report: show the per-category "unlock includes" line under each finding. */
+  locked?: boolean;
 }
 
-export function WhyScoreCard({ cats, score }: Props) {
+export function WhyScoreCard({ cats, score, locked = false }: Props) {
   const ordered = [...cats].sort((a, b) => a.score - b.score);
   const split = Math.min(3, Math.floor(ordered.length / 2));
   const primary = ordered.slice(0, split);
@@ -27,7 +31,7 @@ export function WhyScoreCard({ cats, score }: Props) {
           <GroupHeading label="Primary drag" />
           <ul className="mt-1 divide-y divide-border">
             {primary.map((cat) => (
-              <ScoreBarRow key={cat.name} cat={cat} />
+              <ScoreBarRow key={cat.name} cat={cat} locked={locked} />
             ))}
           </ul>
         </div>
@@ -38,7 +42,7 @@ export function WhyScoreCard({ cats, score }: Props) {
           <GroupHeading label="Supporting signals" />
           <ul className="mt-1 divide-y divide-border">
             {supporting.map((cat) => (
-              <ScoreBarRow key={cat.name} cat={cat} />
+              <ScoreBarRow key={cat.name} cat={cat} locked={locked} />
             ))}
           </ul>
         </div>
@@ -55,7 +59,7 @@ function GroupHeading({ label }: { label: string }) {
   );
 }
 
-function ScoreBarRow({ cat }: { cat: Cat }) {
+function ScoreBarRow({ cat, locked = false }: { cat: Cat; locked?: boolean }) {
   const band = scoreBand(cat.score);
   const meta = getCategoryMeta(cat.name);
   const Icon = meta.icon;
@@ -63,8 +67,8 @@ function ScoreBarRow({ cat }: { cat: Cat }) {
   const fillCls = bandBgClass(band);
 
   return (
-    <li className="grid grid-cols-[132px_minmax(0,1fr)_52px] items-center gap-3 break-inside-avoid py-3 sm:gap-4">
-      <div className="flex min-w-0 items-center gap-2.5">
+    <li className="grid grid-cols-[132px_minmax(0,1fr)_52px] items-start gap-3 break-inside-avoid py-3 sm:gap-4">
+      <div className="flex min-w-0 items-center gap-2.5 pt-0.5">
         <span
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] ${meta.iconBg}`}
         >
@@ -86,9 +90,18 @@ function ScoreBarRow({ cat }: { cat: Cat }) {
             }}
           />
         </div>
+        {locked && (
+          <div className="mt-2 flex items-start gap-1.5">
+            <Lock className="mt-0.5 h-3 w-3 shrink-0 text-brand" strokeWidth={2.5} aria-hidden="true" />
+            <span className="text-[11.5px] leading-[1.4] text-brand">
+              <span className="font-semibold">Unlock includes:</span>{" "}
+              <span className="text-muted-foreground">{getCategoryUnlock(cat.name)}</span>
+            </span>
+          </div>
+        )}
       </div>
 
-      <div className={`shrink-0 text-right text-[14px] font-bold tabular-nums ${textCls}`}>
+      <div className={`shrink-0 pt-0.5 text-right text-[14px] font-bold tabular-nums ${textCls}`}>
         {cat.score}
         <span className="ml-0.5 text-[11px] font-normal text-muted-foreground">/100</span>
       </div>

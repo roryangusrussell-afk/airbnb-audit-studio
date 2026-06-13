@@ -36,6 +36,8 @@ const Index = () => {
             email={flow.email}
             onAuditAnother={flow.reset}
             onSubmitEmail={flow.submitEmail}
+            onCheckout={flow.startCheckout}
+            locked={!flow.unlocked}
           />
         )}
       </div>

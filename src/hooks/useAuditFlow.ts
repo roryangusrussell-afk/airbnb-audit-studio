@@ -12,11 +12,21 @@ import type { PeekData } from "@/lib/api";
 import type { AuditResponse } from "@/lib/types";
 
 export type FlowStatus = "landing" | "loading" | "results" | "error" | "paywall";
+export type FixPlanTier = "single" | "portfolio";
 
 const EMAIL_KEY = "auditEmail";
 const PENDING_REF_KEY = "pendingRef";
 const AUDITS_RUN_KEY = "auditsRun";
 const FREE_AUDIT_USED_KEY = "freeAuditUsed";
+
+// Stripe Payment Links. PLACEHOLDERS for now: these are the old EUR links.
+// Phase 2 replaces them with the USD one-time products ($19 single / $49
+// portfolio) and wires the webhook so payment unlocks the report automatically.
+// See PAYWALL_REDESIGN.md.
+const STRIPE_CHECKOUT_URLS: Record<FixPlanTier, string> = {
+  single: "https://buy.stripe.com/14AeVfamFg2KbVQgGVaMU00",
+  portfolio: "https://buy.stripe.com/bJe3cx1Q94k22lgbmBaMU01",
+};
 
 export function useAuditFlow() {
   const [status, setStatus] = useState<FlowStatus>("landing");
@@ -30,13 +40,16 @@ export function useAuditFlow() {
   const [errorDetail, setErrorDetail] = useState<string>("");
   const [needsEmail, setNeedsEmail] = useState(false);
   const [creditGateOpen, setCreditGateOpen] = useState(false);
+  // Drives the locked vs full report. Defaults locked; flipped by a successful
+  // unlock (Phase 2 webhook) or the ?unlock=1 dev/demo override below.
+  const [unlocked, setUnlocked] = useState(false);
   const completedCountRef = useRef(0);
   const pendingUrlRef = useRef<string>("");
   // Set when the current audit is consuming a paid credit (audit 2+ after free).
   // Drives the post-success useCredit decrement.
   const consumingCreditRef = useRef(false);
 
-  // Capture ?ref= on first load
+  // Capture ?ref= and ?unlock= on first load
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -44,6 +57,14 @@ export function useAuditFlow() {
     if (ref) {
       localStorage.setItem(PENDING_REF_KEY, ref);
     }
+    if (params.get("unlock") === "1") {
+      setUnlocked(true);
+    }
+  }, []);
+
+  const startCheckout = useCallback((tier: FixPlanTier) => {
+    if (typeof window === "undefined") return;
+    window.open(STRIPE_CHECKOUT_URLS[tier], "_blank", "noopener,noreferrer");
   }, []);
 
   const setEmail = useCallback((value: string) => {
@@ -133,30 +154,10 @@ export function useAuditFlow() {
 
       const storedEmail =
         typeof window !== "undefined" ? localStorage.getItem(EMAIL_KEY) : "";
-      const freeUsed =
-        typeof window !== "undefined" &&
-        localStorage.getItem(FREE_AUDIT_USED_KEY) === "1";
 
-      // Audit 2+: must have an email and a positive credit balance.
-      // Audit 1 (no free used yet) is always allowed; email is captured
-      // post-audit via the GatePanel.
-      if (freeUsed && storedEmail) {
-        // Pre-load the peek so the paywall can show the listing context
-        peekListing(auditUrl).then(d => { if (d) setPeekData(d); });
-        const credits = await checkCredits({ email: storedEmail });
-        if (credits < 1) {
-          setStatus("paywall");
-          return;
-        }
-        consumingCreditRef.current = true;
-      } else if (freeUsed && !storedEmail) {
-        // Free already used on this browser but we have no email to charge
-        // against. This only happens if the user cleared their email but not
-        // freeAuditUsed. Send them to the paywall too, they can email Rory.
-        setStatus("paywall");
-        return;
-      }
-
+      // The audit is always free. Monetisation now happens at the fix reveal
+      // (LockedReport / FixPlanUnlock), not by gating repeat audits. Every
+      // submission runs the audit and lands on the locked report.
       await performAudit(auditUrl, storedEmail || "");
     },
     [performAudit],
@@ -223,8 +224,10 @@ export function useAuditFlow() {
     errorDetail,
     needsEmail,
     creditGateOpen,
+    unlocked,
     submitUrl,
     submitEmail,
+    startCheckout,
     reset,
     retry,
     closeCreditGate: () => setCreditGateOpen(false),
