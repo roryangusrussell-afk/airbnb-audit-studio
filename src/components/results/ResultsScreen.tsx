@@ -25,6 +25,8 @@ export function ResultsScreen({
   onAuditAnother,
   onSubmitEmail,
   onCheckout,
+  onUseCredit,
+  creditsRemaining = 0,
   locked = false,
   topSlot,
 }: {
@@ -33,6 +35,8 @@ export function ResultsScreen({
   onAuditAnother: () => void;
   onSubmitEmail?: (payload: GateSubmitPayload) => void;
   onCheckout?: (tier: FixPlanTier) => void;
+  onUseCredit?: () => void;
+  creditsRemaining?: number;
   locked?: boolean;
   topSlot?: React.ReactNode;
 }) {
@@ -48,6 +52,8 @@ export function ResultsScreen({
           topSlot={topSlot}
           onAuditAnother={onAuditAnother}
           onCheckout={onCheckout ?? (() => {})}
+          onUseCredit={onUseCredit}
+          creditsRemaining={creditsRemaining}
           onEmailSummary={onSubmitEmail ? () => setSummaryModalOpen(true) : undefined}
         />
         <EmailGateModal

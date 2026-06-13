@@ -37,6 +37,8 @@ const Index = () => {
             onAuditAnother={flow.reset}
             onSubmitEmail={flow.submitEmail}
             onCheckout={flow.startCheckout}
+            onUseCredit={flow.useFixPlanCredit}
+            creditsRemaining={flow.creditsRemaining}
             locked={!flow.unlocked}
           />
         )}

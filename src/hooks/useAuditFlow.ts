@@ -2,11 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AuditError,
   captureLead,
-  checkCredits,
+  createCheckout,
   peekListing,
   redeemRef,
   runAudit,
-  useCredit as consumeCredit,
+  verifyCheckout,
 } from "@/lib/api";
 import type { PeekData } from "@/lib/api";
 import type { AuditResponse } from "@/lib/types";
@@ -17,16 +17,45 @@ export type FixPlanTier = "single" | "portfolio";
 const EMAIL_KEY = "auditEmail";
 const PENDING_REF_KEY = "pendingRef";
 const AUDITS_RUN_KEY = "auditsRun";
-const FREE_AUDIT_USED_KEY = "freeAuditUsed";
+// Local unlock tracking (cosmetic gate, v1). The Stripe webhook is the durable
+// record; these keep the same-browser experience consistent across refreshes.
+const UNLOCKED_LISTINGS_KEY = "unlockedListings"; // string[] of unlocked listingIds
+const PACK_CREDITS_KEY = "fixPlanCredits"; // remaining portfolio-pack unlocks
+const PENDING_UNLOCK_KEY = "pendingUnlockAudit"; // {url,data} cached before Stripe redirect
 
-// Stripe Payment Links. PLACEHOLDERS for now: these are the old EUR links.
-// Phase 2 replaces them with the USD one-time products ($19 single / $49
-// portfolio) and wires the webhook so payment unlocks the report automatically.
-// See PAYWALL_REDESIGN.md.
-const STRIPE_CHECKOUT_URLS: Record<FixPlanTier, string> = {
-  single: "https://buy.stripe.com/14AeVfamFg2KbVQgGVaMU00",
-  portfolio: "https://buy.stripe.com/bJe3cx1Q94k22lgbmBaMU01",
-};
+function readUnlockedListings(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const v = JSON.parse(localStorage.getItem(UNLOCKED_LISTINGS_KEY) || "[]");
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+
+function isListingUnlocked(id?: string): boolean {
+  return !!id && readUnlockedListings().includes(id);
+}
+
+function markListingUnlocked(id?: string): void {
+  if (!id || typeof window === "undefined") return;
+  const list = readUnlockedListings();
+  if (!list.includes(id)) {
+    list.push(id);
+    localStorage.setItem(UNLOCKED_LISTINGS_KEY, JSON.stringify(list));
+  }
+}
+
+function readPackCredits(): number {
+  if (typeof window === "undefined") return 0;
+  const n = parseInt(localStorage.getItem(PACK_CREDITS_KEY) || "0", 10);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function writePackCredits(n: number): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(PACK_CREDITS_KEY, String(Math.max(0, n)));
+}
 
 export function useAuditFlow() {
   const [status, setStatus] = useState<FlowStatus>("landing");
@@ -40,32 +69,118 @@ export function useAuditFlow() {
   const [errorDetail, setErrorDetail] = useState<string>("");
   const [needsEmail, setNeedsEmail] = useState(false);
   const [creditGateOpen, setCreditGateOpen] = useState(false);
-  // Drives the locked vs full report. Defaults locked; flipped by a successful
-  // unlock (Phase 2 webhook) or the ?unlock=1 dev/demo override below.
+  // Drives the locked vs full report for the current listing. Set by performAudit
+  // (already unlocked?), the checkout return, or the ?unlock=1 dev override.
   const [unlocked, setUnlocked] = useState(false);
+  // Remaining portfolio-pack unlocks the buyer can spend on other listings.
+  const [creditsRemaining, setCreditsRemaining] = useState(0);
   const completedCountRef = useRef(0);
   const pendingUrlRef = useRef<string>("");
-  // Set when the current audit is consuming a paid credit (audit 2+ after free).
-  // Drives the post-success useCredit decrement.
-  const consumingCreditRef = useRef(false);
+  // Forces unlocked regardless of listing; set by the ?unlock=1 dev/demo override.
+  const devUnlockRef = useRef(false);
 
-  // Capture ?ref= and ?unlock= on first load
+  // First load: capture ?ref=, honour ?unlock=1, restore pack credits, and
+  // handle the Stripe success return (?fixplan=success&session_id=...).
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
+
     const ref = params.get("ref");
-    if (ref) {
-      localStorage.setItem(PENDING_REF_KEY, ref);
-    }
+    if (ref) localStorage.setItem(PENDING_REF_KEY, ref);
+
     if (params.get("unlock") === "1") {
+      devUnlockRef.current = true;
       setUnlocked(true);
+    }
+
+    setCreditsRemaining(readPackCredits());
+
+    if (params.get("fixplan") === "success") {
+      const sessionId = params.get("session_id") || "";
+      (async () => {
+        // Restore the cached report (locked) so the buyer always lands on it.
+        let cached: { url?: string; data?: AuditResponse } | null = null;
+        try {
+          const raw = localStorage.getItem(PENDING_UNLOCK_KEY);
+          cached = raw ? JSON.parse(raw) : null;
+        } catch {
+          cached = null;
+        }
+        if (cached?.data) {
+          setData(cached.data);
+          setUrl(cached.url || "");
+          pendingUrlRef.current = cached.url || "";
+          setStatus("results");
+        }
+
+        if (sessionId) {
+          const v = await verifyCheckout(sessionId);
+          if (v?.paid) {
+            const listingId = cached?.data?.listingId || v.listingId;
+            markListingUnlocked(listingId);
+            setUnlocked(true);
+            if (v.email) {
+              setEmailState(v.email);
+              localStorage.setItem(EMAIL_KEY, v.email);
+            }
+            // Portfolio pack: bank the unlocks beyond the one just used.
+            const granted =
+              typeof v.credits === "number" && v.credits > 0
+                ? v.credits
+                : v.plan === "portfolio"
+                ? 10
+                : 1;
+            if (granted > 1) {
+              const remaining = readPackCredits() + (granted - 1);
+              writePackCredits(remaining);
+              setCreditsRemaining(remaining);
+            }
+            localStorage.removeItem(PENDING_UNLOCK_KEY);
+          }
+        }
+
+        // Strip the success params so a refresh doesn't reprocess them.
+        const clean = new URL(window.location.href);
+        clean.searchParams.delete("fixplan");
+        clean.searchParams.delete("session_id");
+        window.history.replaceState({}, "", clean.toString());
+      })();
     }
   }, []);
 
-  const startCheckout = useCallback((tier: FixPlanTier) => {
-    if (typeof window === "undefined") return;
-    window.open(STRIPE_CHECKOUT_URLS[tier], "_blank", "noopener,noreferrer");
-  }, []);
+  const startCheckout = useCallback(
+    async (tier: FixPlanTier) => {
+      if (typeof window === "undefined") return;
+      // Preserve the current report so we can restore and unlock it on return.
+      if (data) {
+        try {
+          localStorage.setItem(
+            PENDING_UNLOCK_KEY,
+            JSON.stringify({ url: pendingUrlRef.current || url, data }),
+          );
+        } catch {
+          // localStorage quota; the report will simply re-run if needed.
+        }
+      }
+      const checkout = await createCheckout({ plan: tier, listingId: data?.listingId });
+      if (checkout?.url) {
+        window.location.href = checkout.url;
+      } else {
+        console.error("[startCheckout] could not create checkout session");
+      }
+    },
+    [data, url],
+  );
+
+  // Spend a banked portfolio-pack unlock on the current listing.
+  const useFixPlanCredit = useCallback(() => {
+    if (creditsRemaining <= 0 || !data?.listingId) return;
+    markListingUnlocked(data.listingId);
+    const remaining = creditsRemaining - 1;
+    writePackCredits(remaining);
+    setCreditsRemaining(remaining);
+    setUnlocked(true);
+  }, [creditsRemaining, data]);
 
   const setEmail = useCallback((value: string) => {
     setEmailState(value);
@@ -85,21 +200,13 @@ export function useAuditFlow() {
         const result = await runAudit(auditUrl);
         setData(result);
         setStatus("results");
+        // Unlock if this listing was already paid for, or the dev override is on.
+        setUnlocked(devUnlockRef.current || isListingUnlocked(result.listingId));
         completedCountRef.current += 1;
 
         if (typeof window !== "undefined") {
           const prev = parseInt(localStorage.getItem(AUDITS_RUN_KEY) || "0", 10) || 0;
           localStorage.setItem(AUDITS_RUN_KEY, String(prev + 1));
-          // First successful audit consumes the free allowance for this browser.
-          // From here on, audit 2+ requires a credit on the email.
-          localStorage.setItem(FREE_AUDIT_USED_KEY, "1");
-        }
-
-        // If this audit consumed a paid credit, decrement the ledger now that
-        // we know the audit succeeded.
-        if (consumingCreditRef.current && withEmail) {
-          consumingCreditRef.current = false;
-          consumeCredit({ email: withEmail }).catch(() => {});
         }
 
         // Log to Sheet only if we already have an email. Without one,
@@ -128,9 +235,6 @@ export function useAuditFlow() {
           }
         }
       } catch (err) {
-        // Reset the consuming flag so a failed audit doesn't burn the credit
-        // on retry, since useCredit was never called.
-        consumingCreditRef.current = false;
         const msg =
           err instanceof AuditError
             ? err.message
@@ -202,7 +306,7 @@ export function useAuditFlow() {
     setErrorDetail("");
     setUrl("");
     setPeekData(null);
-    consumingCreditRef.current = false;
+    setUnlocked(devUnlockRef.current);
     pendingUrlRef.current = "";
   }, []);
 
@@ -225,9 +329,11 @@ export function useAuditFlow() {
     needsEmail,
     creditGateOpen,
     unlocked,
+    creditsRemaining,
     submitUrl,
     submitEmail,
     startCheckout,
+    useFixPlanCredit,
     reset,
     retry,
     closeCreditGate: () => setCreditGateOpen(false),

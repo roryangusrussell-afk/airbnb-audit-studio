@@ -283,3 +283,53 @@ export async function submitFeedback(payload: {
 }): Promise<void> {
   await postBestEffort("/api/feedback", payload, "submitFeedback");
 }
+
+// Create a Stripe Checkout session for a Fix Plan purchase and return its URL.
+// The backend sets the success_url back to the app root with
+// ?fixplan=success&session_id=..., which verifyCheckout then confirms.
+export async function createCheckout(payload: {
+  plan: "single" | "portfolio";
+  listingId?: string;
+  attribution?: Record<string, string>;
+}): Promise<{ url: string } | null> {
+  try {
+    const res = await fetch(`${BASE}/api/create-checkout`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const detail = await readBodySnippet(res);
+      console.warn("[createCheckout] non-OK", { status: res.status, detail });
+      return null;
+    }
+    const data = (await res.json()) as { url?: string };
+    return data.url ? { url: data.url } : null;
+  } catch (err) {
+    console.warn("[createCheckout] failed", (err as Error)?.message);
+    return null;
+  }
+}
+
+export interface CheckoutVerification {
+  paid: boolean;
+  email?: string;
+  plan?: string;
+  credits?: number;
+  listingId?: string;
+}
+
+// Confirm a Stripe Checkout session is paid (same-session unlock after the
+// success redirect). Returns null on any failure so the caller stays locked.
+export async function verifyCheckout(sessionId: string): Promise<CheckoutVerification | null> {
+  try {
+    const res = await fetch(
+      `${BASE}/api/verify-checkout?session_id=${encodeURIComponent(sessionId)}`,
+      { headers: authHeaders() },
+    );
+    if (!res.ok) return null;
+    return (await res.json()) as CheckoutVerification;
+  } catch {
+    return null;
+  }
+}

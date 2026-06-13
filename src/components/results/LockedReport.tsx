@@ -35,12 +35,16 @@ function scrollToUnlock() {
 export function LockedReport({
   data,
   onCheckout,
+  onUseCredit,
+  creditsRemaining = 0,
   onEmailSummary,
   onAuditAnother,
   topSlot,
 }: {
   data: AuditResponse;
   onCheckout: (tier: FixPlanTier) => void;
+  onUseCredit?: () => void;
+  creditsRemaining?: number;
   onEmailSummary?: () => void;
   onAuditAnother: () => void;
   topSlot?: React.ReactNode;
@@ -101,7 +105,12 @@ export function LockedReport({
           </div>
         </div>
 
-        <FixPlanUnlock onCheckout={onCheckout} onEmailSummary={onEmailSummary} />
+        <FixPlanUnlock
+          onCheckout={onCheckout}
+          onUseCredit={onUseCredit}
+          creditsRemaining={creditsRemaining}
+          onEmailSummary={onEmailSummary}
+        />
       </section>
 
       {/* Why the score is N, with per-category unlock locks */}
