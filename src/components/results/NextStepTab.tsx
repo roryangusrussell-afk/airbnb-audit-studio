@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Copy, Gift, CalendarCheck, Home, Tag, Check } from "lucide-react";
+import { ArrowRight, Copy, Gift, CalendarCheck, Home, Search, Check } from "lucide-react";
 import { Eyebrow } from "@/components/Eyebrow";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { submitFeedback } from "@/lib/api";
@@ -8,8 +8,6 @@ import { isPortugalListing, trackEvent } from "@/lib/nextStep";
 
 const STRATEGY_CALL_URL = "https://calendly.com/roryangusrussell/30min";
 const SCC_MANAGEMENT_URL = "https://santacatarinacollection.com/en";
-const STRIPE_SINGLE_AUDIT_URL = "https://buy.stripe.com/14AeVfamFg2KbVQgGVaMU00";
-const STRIPE_FIVE_PACK_URL = "https://buy.stripe.com/bJe3cx1Q94k22lgbmBaMU01";
 
 export function NextStepTab({ email, data }: { email: string; data: AuditResponse }) {
   const isPT = isPortugalListing(data);
@@ -45,7 +43,7 @@ export function NextStepTab({ email, data }: { email: string; data: AuditRespons
         </h3>
         <div className="mt-3 space-y-2.5">
           <ReferralCard email={email} />
-          <BuyAuditsCard />
+          <AuditAnotherCard />
         </div>
       </section>
 
@@ -183,48 +181,32 @@ function ReferralCard({ email }: { email: string }) {
   );
 }
 
-function BuyAuditsCard() {
+function AuditAnotherCard() {
   return (
     <div className="rounded-[14px] border bg-card px-5 py-4 sm:px-6 sm:py-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3.5">
           <span className="flex h-9 w-9 flex-none items-center justify-center rounded-[8px] bg-brand-soft">
-            <Tag className="h-4 w-4 text-brand" />
+            <Search className="h-4 w-4 text-brand" />
           </span>
           <div className="min-w-0 flex-1">
             <div className="text-[14px] font-semibold text-foreground">
-              Audit another listing now
+              Audit another listing
             </div>
             <div className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
-              Useful for comparing listings or checking a small portfolio.
+              The diagnosis is always free. Run it on another property, then unlock its Fix Plan if you want the rewrites.
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-none sm:flex-row sm:items-center sm:justify-end">
+        <div className="flex sm:flex-none sm:justify-end">
           <a
-            href={STRIPE_SINGLE_AUDIT_URL}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => trackEvent("clicked_buy_one_audit")}
-            className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-[10px] border bg-card px-4 text-[12.5px] font-semibold text-foreground transition-colors hover:bg-muted/40 sm:w-auto"
+            href="/"
+            onClick={() => trackEvent("clicked_audit_another")}
+            className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-[10px] bg-brand px-4 text-[12.5px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90 sm:w-auto"
           >
-            Buy 1 for €15
+            Audit another listing
+            <ArrowRight className="h-3.5 w-3.5" />
           </a>
-          <div className="relative">
-            <a
-              href={STRIPE_FIVE_PACK_URL}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => trackEvent("clicked_buy_five_audits")}
-              className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-[10px] bg-brand px-4 text-[12.5px] font-semibold text-brand-foreground shadow-sm transition-colors hover:bg-brand/90 sm:w-auto"
-            >
-              Buy 5 for €39
-              <ArrowRight className="h-3.5 w-3.5" />
-            </a>
-            <span className="pointer-events-none absolute -top-2 right-2 rounded-full bg-foreground px-2 py-[2px] text-[9px] font-bold uppercase tracking-[0.1em] text-background">
-              Best value
-            </span>
-          </div>
         </div>
       </div>
     </div>
