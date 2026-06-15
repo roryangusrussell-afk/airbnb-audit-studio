@@ -217,13 +217,21 @@ describe("useAuditFlow", () => {
     expect(runAudit).toHaveBeenCalledTimes(1);
   });
 
-  it("defaults to locked (unlocked=false) and flips unlocked when ?unlock=1 is present", async () => {
+  it("defaults to locked, and the ?unlock=1 dev override unlocks the report once it loads", async () => {
     const lockedHook = renderHook(() => useAuditFlow());
     expect(lockedHook.result.current.unlocked).toBe(false);
 
+    // The dev override no longer flips unlocked on an empty mount: there is no
+    // report to unlock yet. It applies once an audit loads (cleartext fixes
+    // here, since the seal is a backend concern not exercised in this mock).
     setLocation({ hostname: "example.com", search: "?unlock=1" });
-    const unlockedHook = renderHook(() => useAuditFlow());
-    expect(unlockedHook.result.current.unlocked).toBe(true);
+    const { result } = renderHook(() => useAuditFlow());
+    expect(result.current.unlocked).toBe(false);
+
+    await act(async () => {
+      await result.current.submitUrl(URL);
+    });
+    expect(result.current.unlocked).toBe(true);
   });
 
   it("bypasses the cap on localhost", async () => {

@@ -108,7 +108,10 @@ export interface AuditResponse {
   cats: Cat[];
   checks: Check[];
   issues: Issue[];
-  fixes: Fix[];
+  // Paid Fix Plan field. Absent in the free response when the backend seal is
+  // enabled (delivered encrypted in `fixesSealed`); fetched via /api/fix-plan
+  // after payment, then merged in. Present in the clear when the seal is off.
+  fixes?: Fix[];
   wins: string[];
   advisoryNotes: AdvisoryNote[];
   categoryRatings: CategoryRating[];
@@ -152,6 +155,11 @@ export interface AuditResponse {
   subsections?: ListingSubsections;
   houseRules?: string;
   rewrites?: Rewrites;
+  // Fix Plan gate: when the backend seal is on, the paid fields travel here
+  // encrypted and `hasFixes` flags that there is a plan to unlock. Opened by
+  // /api/fix-plan after payment.
+  fixesSealed?: string;
+  hasFixes?: boolean;
 }
 
 export interface PatternItem {

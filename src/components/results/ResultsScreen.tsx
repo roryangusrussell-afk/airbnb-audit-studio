@@ -28,6 +28,7 @@ export function ResultsScreen({
   onUseCredit,
   creditsRemaining = 0,
   locked = false,
+  unlocking = false,
   topSlot,
 }: {
   data: AuditResponse;
@@ -38,6 +39,7 @@ export function ResultsScreen({
   onUseCredit?: () => void;
   creditsRemaining?: number;
   locked?: boolean;
+  unlocking?: boolean;
   topSlot?: React.ReactNode;
 }) {
   const [activeTab, setActiveTab] = useState<TabKey>("summary");
@@ -54,6 +56,7 @@ export function ResultsScreen({
           onCheckout={onCheckout ?? (() => {})}
           onUseCredit={onUseCredit}
           creditsRemaining={creditsRemaining}
+          unlocking={unlocking}
           onEmailSummary={onSubmitEmail ? () => setSummaryModalOpen(true) : undefined}
         />
         <EmailGateModal

@@ -1,4 +1,4 @@
-import { ArrowLeft, Lock, Stethoscope, Wrench } from "lucide-react";
+import { ArrowLeft, Loader2, Lock, Stethoscope, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ListingCard } from "./ListingCard";
 import { BottomTenRiskBanner } from "./BottomTenRiskBanner";
@@ -37,6 +37,7 @@ export function LockedReport({
   onCheckout,
   onUseCredit,
   creditsRemaining = 0,
+  unlocking = false,
   onEmailSummary,
   onAuditAnother,
   topSlot,
@@ -45,6 +46,7 @@ export function LockedReport({
   onCheckout: (tier: FixPlanTier) => void;
   onUseCredit?: () => void;
   creditsRemaining?: number;
+  unlocking?: boolean;
   onEmailSummary?: () => void;
   onAuditAnother: () => void;
   topSlot?: React.ReactNode;
@@ -56,6 +58,13 @@ export function LockedReport({
   return (
     <div className="container max-w-[1180px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       {topSlot}
+
+      {unlocking && (
+        <div className="mb-4 flex items-center gap-2.5 rounded-2xl border border-brand-border bg-brand-soft/50 px-4 py-3 text-[13px] font-medium text-brand" role="status">
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          Payment confirmed. Preparing your fixes...
+        </div>
+      )}
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-print-hide>
         <div className="eyebrow">Your audit report</div>

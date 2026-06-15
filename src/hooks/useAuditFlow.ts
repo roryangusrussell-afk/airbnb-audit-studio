@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   AuditError,
   captureLead,
   createCheckout,
+  fetchFixPlan,
   peekListing,
   redeemRef,
   runAudit,
@@ -20,32 +22,37 @@ const PENDING_REF_KEY = "pendingRef";
 const AUDITS_RUN_KEY = "auditsRun";
 // Local unlock tracking (cosmetic gate, v1). The Stripe webhook is the durable
 // record; these keep the same-browser experience consistent across refreshes.
-const UNLOCKED_LISTINGS_KEY = "unlockedListings"; // string[] of unlocked listingIds
-const PACK_CREDITS_KEY = "fixPlanCredits"; // remaining portfolio-pack unlocks
+const UNLOCKED_LISTINGS_KEY = "unlockedListings"; // { [listingId]: stripeSessionId }
+const PACK_CREDITS_KEY = "fixPlanCredits"; // remaining portfolio-pack unlocks (UI count)
+const PACK_SESSION_KEY = "fixPlanPackSession"; // portfolio session, reused for banked unlocks
 const PENDING_UNLOCK_KEY = "pendingUnlockAudit"; // {url,data} cached before Stripe redirect
 const LEAD_TRACKED_KEY = "metaLeadTracked"; // fire the Meta Lead event at most once per browser
 
-function readUnlockedListings(): string[] {
-  if (typeof window === "undefined") return [];
+// Map of listingId -> the Stripe session id that unlocked it. Persisted so a
+// re-audit of a paid listing can re-fetch its (now freshly generated) fixes
+// server-side. Tolerates the legacy string[] format from before the seal gate.
+function readUnlocks(): Record<string, string> {
+  if (typeof window === "undefined") return {};
   try {
-    const v = JSON.parse(localStorage.getItem(UNLOCKED_LISTINGS_KEY) || "[]");
-    return Array.isArray(v) ? v : [];
+    const v = JSON.parse(localStorage.getItem(UNLOCKED_LISTINGS_KEY) || "{}");
+    if (Array.isArray(v)) return Object.fromEntries(v.map((id) => [String(id), ""]));
+    return v && typeof v === "object" ? (v as Record<string, string>) : {};
   } catch {
-    return [];
+    return {};
   }
 }
 
-function isListingUnlocked(id?: string): boolean {
-  return !!id && readUnlockedListings().includes(id);
+function getUnlockSession(id?: string): string | undefined {
+  if (!id) return undefined;
+  const m = readUnlocks();
+  return Object.prototype.hasOwnProperty.call(m, id) ? m[id] : undefined;
 }
 
-function markListingUnlocked(id?: string): void {
+function markListingUnlocked(id?: string, sessionId = ""): void {
   if (!id || typeof window === "undefined") return;
-  const list = readUnlockedListings();
-  if (!list.includes(id)) {
-    list.push(id);
-    localStorage.setItem(UNLOCKED_LISTINGS_KEY, JSON.stringify(list));
-  }
+  const m = readUnlocks();
+  m[id] = sessionId || m[id] || "";
+  localStorage.setItem(UNLOCKED_LISTINGS_KEY, JSON.stringify(m));
 }
 
 function readPackCredits(): number {
@@ -78,10 +85,63 @@ export function useAuditFlow() {
   const [creditsRemaining, setCreditsRemaining] = useState(0);
   const completedCountRef = useRef(0);
   const pendingUrlRef = useRef<string>("");
-  // Forces unlocked regardless of listing; set by the ?unlock=1 dev/demo override.
+  // Forces unlocked regardless of listing; set by the ?unlock= dev/demo override.
   const devUnlockRef = useRef(false);
+  // Dev/demo unlock key passed as ?unlock=<DEV_UNLOCK_SECRET>; sent to fix-plan
+  // so demos can open sealed fixes without paying.
+  const devKeyRef = useRef<string>("");
+  // True while we're fetching the paid fixes after a confirmed unlock.
+  const [fixesLoading, setFixesLoading] = useState(false);
 
-  // First load: capture ?ref=, honour ?unlock=1, restore pack credits, and
+  // Unlock a listing by fetching its paid fixes from the server (which verifies
+  // payment) and merging them into the report. `auth` is a paid Stripe session
+  // or a dev key. When the backend seal is off, fixes arrive in the clear and we
+  // just flip the flag. Returns true on success.
+  const unlockListingWithFixes = useCallback(
+    async (
+      targetData: AuditResponse,
+      auth: { sessionId?: string; devKey?: string },
+    ): Promise<boolean> => {
+      if (!targetData) return false;
+      // Sealing disabled on the backend: fixes are already present in the clear.
+      if (targetData.fixes) {
+        if (auth.sessionId) markListingUnlocked(targetData.listingId, auth.sessionId);
+        setUnlocked(true);
+        return true;
+      }
+      if (!targetData.fixesSealed) return false;
+      setFixesLoading(true);
+      try {
+        const fp = await fetchFixPlan({
+          fixesSealed: targetData.fixesSealed,
+          sessionId: auth.sessionId,
+          devKey: auth.devKey,
+        });
+        if (fp && (fp.fixes || fp.rewrites)) {
+          setData((prev) => {
+            const base = prev && prev.listingId === targetData.listingId ? prev : targetData;
+            return {
+              ...base,
+              fixes: fp.fixes ?? base.fixes,
+              rewrites: fp.rewrites ?? base.rewrites,
+            };
+          });
+          if (auth.sessionId) markListingUnlocked(targetData.listingId, auth.sessionId);
+          setUnlocked(true);
+          return true;
+        }
+        toast.error(
+          "We couldn't load your fixes. If you were charged, email rory@santacatarinacollection.com and I'll sort it straight away.",
+        );
+        return false;
+      } finally {
+        setFixesLoading(false);
+      }
+    },
+    [],
+  );
+
+  // First load: capture ?ref=, honour ?unlock=, restore pack credits, and
   // handle the Stripe success return (?fixplan=success&session_id=...).
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -90,9 +150,13 @@ export function useAuditFlow() {
     const ref = params.get("ref");
     if (ref) localStorage.setItem(PENDING_REF_KEY, ref);
 
-    if (params.get("unlock") === "1") {
+    const unlockParam = params.get("unlock");
+    if (unlockParam) {
+      // Dev/demo override. ?unlock=1 is the legacy local form (works only when
+      // the backend seal is off). ?unlock=<DEV_UNLOCK_SECRET> opens sealed fixes
+      // for demos by passing the key through to fix-plan once an audit runs.
       devUnlockRef.current = true;
-      setUnlocked(true);
+      if (unlockParam !== "1") devKeyRef.current = unlockParam;
     }
 
     setCreditsRemaining(readPackCredits());
@@ -118,26 +182,38 @@ export function useAuditFlow() {
         if (sessionId) {
           const v = await verifyCheckout(sessionId);
           if (v?.paid) {
-            const listingId = cached?.data?.listingId || v.listingId;
-            markListingUnlocked(listingId);
-            setUnlocked(true);
             if (v.email) {
               setEmailState(v.email);
               localStorage.setItem(EMAIL_KEY, v.email);
             }
-            // Portfolio pack: bank the unlocks beyond the one just used.
+            // Portfolio pack: bank the unlocks beyond the one just used, and
+            // remember the session so banked unlocks on other listings can be
+            // verified server-side.
             const granted =
               typeof v.credits === "number" && v.credits > 0
                 ? v.credits
                 : v.plan === "portfolio"
                 ? 10
                 : 1;
+            if (v.plan === "portfolio" || granted > 1) {
+              localStorage.setItem(PACK_SESSION_KEY, sessionId);
+            }
             if (granted > 1) {
               const remaining = readPackCredits() + (granted - 1);
               writePackCredits(remaining);
               setCreditsRemaining(remaining);
             }
             localStorage.removeItem(PENDING_UNLOCK_KEY);
+
+            // Fetch the now-paid fixes and merge them in, recording the session
+            // against the listing so a later re-audit can re-fetch. If
+            // localStorage was cleared mid-checkout there's no sealed blob to
+            // open, so just mark it paid; re-running the audit will unlock it.
+            if (cached?.data) {
+              await unlockListingWithFixes(cached.data, { sessionId });
+            } else {
+              markListingUnlocked(v.listingId, sessionId);
+            }
 
             // Fire the Meta Purchase event with the real amount + currency from
             // the verified Stripe session. amountTotal is in minor units (cents),
@@ -166,7 +242,7 @@ export function useAuditFlow() {
         window.history.replaceState({}, "", clean.toString());
       })();
     }
-  }, []);
+  }, [unlockListingWithFixes]);
 
   const startCheckout = useCallback(
     async (tier: FixPlanTier) => {
@@ -192,15 +268,26 @@ export function useAuditFlow() {
     [data, url],
   );
 
-  // Spend a banked portfolio-pack unlock on the current listing.
-  const useFixPlanCredit = useCallback(() => {
-    if (creditsRemaining <= 0 || !data?.listingId) return;
-    markListingUnlocked(data.listingId);
-    const remaining = creditsRemaining - 1;
-    writePackCredits(remaining);
-    setCreditsRemaining(remaining);
-    setUnlocked(true);
-  }, [creditsRemaining, data]);
+  // Spend a banked portfolio-pack unlock on the current listing. The pack's
+  // Stripe session is the credential: fix-plan verifies it and enforces the
+  // 10-listing cap server-side, so this can't be forged from localStorage.
+  const useFixPlanCredit = useCallback(async () => {
+    if (!data?.listingId) return;
+    const packSession =
+      typeof window !== "undefined" ? localStorage.getItem(PACK_SESSION_KEY) : null;
+    if (!packSession) {
+      toast.error(
+        "We couldn't find your portfolio pack on this device. Reopen your purchase confirmation, or email rory@santacatarinacollection.com.",
+      );
+      return;
+    }
+    const ok = await unlockListingWithFixes(data, { sessionId: packSession });
+    if (ok) {
+      const remaining = Math.max(0, creditsRemaining - 1);
+      writePackCredits(remaining);
+      setCreditsRemaining(remaining);
+    }
+  }, [creditsRemaining, data, unlockListingWithFixes]);
 
   const setEmail = useCallback((value: string) => {
     setEmailState(value);
@@ -219,9 +306,19 @@ export function useAuditFlow() {
       try {
         const result = await runAudit(auditUrl);
         setData(result);
+        setUnlocked(false);
         setStatus("results");
-        // Unlock if this listing was already paid for, or the dev override is on.
-        setUnlocked(devUnlockRef.current || isListingUnlocked(result.listingId));
+        // Decide unlock. Cleartext fixes (seal off): unlock if dev or already
+        // paid. Sealed: re-fetch the paid fixes using the dev key or the stored
+        // session for this listing (covers the free re-audit of a paid listing).
+        const unlockSession = getUnlockSession(result.listingId);
+        if (result.fixes) {
+          setUnlocked(devUnlockRef.current || unlockSession !== undefined);
+        } else if (devUnlockRef.current) {
+          void unlockListingWithFixes(result, { devKey: devKeyRef.current });
+        } else if (unlockSession) {
+          void unlockListingWithFixes(result, { sessionId: unlockSession });
+        }
         completedCountRef.current += 1;
 
         if (typeof window !== "undefined") {
@@ -268,7 +365,7 @@ export function useAuditFlow() {
         setStatus("error");
       }
     },
-    [],
+    [unlockListingWithFixes],
   );
 
   const submitUrl = useCallback(
@@ -335,6 +432,7 @@ export function useAuditFlow() {
     setUrl("");
     setPeekData(null);
     setUnlocked(devUnlockRef.current);
+    setFixesLoading(false);
     pendingUrlRef.current = "";
   }, []);
 
@@ -357,6 +455,7 @@ export function useAuditFlow() {
     needsEmail,
     creditGateOpen,
     unlocked,
+    fixesLoading,
     creditsRemaining,
     submitUrl,
     submitEmail,

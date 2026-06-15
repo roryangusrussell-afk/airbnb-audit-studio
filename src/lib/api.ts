@@ -1,4 +1,4 @@
-import type { AuditResponse } from "./types";
+import type { AuditResponse, Fix, Rewrites } from "./types";
 
 const BASE = "https://airbnb-audit-rho.vercel.app";
 
@@ -307,6 +307,37 @@ export async function createCheckout(payload: {
     return data.url ? { url: data.url } : null;
   } catch (err) {
     console.warn("[createCheckout] failed", (err as Error)?.message);
+    return null;
+  }
+}
+
+export interface FixPlanResult {
+  fixes?: Fix[] | null;
+  rewrites?: Rewrites | null;
+}
+
+// Fetch the paid Fix Plan fields for a sealed audit after payment. The backend
+// verifies the Stripe session (or dev key) before returning anything; on any
+// failure this returns null so the report stays locked.
+export async function fetchFixPlan(payload: {
+  fixesSealed: string;
+  sessionId?: string;
+  devKey?: string;
+}): Promise<FixPlanResult | null> {
+  try {
+    const res = await fetch(`${BASE}/api/fix-plan`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const detail = await readBodySnippet(res);
+      console.warn("[fetchFixPlan] non-OK", { status: res.status, detail });
+      return null;
+    }
+    return (await res.json()) as FixPlanResult;
+  } catch (err) {
+    console.warn("[fetchFixPlan] failed", (err as Error)?.message);
     return null;
   }
 }

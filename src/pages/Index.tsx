@@ -40,6 +40,7 @@ const Index = () => {
             onUseCredit={flow.useFixPlanCredit}
             creditsRemaining={flow.creditsRemaining}
             locked={!flow.unlocked}
+            unlocking={flow.fixesLoading}
           />
         )}
       </div>
