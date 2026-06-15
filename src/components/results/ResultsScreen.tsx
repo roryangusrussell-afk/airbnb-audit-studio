@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, FileText, Search, Wrench, Stethoscope } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, Wrench, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListingCard } from "./ListingCard";
@@ -124,15 +124,15 @@ export function ResultsScreen({
             value="breakdown"
             className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
           >
-            <Search className="h-3.5 w-3.5" />
-            Breakdown
+            <Wrench className="h-3.5 w-3.5" />
+            Get fixes
           </TabsTrigger>
           <TabsTrigger
             value="next"
             className="gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm text-muted-foreground transition-colors data-[state=active]:border-brand-border data-[state=active]:bg-brand-soft data-[state=active]:text-brand data-[state=active]:shadow-none"
           >
-            <Wrench className="h-3.5 w-3.5" />
-            Get fixes
+            <ArrowRight className="h-3.5 w-3.5" />
+            Next steps
           </TabsTrigger>
         </TabsList>
         <TabsContent value="summary" className="mt-3">
