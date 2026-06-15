@@ -1,10 +1,11 @@
 import { LegalLayout } from "@/components/LegalLayout";
 
 const Cookies = () => (
-  <LegalLayout title="Cookies" lastUpdated="11 May 2026">
+  <LegalLayout title="Cookies" lastUpdated="15 June 2026">
     <p>
       Auditable uses a small number of cookies and local storage entries to run the audit and remember
-      your email between visits. We don't use advertising or tracking cookies.
+      your email between visits. We also use the Meta (Facebook) Pixel for advertising measurement,
+      which sets advertising cookies. Details are below.
     </p>
 
     <h2>What we use</h2>
@@ -20,8 +21,17 @@ const Cookies = () => (
     <h3>Analytics</h3>
     <p>
       We use <strong>Vercel Analytics</strong> to count page views and understand referrers. This is
-      cookieless and uses a hashed visitor signature that cannot identify you. No personal data is
-      transmitted to advertising networks.
+      cookieless and uses a hashed visitor signature that cannot identify you. Vercel Analytics is
+      separate from the advertising pixel below and transmits no data to advertising networks.
+    </p>
+
+    <h3>Advertising</h3>
+    <p>
+      We use the <strong>Meta Pixel</strong> on this site. It sets cookies (such as <strong>_fbp</strong>)
+      and reports actions like page views, report requests, and purchases back to Meta, so we can
+      measure whether our advertising works. This is the only advertising or tracking cookie we use.
+      You can opt out through your Meta ad preferences, your browser's cookie controls, or by emailing
+      us.
     </p>
 
     <h2>How to control them</h2>
@@ -33,9 +43,10 @@ const Cookies = () => (
 
     <h2>Third-party services</h2>
     <p>
-      Auditable embeds no third-party content. The audit calls our own backend, which in turn talks
-      to Anthropic and Apify (see <a href="/privacy">Privacy Policy</a>). Those calls happen
-      server-side and don't drop cookies in your browser.
+      The audit calls our own backend, which in turn talks to Anthropic and Apify (see
+      <a href="/privacy">Privacy Policy</a>). Those calls happen server-side and don't drop cookies in
+      your browser. The exception is the Meta Pixel described above, which loads from Meta in your
+      browser and does set cookies.
     </p>
 
     <h2>Changes</h2>

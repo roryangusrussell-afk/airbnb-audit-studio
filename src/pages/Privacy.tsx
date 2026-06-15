@@ -1,7 +1,7 @@
 import { LegalLayout } from "@/components/LegalLayout";
 
 const Privacy = () => (
-  <LegalLayout title="Privacy Policy" lastUpdated="21 May 2026">
+  <LegalLayout title="Privacy Policy" lastUpdated="15 June 2026">
     <p>
       This policy explains what data Auditable collects, why, and what you can do about it.
       Auditable is operated by Rory Russell, based in Lisbon, Portugal. If you have any questions
@@ -28,6 +28,12 @@ const Privacy = () => (
       <li>
         <strong>Marketing opt-in flag</strong>, if you tick the box, along with the timestamp of
         when you gave consent.
+      </li>
+      <li>
+        <strong>Advertising and conversion events</strong>, via the Meta (Facebook) Pixel. When you
+        visit the site it records actions such as viewing the page, requesting your report, and
+        completing a purchase, so we can measure whether our advertising works. It sets Meta cookies
+        and may share these events along with your device or cookie identifiers with Meta.
       </li>
     </ul>
 
@@ -56,9 +62,14 @@ const Privacy = () => (
       <li><strong>Resend</strong>: to deliver the audit report email (US; transferred under Standard Contractual Clauses).</li>
       <li><strong>A data fetching service</strong>: to retrieve the public listing page. No personal data is shared beyond the listing URL.</li>
       <li><strong>Internal records system</strong>: to log audits for support and service improvement.</li>
+      <li><strong>Meta (Facebook)</strong>: advertising measurement via the Meta Pixel. Limited event data (such as page views, report requests, and purchases, including the amount paid) and Meta cookie identifiers are shared with Meta so we can measure and improve our advertising (US; transferred under Standard Contractual Clauses).</li>
     </ul>
     <p>
-      We do not sell your data. We do not share it with advertisers or data brokers.
+      We do not sell your personal data for money. We do use the Meta Pixel to measure our
+      advertising, which involves sharing the limited event data described above with Meta. If you
+      are a California resident, you have the right to opt out of this sharing: email us with the
+      subject line "Do not share" and we will disable advertising tracking for you. Aside from the
+      providers listed here, we do not share your data with data brokers.
     </p>
 
     <h2>How long we keep data</h2>
