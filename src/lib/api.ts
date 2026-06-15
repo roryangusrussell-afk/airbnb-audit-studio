@@ -317,6 +317,11 @@ export interface CheckoutVerification {
   plan?: string;
   credits?: number;
   listingId?: string;
+  // Real paid amount in the smallest currency unit (e.g. cents) and the ISO
+  // currency code, read straight from the Stripe session. Used to fire the
+  // Meta Purchase event with the actual amount paid rather than a hardcode.
+  amountTotal?: number;
+  currency?: string;
 }
 
 // Confirm a Stripe Checkout session is paid (same-session unlock after the

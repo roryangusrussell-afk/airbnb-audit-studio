@@ -9,6 +9,7 @@ import {
   verifyCheckout,
 } from "@/lib/api";
 import type { PeekData } from "@/lib/api";
+import { trackLead, trackPurchase } from "@/lib/metaPixel";
 import type { AuditResponse } from "@/lib/types";
 
 export type FlowStatus = "landing" | "loading" | "results" | "error" | "paywall";
@@ -22,6 +23,7 @@ const AUDITS_RUN_KEY = "auditsRun";
 const UNLOCKED_LISTINGS_KEY = "unlockedListings"; // string[] of unlocked listingIds
 const PACK_CREDITS_KEY = "fixPlanCredits"; // remaining portfolio-pack unlocks
 const PENDING_UNLOCK_KEY = "pendingUnlockAudit"; // {url,data} cached before Stripe redirect
+const LEAD_TRACKED_KEY = "metaLeadTracked"; // fire the Meta Lead event at most once per browser
 
 function readUnlockedListings(): string[] {
   if (typeof window === "undefined") return [];
@@ -136,6 +138,24 @@ export function useAuditFlow() {
               setCreditsRemaining(remaining);
             }
             localStorage.removeItem(PENDING_UNLOCK_KEY);
+
+            // Fire the Meta Purchase event with the real amount + currency from
+            // the verified Stripe session. amountTotal is in minor units (cents),
+            // Meta expects major units. eventID = the Stripe session id, so a
+            // refresh (params are stripped below) or a future server-side CAPI
+            // event dedupes to a single purchase. Falls back to the list price
+            // only if Stripe somehow returned no amount.
+            const value =
+              typeof v.amountTotal === "number" && v.amountTotal > 0
+                ? v.amountTotal / 100
+                : v.plan === "portfolio"
+                ? 79
+                : 19;
+            trackPurchase({
+              value,
+              currency: v.currency || "USD",
+              eventID: sessionId,
+            });
           }
         }
 
@@ -294,6 +314,14 @@ export function useAuditFlow() {
           consentText: payload.consentText,
           source: payload.consentSource ?? "gate_panel",
         });
+
+        // Signup complete: fire the Meta Lead event once per browser. The gate
+        // only shows when no email is stored, so this is the new-lead moment;
+        // returning visitors with a stored email never reach here.
+        if (typeof window !== "undefined" && !localStorage.getItem(LEAD_TRACKED_KEY)) {
+          trackLead({ content_name: "free_audit_email_capture" });
+          localStorage.setItem(LEAD_TRACKED_KEY, "1");
+        }
       }
     },
     [data, setEmail, url],
