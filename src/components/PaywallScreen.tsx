@@ -13,17 +13,17 @@ import {
 } from "lucide-react";
 
 const STRATEGY_CALL_URL = "https://calendly.com/roryangusrussell/30min";
-const STRIPE_SINGLE_AUDIT_URL = "https://buy.stripe.com/14AeVfamFg2KbVQgGVaMU00";
-const STRIPE_FIVE_PACK_URL = "https://buy.stripe.com/bJe3cx1Q94k22lgbmBaMU01";
 
 export function PaywallScreen({
   url: _url,
   email: _email,
   onReset,
+  onCheckout,
 }: {
   url: string;
   email: string;
   onReset: () => void;
+  onCheckout: (tier: "single" | "portfolio") => void;
 }) {
   return (
     <div className="container max-w-[760px] px-4 py-8 sm:px-6 sm:py-12">
@@ -50,7 +50,7 @@ export function PaywallScreen({
             </h1>
             <p className="mx-auto mt-2.5 max-w-[46ch] text-[14px] leading-6 text-muted-foreground">
               Book a free call to go through your results together, or buy
-              credits to audit more listings at €15 each.
+              another full Fix Plan for $19.
             </p>
           </div>
           <div className="mt-1 inline-flex items-center gap-3 rounded-[12px] bg-muted/40 px-4 py-2.5 text-left">
@@ -111,10 +111,9 @@ export function PaywallScreen({
           </div>
         </div>
         <div className="space-y-3 px-6 pt-3 pb-7 sm:px-10 sm:pb-8">
-          <a
-            href={STRIPE_FIVE_PACK_URL}
-            target="_blank"
-            rel="noreferrer"
+          <button
+            type="button"
+            onClick={() => onCheckout("portfolio")}
             className="group flex w-full items-start gap-4 rounded-[14px] border bg-card px-5 py-4 transition-colors hover:border-brand-border hover:bg-brand-soft/40 sm:items-center"
           >
             <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brand-soft">
@@ -123,23 +122,22 @@ export function PaywallScreen({
             <span className="min-w-0 flex-1 text-left">
               <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                 <span className="text-[15px] font-bold text-foreground">
-                  Buy 5 audits for €39
+                  Fix up to 10 listings for $79
                 </span>
                 <span className="inline-flex items-center rounded-full bg-brand-soft px-2 py-[2px] text-[10px] font-bold uppercase tracking-[0.1em] text-brand">
                   Best value
                 </span>
               </span>
               <span className="mt-1 block text-[12.5px] leading-relaxed text-muted-foreground">
-                €7.80 per audit. Best for anyone with two or more listings.
+                One payment for your portfolio. Best for anyone with three or more listings.
               </span>
             </span>
             <ArrowRight className="h-4 w-4 flex-none text-brand transition-transform group-hover:translate-x-0.5" />
-          </a>
+          </button>
 
-          <a
-            href={STRIPE_SINGLE_AUDIT_URL}
-            target="_blank"
-            rel="noreferrer"
+          <button
+            type="button"
+            onClick={() => onCheckout("single")}
             className="group flex w-full items-start gap-4 rounded-[14px] border bg-card px-5 py-4 transition-colors hover:border-brand-border hover:bg-brand-soft/30 sm:items-center"
           >
             <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-muted">
@@ -147,14 +145,14 @@ export function PaywallScreen({
             </span>
             <span className="min-w-0 flex-1 text-left">
               <span className="block text-[15px] font-semibold text-foreground">
-                Buy 1 audit for €15
+                Get 1 Fix Plan for $19
               </span>
               <span className="mt-1 block text-[12.5px] leading-relaxed text-muted-foreground">
                 One listing. Same full report, same paste-ready rewrites.
               </span>
             </span>
             <ArrowRight className="h-4 w-4 flex-none text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-          </a>
+          </button>
         </div>
 
         <div className="flex items-center justify-center gap-2.5 border-t bg-muted/20 px-6 py-4 text-center sm:px-10">
