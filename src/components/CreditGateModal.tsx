@@ -261,11 +261,11 @@ export function CreditGateModal({
                 aria-label="Buy one audit for 19 dollars"
               />
               <BuyRow
-                label="5 audits"
+                label="Up to 10 Fix Plans"
                 price="$79"
-                originalPrice="$95"
-                savingsNote="Save $16"
-                aria-label="Buy five audits for 79 dollars"
+                originalPrice="$190"
+                savingsNote="Save $111"
+                aria-label="Buy up to ten Fix Plans for 79 dollars"
               />
               <BuyRow
                 label="Portfolio / Enterprise"

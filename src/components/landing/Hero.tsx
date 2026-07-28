@@ -22,8 +22,8 @@ const trustItems = [
   },
   {
     icon: Zap,
-    title: "Free, then €15 per audit",
-    body: "First audit is free after email. Each additional audit is €15, or €39 for five.",
+    title: "Free diagnosis, then $19 for the Fix Plan",
+    body: "See your score and category breakdown free. Unlock one full Fix Plan for $19, or up to 10 for $79.",
   },
 ];
 

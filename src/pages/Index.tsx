@@ -28,7 +28,12 @@ const Index = () => {
           <ErrorScreen message={flow.error} detail={flow.errorDetail} onRetry={flow.retry} onReset={flow.reset} />
         )}
         {flow.status === "paywall" && (
-          <PaywallScreen url={flow.url} email={flow.email} onReset={flow.reset} />
+          <PaywallScreen
+            url={flow.url}
+            email={flow.email}
+            onReset={flow.reset}
+            onCheckout={flow.startCheckout}
+          />
         )}
         {flow.status === "results" && flow.data && (
           <ResultsScreen
