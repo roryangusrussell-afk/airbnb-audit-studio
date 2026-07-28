@@ -5,6 +5,14 @@ AI-powered listing audit frontend for Airbnb hosts and short-term rental operato
 Live app: [airbnb-audit-studio.vercel.app](https://airbnb-audit-studio.vercel.app)  
 Sample report: [airbnb-audit-studio.vercel.app/sample](https://airbnb-audit-studio.vercel.app/sample)
 
+## Thirty-second review
+
+- **Business problem:** hosts cannot easily tell which listing changes will improve clarity, conversion and AI-mediated discovery.
+- **Product:** a live audit flow that turns a public Airbnb URL into diagnostics, prioritised fixes and safe paste-ready rewrites.
+- **Commercial use:** the wider production system has analysed a 5,700-listing Lisbon dataset and supported an audit-led owner acquisition motion.
+- **Trust boundary:** unsupported claims are omitted or bracketed, the tool never edits a listing, and the operational backend remains private.
+- **Verification:** 81 frontend tests cover scoring, API failures, validation, state transitions, email capture and user actions.
+
 ## What it is
 
 Airbnb Audit Studio lets a host paste a public Airbnb listing URL and receive a structured report on how clearly the listing reads to guests and Airbnb's AI features.
@@ -113,6 +121,8 @@ npm run test
 npm run build
 ```
 
+These checks also run automatically on every push and pull request.
+
 ## Public-safety note
 
 This repo does not contain production API keys, scraper tokens, payment secrets, private host data, guest data, or backend prompts. The frontend may include public endpoint URLs and a build-time audit-token header hook. That token is documented in code as a rotatable speed bump, not real authentication.
@@ -146,4 +156,3 @@ I built a frontend that turns the audit into a guided workflow:
 ## Status
 
 This is a working frontend connected to a production backend. The public repo is intended as a portfolio and product case study. The operational backend remains private because it contains paid API integrations, internal logging, and prompt/rubric implementation details.
-
