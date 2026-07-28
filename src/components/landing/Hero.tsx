@@ -72,7 +72,9 @@ export function Hero({ onSubmit }: { onSubmit: (url: string) => void }) {
               your Airbnb listing<span className="text-brand">.</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Paste your listing URL. We score your title, photos, description, amenities, and reviews — then send you paste-ready rewrites you can drop straight into Airbnb. First audit is free.
+              Paste your listing URL for a free score and category breakdown.
+              If you want to act on it, unlock paste-ready rewrites and a
+              ranked Fix Plan you can use in Airbnb.
             </p>
 
             <div className="mt-8 max-w-xl space-y-3">
